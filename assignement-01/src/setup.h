@@ -22,6 +22,4 @@ void setUpButtons();
 
 //void setUpLCD();
 
-void setUpInterrupt();
-
 #endif

@@ -5,8 +5,8 @@
 void setup() {
   setUpLeds();
   setUpButtons();
+  //setUpLCD();
   setUpWaitInterrupt();
-  
   //randomSeed(analogRead(A0)); // inizializza casualità
 }
 

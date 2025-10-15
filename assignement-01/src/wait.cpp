@@ -7,6 +7,7 @@ bool displayed = false;
 int currentValue = 0;
 int direction = 1;
 
+
 void waitModeOperations(){
   fadingLed();
   if (!displayed){
@@ -36,6 +37,5 @@ void checkStartButton() { //check for bouncing
     displayed = false;
     waiting = false;
     analogWrite(LED_RED_PIN, 0);
-    //diplay: GO!
   }
 }
