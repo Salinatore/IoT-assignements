@@ -18,6 +18,16 @@ void loop() {
   if (currentWaiting) {
     waitModeOperations();
   } else {
+    if (firstGameRound) {
+      firstRoundOperations();
+    }
     gameModeOperations();
   }
+}
+
+void firstRoundOperations() {
+  analogWrite(LED_RED_PIN, 0);
+  //reset score
+  //GO!
+  wait(2000);
 }

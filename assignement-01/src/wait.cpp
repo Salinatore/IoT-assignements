@@ -2,6 +2,7 @@
 #include "setup.h"
 #include <Arduino.h>
 
+volatile bool firstGameRound = false;
 volatile bool waiting = true; 
 bool displayed = false;
 int currentValue = 0;
@@ -34,8 +35,8 @@ void setUpWaitInterrupt() {
 
 void checkStartButton() { //check for bouncing 
   if (waiting) {
+    firstGameRound = true;
     displayed = false;
     waiting = false;
-    analogWrite(LED_RED_PIN, 0);
   }
 }
