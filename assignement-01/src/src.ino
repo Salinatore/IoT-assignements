@@ -19,13 +19,13 @@ void loop() {
     waitModeOperations();
   } else {
     if (firstGameRound) {
-      firstRoundOperations();
+      firstGameRoundOperations();
     }
     gameModeOperations();
   }
 }
 
-void firstRoundOperations() {
+void firstGameRoundOperations() {
   analogWrite(LED_RED_PIN, 0);
   //reset score
   //GO!
