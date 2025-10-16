@@ -9,7 +9,7 @@
 #define LED1_PIN 10
 #define LED2_PIN 11
 #define LED3_PIN 12
-#define LED4_PIN 13
+#define LED4_PIN 13   
 #define LED_RED_PIN 9
 
 //#define I2C_ADDR    0x27
@@ -17,6 +17,8 @@
 //#define LCD_LINES   2
 
 void setUpLeds();
+
+void setUpButtons();
 
 void setUpButtons();
 

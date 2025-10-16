@@ -8,6 +8,8 @@ void waitModeOperations();
 
 void setUpWaitInterrupt();
 
+void detachWaitInterrupt();
+
 //internal procedure
 
 void fadingLed();

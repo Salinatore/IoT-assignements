@@ -1,8 +1,10 @@
 #include "setup.h"
 #include "game.h"
 #include "wait.h"
+#include "btn_control.h"
 
 void setup() {
+  Serial.begin(9600);
   setUpLeds();
   setUpButtons();
   //setUpLCD();
@@ -16,6 +18,7 @@ void loop() {
   interrupts();
   //remember to add deep state behaviour
   if (currentWaiting) {
+    Serial.println("waiting");
     waitModeOperations();
   } else {
     if (firstGameRound) {
@@ -27,7 +30,9 @@ void loop() {
 
 void firstGameRoundOperations() {
   analogWrite(LED_RED_PIN, 0);
-  //reset score
-  //GO!
-  wait(2000);
+  score = 0;
+  //display: GO!
+  detachWaitInterrupt();
+  setUpBTNControlInterrupt();
+  delay(2000);
 }

@@ -1,5 +1,6 @@
 #include "wait.h"
 #include "setup.h"
+#include "interrupt.h"
 #include <Arduino.h>
 
 volatile bool firstGameRound = false;
@@ -30,7 +31,7 @@ void dislpayWelcome() {
 }
 
 void setUpWaitInterrupt() {
-  attachInterrupt(digitalPinToInterrupt(BUTTON1_PIN), checkStartButton, RISING);
+  internalEnableInterrupt(BUTTON1_PIN, checkStartButton, RISING);
 }
 
 void checkStartButton() { //check for bouncing 
@@ -39,4 +40,8 @@ void checkStartButton() { //check for bouncing
     displayed = false;
     waiting = false;
   }
+}
+
+void detachWaitInterrupt() {
+  internalDisableInterrupt(BUTTON1_PIN);
 }
