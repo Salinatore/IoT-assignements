@@ -16,16 +16,19 @@ int score;
 
 //btn_pressed
 
-void startRound(int seq[N_BUTTONS]) {
+void generateSequence(int seq[N_BUTTONS]) {
   int pool[N_BUTTONS] = {1, 2, 3, 4};
-  for (int i = (N_BUTTONS - 1); i > 0; --i) {
-    int j = random(i + 1);
-    int tmp = pool[i];
-    pool[i] = pool[j];
-    pool[j] = tmp;
-  }
-  for (int i = 0; i < N_BUTTONS; i++) seq[i] = pool[i];
+    for (int i = (N_BUTTONS - 1); i > 0; --i) {
+      int j = random(i + 1);
+      int tmp = pool[i];
+      pool[i] = pool[j];
+      pool[j] = tmp;
+    }
+    for (int i = 0; i < N_BUTTONS; i++) seq[i] = pool[i];
+}
 
+void startRound(int seq[N_BUTTONS]) {
+  generateSequence(seq);
   time = millis(); //start the timer
   current = 0; //restart the current expected btn
 }
