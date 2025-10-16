@@ -37,7 +37,9 @@ void setup() {
   pinMode(BUTTON3_PIN, INPUT_PULLUP);
   pinMode(BUTTON4_PIN, INPUT_PULLUP);
 
-  randomSeed(analogRead(A0)); // inizializza casualità
+  randomSeed(analogRead(A0)); 
+  Serial.begin(9600);
+  Serial.print("Press Btn1 start ");// inizializza casualità
 }
 
 void generateSequence(int seq[4]) {
@@ -48,7 +50,10 @@ void generateSequence(int seq[4]) {
     pool[i] = pool[j];
     pool[j] = tmp;
   }
-  for (int i = 0; i < 4; i++) seq[i] = pool[i];
+  for (int i = 0; i < 4; i++) {
+    seq[i] = pool[i];
+    Serial.print(String(seq[i]));
+  }
 }
 
 void showSequenceLCD(int seq[4]) {
@@ -91,7 +96,7 @@ void loop() {
   //attesa start gioco
   if (!gameneedtostart) {
     lcd.setCursor(0, 0);
-    lcd.print("Press Btn1 start ");
+    Serial.println("Press Btn1 start ");
     if (digitalRead(BUTTON1_PIN) == LOW) {
       gameneedtostart = true;
       gameactivation = false;
@@ -133,15 +138,15 @@ void loop() {
       //se ho passato tutta la sequenza vittoria
       if (curretanswer >= 4) {
         lcd.clear();
-        lcd.print("WIN!");
+        Serial.print("WIN!");
         gameneedtostart = false;
         gameactivation = false;
         delay(1000);
       }
-    } else {
+    } else if(pressed != seq[curretanswer]){
       //errore nel bottone premuto
       lcd.clear();
-      lcd.print("LOSE!");
+      Serial.print("LOSE!");
       digitalWrite(LEDS_RED_PIN, HIGH);
       delay(500);
       digitalWrite(LEDS_RED_PIN, LOW);
