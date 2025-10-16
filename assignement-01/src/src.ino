@@ -37,6 +37,7 @@ void firstGameRoundOperations() {
   score = 0;
   //display: GO!
   Serial.println("GO!!");
+  t1=20000;
   detachWaitInterrupt();
   setUpBTNControlInterrupt();
   delay(2000);

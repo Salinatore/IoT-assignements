@@ -11,9 +11,25 @@
 bool roundActivation = true;
 int seq[N_BUTTONS];
 unsigned long time = 0;
-unsigned long t1 = 20000;
+unsigned long t1;
 int current;
 int score;
+
+int getLedPin(int buttonId) {
+  switch (buttonId) {
+    case 1: return LED1_PIN;
+    case 2: return LED2_PIN;
+    case 3: return LED3_PIN;
+    case 4: return LED4_PIN;
+    default: return -1;  // nessun LED associato
+  }
+}
+
+void turnOffAllGameLed() {
+  for (int i = 1; i <= N_BUTTONS; i++) {
+    digitalWrite(getLedPin(i), LOW);
+  }
+}
 
 void generateSequence(int seq[N_BUTTONS]) {
   int pool[N_BUTTONS] = { 1, 2, 3, 4 };
@@ -25,15 +41,13 @@ void generateSequence(int seq[N_BUTTONS]) {
   }
   for (int i = 0; i < N_BUTTONS; i++) {
     seq[i] = pool[i];
+    Serial.print(seq[i]);
   }
+  Serial.println("");
 }
 
 void startRound(int seq[N_BUTTONS]) {
   generateSequence(seq);
-  for (int i = 0; i < N_BUTTONS; i++) {
-    Serial.print(seq[i]);
-    Serial.print(" ");  // add a space or comma for clarity
-  }
   Serial.println();
   //display: sequence
   time = millis();  //start the timer
@@ -45,12 +59,14 @@ void nextRound() {
   t1 = t1 - 1000;
   score++;
   Serial.println("Score: " + String(score) + " WIN");
+  turnOffAllGameLed();
   //display score
   roundActivation = true;
 }
 
 void gameOver() {
   analogWrite(LED_RED_PIN, 255);
+  turnOffAllGameLed();
   delay(2000);
   Serial.println("Score: " + String(score) + " LOST");
   //print score
@@ -75,6 +91,7 @@ void manageGame() {
   if (currentBtnPressed == -1) return;
 
   if (currentBtnPressed == seq[current]) {
+    digitalWrite(getLedPin(seq[current]), HIGH);
     current++;
     Serial.println(String("current") + String(current));
     if (current >= N_BUTTONS) {

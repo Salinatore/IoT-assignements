@@ -2,7 +2,7 @@
 #define GAME_H
 
 extern int score;
-
+extern unsigned long t1;
 void gameModeOperations();
 
 #endif
