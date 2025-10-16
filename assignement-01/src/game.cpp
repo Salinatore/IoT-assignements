@@ -8,7 +8,7 @@
 
 #define N_BUTTONS 4
 
-bool gameactivation = true;
+bool roundActivation = true;
 int seq[N_BUTTONS];
 unsigned long time = 0;
 unsigned long t1 = 20000;
@@ -25,13 +25,16 @@ void generateSequence(int seq[N_BUTTONS]) {
   }
   for (int i = 0; i < N_BUTTONS; i++) {
     seq[i] = pool[i];
-    Serial.print(seq[i]);
   }
-  Serial.println("");
 }
 
 void startRound(int seq[N_BUTTONS]) {
   generateSequence(seq);
+  for (int i = 0; i < N_BUTTONS; i++) {
+    Serial.print(seq[i]);
+    Serial.print(" ");  // add a space or comma for clarity
+  }
+  Serial.println();
   //display: sequence
   time = millis();  //start the timer
   current = 0;      //restart the current expected btn
@@ -39,11 +42,11 @@ void startRound(int seq[N_BUTTONS]) {
 }
 
 void nextRound() {
-  t1 = t1 - 500;
+  t1 = t1 - 1000;
   score++;
   Serial.println("Score: " + String(score) + " WIN");
   //display score
-  gameactivation = true;
+  roundActivation = true;
 }
 
 void gameOver() {
@@ -55,32 +58,42 @@ void gameOver() {
   waiting = true;
   detachBTNControlInterrupt();
   setUpWaitInterrupt();
+  roundActivation = true;
 }
 
 void manageGame() {
   if (millis() - time > t1) {
     Serial.println("Lost for timeout");
     gameOver();
-  } else {
-    if (btnPressed != -1) {
-      if (btnPressed == seq[current]) {
-      current++;
-        if (current == N_BUTTONS) {
-          nextRound();
-        }
-      } else {
-        Serial.println("Wrong Sequence");
-        gameOver();
-      }
+    return;
+  } 
+
+  noInterrupts();
+  int currentBtnPressed = btnPressed;
+  interrupts();
+
+  if (currentBtnPressed == -1) return;
+
+  if (currentBtnPressed == seq[current]) {
+    current++;
+    Serial.println(String("current") + String(current));
+    if (current >= N_BUTTONS) {
+      nextRound();
     }
+  } else if (currentBtnPressed != seq[current]) {
+    Serial.println(String("Wrong Sequence") + String(seq[current]) + String(currentBtnPressed));
+    gameOver();
   }
+
+  noInterrupts();
   btnPressed = -1;
+  interrupts();
 }
 
 void gameModeOperations() {
-  if (gameactivation) {
+  if (roundActivation) {
     startRound(seq);
-    gameactivation = false;
+    roundActivation = false;
   }
   manageGame();
 }

@@ -8,9 +8,7 @@ volatile int btnPressed = -1;
 unsigned long int lastPress = millis();
 
 void bouncingPrevention(int btnNum) {
-  Serial.println("PRESSED " + btnNum);
   if (millis() - lastPress > 300) {
-    Serial.println("succeded");
     btnPressed = btnNum;
     lastPress = millis();
   }

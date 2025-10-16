@@ -3,6 +3,8 @@
 #include "wait.h"
 #include "btn_control.h"
 
+bool currentWaiting = true;
+
 void setup() {
   Serial.begin(9600);
   setUpLeds();
@@ -13,10 +15,11 @@ void setup() {
 }
 
 void loop() {
-  noInterrupts();
-  bool currentWaiting = waiting;
-  interrupts();
   //remember to add deep state behaviour
+  noInterrupts();
+  currentWaiting = waiting;
+  interrupts();
+
   if (currentWaiting) {
     Serial.println("waiting");
     waitModeOperations();
@@ -29,9 +32,11 @@ void loop() {
 }
 
 void firstGameRoundOperations() {
+  firstGameRound = false;
   analogWrite(LED_RED_PIN, 0);
   score = 0;
   //display: GO!
+  Serial.println("GO!!");
   detachWaitInterrupt();
   setUpBTNControlInterrupt();
   delay(2000);
