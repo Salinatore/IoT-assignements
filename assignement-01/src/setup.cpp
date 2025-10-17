@@ -16,4 +16,8 @@ void setUpButtons() {
   pinMode(BUTTON4_PIN, INPUT_PULLUP);
 }
 
+void setUpPotentiometer() {
+  pinMode(POT_PIN, INPUT);
+}
+
 //void setUpLCD();

@@ -12,6 +12,7 @@ bool roundActivation = true;
 int seq[N_BUTTONS];
 unsigned long time = 0;
 unsigned long t1;
+int difficulty;
 int current;
 int score;
 
@@ -22,6 +23,15 @@ int getLedPin(int buttonId) {
     case 3: return LED3_PIN;
     case 4: return LED4_PIN;
     default: return -1;  // nessun LED associato
+  }
+}
+
+int difficultyTimeReduction(int difficulty) {
+  switch (difficulty) {
+    case 1: return 1000;
+    case 2: return 2000;
+    case 3: return 3000;
+    case 4: return 4000;
   }
 }
 
@@ -56,7 +66,7 @@ void startRound(int seq[N_BUTTONS]) {
 }
 
 void nextRound() {
-  t1 = t1 - 1000;
+  t1 = t1 - difficultyTimeReduction(difficulty);
   score++;
   Serial.println("Score: " + String(score) + " WIN");
   turnOffAllGameLed();

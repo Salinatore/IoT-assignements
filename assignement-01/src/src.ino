@@ -11,6 +11,7 @@ void setup() {
   setUpButtons();
   //setUpLCD();
   setUpWaitInterrupt();
+  setUpPotentiometer();
   //randomSeed(analogRead(A0)); // inizializza casualità
 }
 
@@ -35,10 +36,16 @@ void firstGameRoundOperations() {
   firstGameRound = false;
   analogWrite(LED_RED_PIN, 0);
   score = 0;
+  difficultySetting();
   //display: GO!
   Serial.println("GO!!");
   t1=20000;
   detachWaitInterrupt();
   setUpBTNControlInterrupt();
   delay(2000);
+}
+
+
+void difficultySetting () {
+  difficulty = map(analogRead(POT_PIN), 0, 1023, 1, 4);
 }

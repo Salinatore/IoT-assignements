@@ -3,6 +3,7 @@
 
 extern int score;
 extern unsigned long t1;
+extern int difficulty;
 void gameModeOperations();
 
 #endif
