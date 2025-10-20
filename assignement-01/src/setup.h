@@ -13,9 +13,10 @@
 #define LED_RED_PIN 9
 
 #define POT_PIN A0
-//#define I2C_ADDR    0x27
-//#define LCD_COLUMNS 16
-//#define LCD_LINES   2
+
+#define I2C_ADDR    0x27
+#define LCD_COLUMNS 16
+#define LCD_LINES   2
 
 void setUpLeds();
 

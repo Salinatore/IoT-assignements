@@ -2,6 +2,7 @@
 #include "setup.h"
 #include "wait.h"
 #include "btn_control.h"
+#include "lcd_control.h"
 #include <Arduino.h>
 
 #define LED_RED_PIN 9
@@ -59,6 +60,7 @@ void generateSequence(int seq[N_BUTTONS]) {
 void startRound(int seq[N_BUTTONS]) {
   generateSequence(seq);
   Serial.println();
+  writeSequence(seq);
   //display: sequence
   time = millis();  //start the timer
   current = 0;      //restart the current expected btn
@@ -69,6 +71,7 @@ void nextRound() {
   t1 = t1 - difficultyTimeReduction(difficulty);
   score++;
   Serial.println("Score: " + String(score) + " WIN");
+  writeWinMessage(score);
   turnOffAllGameLed();
   //display score
   roundActivation = true;
@@ -79,6 +82,7 @@ void gameOver() {
   turnOffAllGameLed();
   delay(2000);
   Serial.println("Score: " + String(score) + " LOST");
+  writeLoseMessage(score);
   //print score
   delay(10000);
   waiting = true;

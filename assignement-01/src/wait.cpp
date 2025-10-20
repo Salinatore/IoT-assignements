@@ -1,6 +1,7 @@
 #include "wait.h"
 #include "setup.h"
 #include "interrupt.h"
+#include "lcd_control.h"
 #include <Arduino.h>
 
 volatile bool firstGameRound = false;
@@ -28,6 +29,7 @@ void fadingLed() {
 
 void dislpayWelcome() {
   //display: Welcome to TOS! Press B1 to Start
+  writeWelcomeMessage();
 }
 
 void setUpWaitInterrupt() {
