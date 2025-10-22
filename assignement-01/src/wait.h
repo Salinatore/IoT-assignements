@@ -18,4 +18,6 @@ void dislpayWelcome();
 
 void checkStartButton();
 
+void checkTimeToSleep();
+
 #endif

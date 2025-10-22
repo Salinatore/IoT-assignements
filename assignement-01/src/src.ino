@@ -23,7 +23,6 @@ void loop() {
   interrupts();
 
   if (currentWaiting) {
-    Serial.println("waiting");
     waitModeOperations();
   } else {
     if (firstGameRound) {
