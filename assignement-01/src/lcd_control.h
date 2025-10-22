@@ -7,7 +7,7 @@ void writeGo();
 
 void writeWelcomeMessage();
 
-void writeSequence(int seq);
+void writeSequence(int seq[]);
 
 void writeWinMessage(int score);
 

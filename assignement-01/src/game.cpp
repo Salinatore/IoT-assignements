@@ -7,10 +7,8 @@
 
 #define LED_RED_PIN 9
 
-#define N_BUTTONS 4
-
 bool roundActivation = true;
-int seq[N_BUTTONS];
+int seq[N_SEQ];
 unsigned long time = 0;
 unsigned long t1;
 int difficulty;
@@ -37,27 +35,27 @@ int difficultyTimeReduction(int difficulty) {
 }
 
 void turnOffAllGameLed() {
-  for (int i = 1; i <= N_BUTTONS; i++) {
+  for (int i = 1; i <= N_SEQ; i++) {
     digitalWrite(getLedPin(i), LOW);
   }
 }
 
-void generateSequence(int seq[N_BUTTONS]) {
-  int pool[N_BUTTONS] = { 1, 2, 3, 4 };
-  for (int i = (N_BUTTONS - 1); i > 0; --i) {
+void generateSequence(int seq[N_SEQ]) {
+  int pool[N_SEQ] = { 1, 2, 3, 4 };
+  for (int i = (N_SEQ - 1); i > 0; --i) {
     int j = random(i + 1);
     int tmp = pool[i];
     pool[i] = pool[j];
     pool[j] = tmp;
   }
-  for (int i = 0; i < N_BUTTONS; i++) {
+  for (int i = 0; i < N_SEQ; i++) {
     seq[i] = pool[i];
     Serial.print(seq[i]);
   }
   Serial.println("");
 }
 
-void startRound(int seq[N_BUTTONS]) {
+void startRound(int seq[N_SEQ]) {
   generateSequence(seq);
   Serial.println();
   writeSequence(seq);
@@ -108,7 +106,7 @@ void manageGame() {
     digitalWrite(getLedPin(seq[current]), HIGH);
     current++;
     Serial.println(String("current") + String(current));
-    if (current >= N_BUTTONS) {
+    if (current >= N_SEQ) {
       nextRound();
     }
   } else if (currentBtnPressed != seq[current]) {

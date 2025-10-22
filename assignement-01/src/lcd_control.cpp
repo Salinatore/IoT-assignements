@@ -26,10 +26,13 @@ void writeWelcomeMessage() {
   lcd.print("Press B1 to Start");
 }
 
-void writeSequence(int seq) {
+void writeSequence(int seq[]) {
   lcd.clear();         
   lcd.setCursor(0, 0); 
-  lcd.print(String(seq));
+  for(int i=0; i<N_SEQ; i++){
+    lcd.setCursor(i, 0); 
+    lcd.print(seq[i]);
+  }
 }
 
 void writeWinMessage(int score) {

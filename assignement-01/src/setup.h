@@ -18,6 +18,8 @@
 #define LCD_COLUMNS 16
 #define LCD_LINES   2
 
+#define N_SEQ 4
+
 void setUpLeds();
 
 void setUpButtons();
