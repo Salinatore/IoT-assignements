@@ -5,9 +5,12 @@
 #include "lcd_control.h"
 #include <Arduino.h>
 
-#define LED_RED_PIN 9
+#define BASE_ROUND_TIME 20000
+#define TIME_DISPLAYING_GO 2000
+#define TIME_DISPLAYING_RED_LED 2000
+#define TIME_DISPLAYING_LOSE_SCORE 10000
 
-bool roundActivation = true;
+bool startingRound = true;
 int seq[N_SEQ];
 unsigned long time = 0;
 unsigned long t1;
@@ -57,36 +60,38 @@ void generateSequence(int seq[N_SEQ]) {
 
 void startRound(int seq[N_SEQ]) {
   generateSequence(seq);
-  Serial.println();
   writeSequence(seq);
-  //display: sequence
-  time = millis();  //start the timer
-  current = 0;      //restart the current expected btn
+  
+  time = millis();  
+  current = 0;      
   btnPressed = -1;
 }
 
 void nextRound() {
   t1 = t1 - difficultyTimeReduction(difficulty);
   score++;
-  Serial.println("Score: " + String(score) + " WIN");
+
   writeWinMessage(score);
+  delay(1500);
   turnOffAllGameLed();
-  //display score
-  roundActivation = true;
+  startingRound = true;
 }
 
 void gameOver() {
   analogWrite(LED_RED_PIN, 255);
   turnOffAllGameLed();
-  delay(2000);
-  Serial.println("Score: " + String(score) + " LOST");
+
+  delay(TIME_DISPLAYING_RED_LED);
+  
   writeLoseMessage(score);
-  //print score
-  delay(10000);
-  waiting = true;
+  
+  delay(TIME_DISPLAYING_LOSE_SCORE);
+
   detachBTNControlInterrupt();
   setUpWaitInterrupt();
-  roundActivation = true;
+
+  waiting = true;
+  startingRound = true;
 }
 
 void manageGame() {
@@ -105,12 +110,10 @@ void manageGame() {
   if (currentBtnPressed == seq[current]) {
     digitalWrite(getLedPin(seq[current]), HIGH);
     current++;
-    Serial.println(String("current") + String(current));
     if (current >= N_SEQ) {
       nextRound();
     }
   } else if (currentBtnPressed != seq[current]) {
-    Serial.println(String("Wrong Sequence") + String(seq[current]) + String(currentBtnPressed));
     gameOver();
   }
 
@@ -120,9 +123,32 @@ void manageGame() {
 }
 
 void gameModeOperations() {
-  if (roundActivation) {
+  if (startingRound) {
     startRound(seq);
-    roundActivation = false;
+    startingRound = false;
   }
   manageGame();
+}
+
+//first time switching to game mode operations
+
+void difficultySetting () {
+  difficulty = map(analogRead(POT_PIN), 0, 1023, 1, 4);
+  Serial.println(difficulty);
+}
+
+void firstGameRoundOperations() {
+  firstGameRound = false;
+  score = 0;
+  t1 = BASE_ROUND_TIME;
+
+  writeGo();
+
+  analogWrite(LED_RED_PIN, 0);
+  difficultySetting();
+  
+  detachWaitInterrupt();
+  setUpBTNControlInterrupt();
+
+  delay(TIME_DISPLAYING_GO); 
 }

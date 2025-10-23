@@ -13,4 +13,8 @@ void writeWinMessage(int score);
 
 void writeLoseMessage(int score);
 
+void sleepLCD();
+
+void wakeUpLCD();
+
 #endif

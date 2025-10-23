@@ -7,7 +7,7 @@ LiquidCrystal_I2C lcd(I2C_ADDR, LCD_COLUMNS, LCD_LINES);
 
 void setUpLCD() {
   lcd.init();          
-  lcd.backlight();     
+  lcd.backlight();  
   lcd.clear();         
   lcd.setCursor(0, 0); 
 }
@@ -16,6 +16,7 @@ void writeGo() {
   lcd.clear();         
   lcd.setCursor(0, 0); 
   lcd.print("GO");
+  Serial.println("GO!!");
 }
 
 void writeWelcomeMessage() {
@@ -23,7 +24,7 @@ void writeWelcomeMessage() {
   lcd.setCursor(0, 0);
   lcd.print("Welcome to TOS!");
   lcd.setCursor(0, 1);
-  lcd.print("Press B1 to Start");
+  lcd.print("B1 to Start (:O)");
 }
 
 void writeSequence(int seq[]) {
@@ -39,10 +40,24 @@ void writeWinMessage(int score) {
   lcd.clear();         
   lcd.setCursor(0, 0); 
   lcd.print("Score: " + String(score) + " WIN");
+  Serial.println("Score: " + String(score) + " WIN");
 }
 
 void writeLoseMessage(int score) {
   lcd.clear();         
   lcd.setCursor(0, 0); 
   lcd.print("Score: " + String(score) + " LOSE");
+  Serial.println("Score: " + String(score) + " LOST");
+}
+
+void sleepLCD() {
+  lcd.clear();         
+  lcd.setCursor(0, 0); 
+  lcd.print("Sleeping :)");
+  lcd.noBacklight();
+}
+
+void wakeUpLCD() {
+  lcd.backlight();
+  writeWelcomeMessage();
 }

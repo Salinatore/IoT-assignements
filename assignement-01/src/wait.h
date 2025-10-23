@@ -10,14 +10,4 @@ void setUpWaitInterrupt();
 
 void detachWaitInterrupt();
 
-//internal procedure
-
-void fadingLed();
-
-void dislpayWelcome();
-
-void checkStartButton();
-
-void checkTimeToSleep();
-
 #endif
