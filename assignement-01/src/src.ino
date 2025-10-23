@@ -5,6 +5,8 @@
 #include "lcd_control.h"
 
 bool currentWaiting = true;
+bool currentfirstWait = false;
+bool currentfirstGameRound = false;
 
 void setup() {
   setUpLeds();
@@ -12,7 +14,7 @@ void setup() {
   setUpLCD();
   setUpWaitInterrupt();
   setUpPotentiometer();
-  //randomSeed(analogRead(A0)); // inizializza casualità
+  //randomSeed(millis()); // inizializza casualità
 
   Serial.begin(9600); //debug
 }
@@ -20,12 +22,17 @@ void setup() {
 void loop() {
   noInterrupts();
   currentWaiting = waiting;
+  currentfirstWait = firstWait;
+  currentfirstGameRound = firstGameRound;
   interrupts();
   
   if (currentWaiting) {
+    if (currentfirstWait) {
+      firstWaitOperations();
+    }
     waitModeOperations();
   } else {
-    if (firstGameRound) {
+    if (currentfirstGameRound) {
       firstGameRoundOperations();
     }
     gameModeOperations();

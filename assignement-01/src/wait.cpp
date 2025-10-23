@@ -11,7 +11,7 @@
 
 volatile bool firstGameRound = false;
 volatile bool waiting = true; 
-bool firstTime = false;
+volatile bool firstWait = true;
 int ledValue = 0;
 int direction = BASE_DIRACTION;
 unsigned long timeSinceStart = 0;
@@ -32,7 +32,7 @@ void checkStartButton() {
   //no need to check for bouncing since multiple presses don't have any affect  
   if (waiting) {
     firstGameRound = true;
-    firstTime = false;
+    firstWait = true;
     waiting = false;
   }
 }
@@ -72,15 +72,15 @@ void checkTimeToSleep() {
   }
 }
 
-void waitModeOperations() {
-  if (!firstTime){
-    ledValue = 0;
-    direction = BASE_DIRACTION;
-    timeSinceStart = millis();
-    firstTime = true;
-    dislpayWelcome(); 
-  }
+void firstWaitOperations() {
+  ledValue = 0;
+  direction = BASE_DIRACTION;
+  timeSinceStart = millis();
+  firstWait = false;
+  dislpayWelcome(); 
+}
 
+void waitModeOperations() {
   checkTimeToSleep();
   fadingLed();
   delay(20);
