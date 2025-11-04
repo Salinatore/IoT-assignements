@@ -5,8 +5,13 @@
 #include <Arduino.h>
 #include <avr/sleep.h>
 
+// Timing constants
 #define MS_UNTIL_SLEEP 10000
+#define FADING_DELAY_MS 20
+
+// LED fading constants
 #define MAX_LIGHT_VALUE 200
+#define MIN_LIGHT_VALUE 0
 #define BASE_DIRACTION 1
 
 volatile bool firstGameRound = false;
@@ -19,12 +24,12 @@ unsigned long timeSinceStart = 0;
 void fadingLed() {
   analogWrite(LED_RED_PIN, ledValue);
   ledValue = ledValue + direction;
-  if (ledValue == 0 || ledValue == MAX_LIGHT_VALUE) {
+  if (ledValue == MIN_LIGHT_VALUE || ledValue == MAX_LIGHT_VALUE) {
     direction = -direction;
   }
 }
 
-void dislpayWelcome() {
+void displayWelcome() {
   writeWelcomeMessage();
 }
 
@@ -77,13 +82,11 @@ void firstWaitOperations() {
   direction = BASE_DIRACTION;
   timeSinceStart = millis();
   firstWait = false;
-  dislpayWelcome(); 
+  displayWelcome(); 
 }
 
 void waitModeOperations() {
   checkTimeToSleep();
   fadingLed();
-  delay(20);
+  delay(FADING_DELAY_MS);
 }
-
-

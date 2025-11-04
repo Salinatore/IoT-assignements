@@ -5,10 +5,25 @@
 #include "lcd_control.h"
 #include <Arduino.h>
 
-#define BASE_ROUND_TIME 20000
-#define TIME_DISPLAYING_GO 2000
-#define TIME_DISPLAYING_RED_LED 2000
-#define TIME_DISPLAYING_LOSE_SCORE 10000
+// Game timing constants
+#define BASE_ROUND_TIME_MS 20000
+#define TIME_DISPLAYING_GO_MS 2000
+#define TIME_DISPLAYING_RED_LED_MS 2000
+#define TIME_DISPLAYING_LOSE_SCORE_MS 10000
+#define WIN_MESSAGE_DELAY_MS 1500
+
+// Game state constants
+#define INVALID_LED_PIN -1
+
+// Difficulty settings
+#define MIN_DIFFICULTY              1
+#define MAX_DIFFICULTY              4
+#define POTENTIOMETER_MIN           0
+#define POTENTIOMETER_MAX           1023
+
+// LED constants
+#define LED_RED_FULL_INTENSITY      255
+#define LED_RED_OFF                 0
 
 bool startingRound = true;
 int seq[N_SEQ];
@@ -24,13 +39,13 @@ int getLedPin(int buttonId) {
     case 2: return LED2_PIN;
     case 3: return LED3_PIN;
     case 4: return LED4_PIN;
-    default: return -1;  // nessun LED associato
+    default: return INVALID_LED_PIN; 
   }
 }
 
 int difficultyTimeReduction(int difficulty) {
   switch (difficulty) {
-    case 1: return 1000;
+    case 1: return 1000; //defalt case is implicitly this one
     case 2: return 2000;
     case 3: return 3000;
     case 4: return 4000;
@@ -64,7 +79,7 @@ void startRound(int seq[N_SEQ]) {
   
   time = millis();  
   current = 0;      
-  btnPressed = -1;
+  btnPressed = NO_BUTTON_PRESSED;
 }
 
 void nextRound() {
@@ -72,20 +87,20 @@ void nextRound() {
   score++;
 
   writeWinMessage(score);
-  delay(1500);
+  delay(WIN_MESSAGE_DELAY_MS);
   turnOffAllGameLed();
   startingRound = true;
 }
 
 void gameOver() {
-  analogWrite(LED_RED_PIN, 255);
+  analogWrite(LED_RED_PIN, LED_RED_FULL_INTENSITY);
   turnOffAllGameLed();
 
-  delay(TIME_DISPLAYING_RED_LED);
+  delay(TIME_DISPLAYING_RED_LED_MS);
   
   writeLoseMessage(score);
   
-  delay(TIME_DISPLAYING_LOSE_SCORE);
+  delay(TIME_DISPLAYING_LOSE_SCORE_MS);
 
   detachBTNControlInterrupt();
   setUpWaitInterrupt();
@@ -105,7 +120,7 @@ void manageGame() {
   int currentBtnPressed = btnPressed;
   interrupts();
 
-  if (currentBtnPressed == -1) return;
+  if (currentBtnPressed == NO_BUTTON_PRESSED) return;
 
   if (currentBtnPressed == seq[current]) {
     digitalWrite(getLedPin(seq[current]), HIGH);
@@ -118,7 +133,7 @@ void manageGame() {
   }
 
   noInterrupts();
-  btnPressed = -1;
+  btnPressed = NO_BUTTON_PRESSED;
   interrupts();
 }
 
@@ -130,25 +145,29 @@ void gameModeOperations() {
   manageGame();
 }
 
-//first time switching to game mode operations
-
 void difficultySetting () {
-  difficulty = map(analogRead(POT_PIN), 0, 1023, 1, 4);
+  difficulty = map(
+    analogRead(POT_PIN), 
+    POTENTIOMETER_MIN, 
+    POTENTIOMETER_MAX, 
+    MIN_DIFFICULTY, 
+    MAX_DIFFICULTY
+  );
   Serial.println(difficulty);
 }
 
 void firstGameRoundOperations() {
   firstGameRound = false;
   score = 0;
-  t1 = BASE_ROUND_TIME;
+  t1 = BASE_ROUND_TIME_MS;
 
   writeGo();
 
-  analogWrite(LED_RED_PIN, 0);
+  analogWrite(LED_RED_PIN, LED_RED_OFF);
   difficultySetting();
   
   detachWaitInterrupt();
   setUpBTNControlInterrupt();
 
-  delay(TIME_DISPLAYING_GO); 
+  delay(TIME_DISPLAYING_GO_MS); 
 }

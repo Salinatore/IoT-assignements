@@ -26,7 +26,6 @@ void setUpButtons();
 
 void setUpButtons();
 
-//void setUpLCD();
-
 void setUpPotentiometer();
+
 #endif

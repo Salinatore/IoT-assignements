@@ -3,15 +3,39 @@
 #include "interrupt.h"
 #include <Arduino.h>
 
-volatile int btnPressed = -1;
+// Button constants
+#define BUTTON_DEBOUNCE_DELAY_MS   300
 
+// Button identifiers
+#define BUTTON_1 1
+#define BUTTON_2 2
+#define BUTTON_3 3
+#define BUTTON_4 4
+
+volatile int btnPressed = NO_BUTTON_PRESSED;
 unsigned long int lastPress = millis();
 
 void bouncingPrevention(int btnNum) {
-  if (millis() - lastPress > 300) {
+  if (millis() - lastPress > BUTTON_DEBOUNCE_DELAY_MS) {
     btnPressed = btnNum;
     lastPress = millis();
   }
+}
+
+void controlBTN1() {
+  bouncingPrevention(BUTTON_1);
+}
+
+void controlBTN2() {
+  bouncingPrevention(BUTTON_2);
+}
+
+void controlBTN3() {
+  bouncingPrevention(BUTTON_3);
+}
+
+void controlBTN4() {
+  bouncingPrevention(BUTTON_4);
 }
 
 void setUpBTNControlInterrupt() {
@@ -26,20 +50,4 @@ void detachBTNControlInterrupt() {
   internalDisableInterrupt(BUTTON2_PIN);
   internalDisableInterrupt(BUTTON3_PIN);
   internalDisableInterrupt(BUTTON4_PIN);
-}
-
-void controlBTN1() {
-  bouncingPrevention(1);
-}
-
-void controlBTN2() {
-  bouncingPrevention(2);
-}
-
-void controlBTN3() {
-  bouncingPrevention(3);
-}
-
-void controlBTN4() {
-  bouncingPrevention(4);
 }
