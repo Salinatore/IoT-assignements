@@ -54,6 +54,8 @@ void sleepLCD() {
   lcd.clear();         
   lcd.setCursor(0, 0); 
   lcd.print("Sleeping :)");
+  lcd.setCursor(0, 1);
+  lcd.print("B1 to wake up");
   lcd.noBacklight();
 }
 
