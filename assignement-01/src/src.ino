@@ -8,15 +8,19 @@ bool currentWaiting = true;
 bool currentfirstWait = false;
 bool currentfirstGameRound = false;
 
+long seed = 0;
+
 void setup() {
   setUpLeds();
   setUpButtons();
   setUpLCD();
   setUpWaitInterrupt();
   setUpPotentiometer();
-  //randomSeed(millis()); // inizializza casualità
-
+  
   Serial.begin(9600); //debug
+  long seed = analogRead(A2);
+  randomSeed(seed); // inizializza casualità
+
 }
 
 void loop() {
@@ -25,7 +29,7 @@ void loop() {
   currentfirstWait = firstWait;
   currentfirstGameRound = firstGameRound;
   interrupts();
-  
+
   if (currentWaiting) {
     if (currentfirstWait) {
       firstWaitOperations();
