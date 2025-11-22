@@ -11,9 +11,7 @@
 void wakeUp(){}
 
 HWPlatform::HWPlatform(){
-  pButton = new ButtonImpl(BT_PIN);
   pLed = new Led(LED_PIN);
-  pMotor = new ServoMotorImpl(MOTOR_PIN);
 }
 
 
