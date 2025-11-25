@@ -4,10 +4,7 @@
 #include "config.h"
 #include "devices/Button.h"
 #include "devices/Led.h"
-#include "devices/Pir.h"
-#include "devices/Sonar.h"
 #include "devices/ServoMotor.h"
-#include "devices/TempSensorTMP36.h"
 
 class HWPlatform {
 
@@ -21,15 +18,9 @@ public:
   ServoMotor* getMotor();
 
 private:
-  Button* resetButton;
-  Led* led1;
-  Led* led2;
-  Led* ledR;
-  ServoMotor* servo;
-  //create a class to manage LCD
-  Pir* presenceDetector;
-  Sonar* distanceDetector;
-  TempSensorTMP36* tempSensor;
+  Button* pButton;
+  Led* pLed;
+  ServoMotor* pMotor;
   
 };
 
