@@ -6,10 +6,9 @@ from typing import Set
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 
+from config import BAUD, PORT
 from controllers.serial_manager import SerialManager
-from model.state import DroneState, State
-
-state = State()
+from model.state import State
 
 active_websockets: Set[WebSocket] = set()
 
@@ -37,6 +36,7 @@ def handle_state_change():
         print(f"Error broadcasting message: {e}")
 
 
+state = State()
 state.setMessageHandler(on_status_change=handle_state_change)
 
 
@@ -57,8 +57,8 @@ def handle_serial_message(msg: str):
 
 
 serial_manager = SerialManager(
-    port="/dev/tty.usbmodem1101",
-    baud=115200,
+    port=PORT,
+    baud=BAUD,
     on_message=handle_serial_message,
 )
 
@@ -100,13 +100,6 @@ async def root():
 @app.get("/state")
 async def get_state() -> State:
     """Get current drone/hangar state"""
-    return state
-
-
-@app.get("/changestate")
-async def change_state() -> State:
-    """Get current drone/hangar state"""
-    state.set_drone_state(DroneState.OPERATING)
     return state
 
 
