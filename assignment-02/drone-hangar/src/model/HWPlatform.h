@@ -14,12 +14,17 @@ class HWPlatform {
 
 public:
   HWPlatform();
-  void init();
   void test();
 
   Button* getButton();
-  Led*  getLed();
+  Led*  getLed1();
+  Led*  getLed2();
+  Led*  getLedR();
   ServoMotor* getMotor();
+  MyLcd* getLCD();
+  Pir* getDPD();
+  Sonar* getDDD();
+  TempSensorTMP36* getTempSensor();
 
 private:
   Button* resetButton;
@@ -31,7 +36,7 @@ private:
   Pir* presenceDetector;
   Sonar* distanceDetector;
   TempSensorTMP36* tempSensor;
-  
+
 };
 
 #endif

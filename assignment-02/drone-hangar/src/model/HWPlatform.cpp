@@ -4,7 +4,6 @@
 #include "kernel/MsgService.h"
 #include "config.h"
 #include "devices/Led.h"
-#include "devices/LightSensorImpl.h"
 #include "devices/ServoMotorImpl.h"
 #include "kernel/Logger.h"
 
@@ -23,6 +22,38 @@ HWPlatform::HWPlatform(){
 }
 
 
-void HWPlatform::init(){
+Button* HWPlatform::getButton(){
+  return this->resetButton;
 }
 
+Led*  HWPlatform::getLed1(){
+  return this->led1;
+}
+
+Led*  HWPlatform::getLed2(){
+  return this->led2;
+}
+
+Led*  HWPlatform::getLedR(){
+  return this->ledR;
+}
+
+ServoMotor* HWPlatform::getMotor(){
+  return this->servo;
+}
+
+MyLcd* HWPlatform::getLCD(){
+  return this->lcd;
+}
+
+Pir* HWPlatform::getDPD(){
+  return this->presenceDetector;
+}
+
+Sonar* HWPlatform::getDDD(){
+  return this->distanceDetector;
+}
+
+TempSensorTMP36* HWPlatform::getTempSensor(){
+  return this->tempSensor;
+}
