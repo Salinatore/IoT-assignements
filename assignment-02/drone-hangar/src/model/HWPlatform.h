@@ -8,6 +8,7 @@
 #include "devices/Sonar.h"
 #include "devices/ServoMotor.h"
 #include "devices/TempSensorTMP36.h"
+#include "devices/MyLcd.h"
 
 class HWPlatform {
 
@@ -26,7 +27,7 @@ private:
   Led* led2;
   Led* ledR;
   ServoMotor* servo;
-  //create a class to manage LCD
+  MyLcd* lcd;
   Pir* presenceDetector;
   Sonar* distanceDetector;
   TempSensorTMP36* tempSensor;

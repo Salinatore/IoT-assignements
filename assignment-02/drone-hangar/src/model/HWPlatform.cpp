@@ -11,36 +11,18 @@
 void wakeUp(){}
 
 HWPlatform::HWPlatform(){
-  pLed = new Led(LED_PIN);
+  this->led1 = new Led(LED_PIN1);
+  this->led2 = new Led(LED_PIN2);
+  this->ledR = new Led(LED_PINR);
+  this->resetButton = new ButtonImpl(RST_BT_PIN);
+  this->servo = new ServoMotorImpl(MOTOR_PIN);
+  this->lcd = new MyLcd();
+  this->presenceDetector = new Pir(PIR_PIN);
+  this->distanceDetector = new Sonar(ECHO_PIN, TEMP_PIN, SONAR_TIME);
+  this->tempSensor = new TempSensorTMP36(TEMP_PIN);
 }
 
 
 void HWPlatform::init(){
-}
-
-Button* HWPlatform::getButton(){
-  return this->pButton;
-}
-
-
-Led*  HWPlatform::getLed(){
-  return this->pLed;
-}
-
-ServoMotor* HWPlatform::getMotor(){
-  return this->pMotor;
-}
-
-void HWPlatform::test(){
-  bool btPressed = pButton->isPressed();
-  pLed->switchOn();
-  pMotor->on();
-  pMotor->setPosition(90);
-  Logger.log("Button: " + String(btPressed ? "pressed" : " not pressed"));
-  delay(1000);
-  pMotor->setPosition(0);
-  delay(1000);
-  pMotor->off();
-  pLed->switchOff();
 }
 

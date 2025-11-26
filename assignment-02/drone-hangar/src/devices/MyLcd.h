@@ -1,13 +1,14 @@
-#ifndef __LCD__
-#define __LCD__
+#ifndef __MYLCD__
+#define __MYLCD__
 
 #include <string.h>
 
-class Lcd{
+class MyLcd{
 private:
 
+
 public:
-    Lcd();
+    MyLcd();
     void writeMessage(String message);
 };
 
