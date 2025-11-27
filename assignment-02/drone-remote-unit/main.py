@@ -118,19 +118,13 @@ async def get_state() -> State:
     return state
 
 
-@app.get("/test-msg")
-async def test_msg() -> None:
-    """Get current drone/hangar state"""
-    handle_serial_message("st-a-alarm")
-
-
 @app.get("/landing")
 async def landing():
     """Send command to Arduino"""
     if not state.is_possible_to_land():
         return {"status": "error"}
 
-    state.set_drone_state(DroneState.REST)
+    state.set_drone_state(DroneState.LANDING)
 
     try:
         await serial_manager.send("landing")
@@ -145,7 +139,7 @@ async def take_off():
     if not state.is_possible_to_take_off():
         return {"status": "error"}
 
-    state.set_drone_state(DroneState.OPERATING)
+    state.set_drone_state(DroneState.TAKING_OFF)
 
     try:
         await serial_manager.send("free-your-wings")
