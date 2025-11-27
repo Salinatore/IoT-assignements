@@ -1,6 +1,6 @@
 let ws = null;
 const logsContainer = document.getElementById("logsContainer");
-const msgsContainer = document.getElementById("masgsContainer");
+const msgsContainer = document.getElementById("msgsContainer");
 const statusDiv = document.getElementById("status");
 const statusDrone = document.getElementById("dronestatus");
 const statusHangar = document.getElementById("hangarstatus");
@@ -30,6 +30,7 @@ function connect() {
         break;
       case "msg":
         addMsgEntry(data.data);
+        break;
       default:
         console.warn(`Unknown message type: ${data.type}`);
     }
@@ -130,13 +131,16 @@ function refreshStatus(data) {
   statusDrone.textContent = data.drone_state;
   if (data.hangar_state !== "ND") {
     statusHangar.textContent = data.hangar_state;
+    statusHangar.style.display = "block";
   } else {
+    statusHangar.style.display = "none";
     statusHangar.textContent = "";
   }
   if (data.current_distance !== "ND") {
+    current_distance.style.display = "block";
     current_distance.textContent = data.current_distance;
   } else {
-    current_distance.textContent = "";
+    current_distance.style.display = "none";
   }
   takaOffBtn.disabled = !data.can_take_off;
   landingBtn.disabled = !data.can_land;

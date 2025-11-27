@@ -118,6 +118,12 @@ async def get_state() -> State:
     return state
 
 
+@app.get("/test-msg")
+async def test_msg() -> None:
+    """Get current drone/hangar state"""
+    handle_serial_message("st-a-alarm")
+
+
 @app.get("/landing")
 async def landing():
     """Send command to Arduino"""
