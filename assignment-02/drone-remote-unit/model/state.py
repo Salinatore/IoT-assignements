@@ -22,7 +22,7 @@ class State(BaseModel):
     _hangar_state: HangarState = HangarState.NORMAL
     _current_distance: int = 0
 
-    def setMessageHandler(self, on_status_change: Callable[None, None]) -> None:
+    def setMessageHandler(self, on_status_change: Callable[[], None]) -> None:
         self._on_status_change = on_status_change
 
     def is_possible_to_land(self) -> bool:
