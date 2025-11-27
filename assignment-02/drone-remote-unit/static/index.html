@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Drone Logs - Real-time</title>
+        <link rel="stylesheet" type="text/css" href="./css/style.css" />
+    </head>
+    <body>
+        <main>
+            <h1>🚁 Drone Control - Real-time Logs</h1>
+
+            <div id="status" class="status disconnected">Disconnected</div>
+            <div id="dronestatus">Waiting...</div>
+            <div id="hangarstatus">Waiting...</div>
+            <div id="distance">Waiting...</div>
+
+            <div class="controls">
+                <button id="takeoffBtn" onclick="click" disabled>
+                    Request TakeOff
+                </button>
+                <button id="landingBtn" onclick="click" disabled>
+                    Request Landing
+                </button>
+                <button onclick="clearLogs()">Clear Logs</button>
+            </div>
+
+            <div class="msgs-container" id="msgsContainer">
+                <div class="empty-state">No messages yet. Waiting...</div>
+            </div>
+
+            <div class="logs-container" id="logsContainer">
+                <div class="empty-state">No logs yet. Waiting...</div>
+            </div>
+        </main>
+
+        <script src="js/scripts.js"></script>
+    </body>
+</html>

@@ -1,0 +1,201 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background: #1a1a1a;
+    color: #fff;
+    padding: 20px;
+}
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+h1 {
+    margin-bottom: 20px;
+    color: #4caf50;
+}
+.status {
+    padding: 10px 20px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+.status.connected {
+    background: #4caf50;
+    color: white;
+}
+.status.disconnected {
+    background: #f44336;
+    color: white;
+}
+/* Status info section */
+#dronestatus,
+#hangarstatus,
+#distance {
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    background: #2a2a2a;
+    border-radius: 5px;
+    border-left: 4px solid #2196f3;
+    font-size: 14px;
+}
+#dronestatus::before {
+    content: "🚁 Drone: ";
+    font-weight: bold;
+    color: #4caf50;
+}
+#hangarstatus::before {
+    content: "🏠 Hangar: ";
+    font-weight: bold;
+    color: #2196f3;
+}
+#distance::before {
+    content: "📏 Distance: ";
+    font-weight: bold;
+    color: #ff9800;
+}
+.controls {
+    margin: 20px 0;
+    display: flex;
+    gap: 10px;
+}
+input {
+    flex: 1;
+    padding: 10px;
+    border: 2px solid #333;
+    border-radius: 5px;
+    background: #2a2a2a;
+    color: #fff;
+    font-size: 16px;
+}
+button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background: #4caf50;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+button:hover {
+    background: #45a049;
+}
+button:disabled {
+    background: #666;
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+#takeoffBtn {
+    background: #2196f3;
+}
+#takeoffBtn:hover:not(:disabled) {
+    background: #1976d2;
+}
+#landingBtn {
+    background: #ff9800;
+}
+#landingBtn:hover:not(:disabled) {
+    background: #f57c00;
+}
+/* Messages container */
+.msgs-container {
+    background: #2a2a2a;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    max-height: 300px;
+    overflow-y: auto;
+    border: 2px solid #2196f3;
+}
+.msgs-container .empty-state {
+    color: #2196f3;
+}
+/* Message entry - matches log-entry style with blue accent */
+.msg-entry {
+    padding: 12px;
+    margin-bottom: 10px;
+    background: #333;
+    border-radius: 5px;
+    border-left: 4px solid #2196f3;
+    animation: slideIn 0.3s ease-out;
+}
+.msg-timestamp {
+    color: #888;
+    font-size: 12px;
+    margin-bottom: 5px;
+}
+.msg-message {
+    color: #fff;
+    font-family: "Courier New", monospace;
+}
+/* Logs container */
+.logs-container {
+    background: #2a2a2a;
+    border-radius: 10px;
+    padding: 20px;
+    max-height: 600px;
+    overflow-y: auto;
+    border: 2px solid #4caf50;
+}
+.logs-container .empty-state {
+    color: #4caf50;
+}
+.log-entry {
+    padding: 12px;
+    margin-bottom: 10px;
+    background: #333;
+    border-radius: 5px;
+    border-left: 4px solid #4caf50;
+    animation: slideIn 0.3s ease-out;
+}
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+.log-timestamp {
+    color: #888;
+    font-size: 12px;
+    margin-bottom: 5px;
+}
+.log-message {
+    color: #fff;
+    font-family: "Courier New", monospace;
+}
+.empty-state {
+    text-align: center;
+    color: #666;
+    padding: 40px;
+    font-style: italic;
+}
+/* Scrollbar styling */
+.logs-container::-webkit-scrollbar,
+.msgs-container::-webkit-scrollbar {
+    width: 8px;
+}
+.logs-container::-webkit-scrollbar-track,
+.msgs-container::-webkit-scrollbar-track {
+    background: #1a1a1a;
+    border-radius: 10px;
+}
+.logs-container::-webkit-scrollbar-thumb {
+    background: #4caf50;
+    border-radius: 10px;
+}
+.msgs-container::-webkit-scrollbar-thumb {
+    background: #2196f3;
+    border-radius: 10px;
+}
+.logs-container::-webkit-scrollbar-thumb:hover,
+.msgs-container::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
