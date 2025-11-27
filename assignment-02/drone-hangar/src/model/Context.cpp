@@ -22,23 +22,25 @@ bool Context::isTakeOff(){
 }
 
 bool Context::isDroneFullyOut(){
-    return droneFullyOut;
+    return fullyOut;
 }
 
 bool Context::isAlarm(){
     return alarm;
 }
 
-bool Context::isImminentLanding(){
-    return imminentLanding;
+bool Context::isFullyOut(){
+    return this->fullyOut;
 }
 
-bool Context::isDroneDetected()
-{
-    return droneDetected;
+void Context::setFullyOut(bool out){
+    this->fullyOut = out;
 }
 
-bool Context::isFullyIn()
-{
-    return false;
+void Context::setLanding(bool landing){
+    this->landing = landing;
+}
+
+void Context::setTakeOff(bool takeoff){
+    this->takeOff = takeOff;
 }

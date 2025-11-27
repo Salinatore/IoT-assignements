@@ -11,7 +11,7 @@ public:
     this->content = content;
   }
   
-  String getContent(){
+  String getContent() const{
     return content;
   }
 };
