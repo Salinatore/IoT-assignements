@@ -13,6 +13,7 @@ class DroneState(str, Enum):
 
 class HangarState(str, Enum):
     NORMAL = "NORMAL"
+    PREALARM = "PREALARM"
     ALARM = "ALARM"
 
 
@@ -24,19 +25,17 @@ class State(BaseModel):
     def setMessageHandler(self, on_status_change: Callable[None, None]) -> None:
         self._on_status_change = on_status_change
 
-    @model_serializer
-    def ser_model(self) -> dict[str, Any]:
-        data = {
-            "drone_state": self._drone_state,
-            "hangar_state": self._hangar_state,
-        }
+    def is_possible_to_land(self) -> bool:
+        return (
+            self._drone_state == DroneState.OPERATING
+            and self._hangar_state == HangarState.NORMAL
+        )
 
-        if self._drone_state in (DroneState.TAKING_OFF, DroneState.LANDING):
-            data["current_distance"] = self._current_distance
-        else:
-            data["current_distance"] = "ND"
-
-        return data
+    def is_possible_to_take_off(self) -> bool:
+        return (
+            self._drone_state == DroneState.REST
+            and self._hangar_state == HangarState.NORMAL
+        )
 
     def set_drone_state(self, new_drone_state: DroneState):
         self._drone_state = new_drone_state
@@ -49,3 +48,28 @@ class State(BaseModel):
     def _handle_status_change(self):
         if self._on_status_change:
             self._on_status_change()
+
+    @model_serializer
+    def ser_model(self) -> dict[str, Any]:
+        if (
+            self._hangar_state in HangarState.ALARM
+            and self._drone_state in DroneState.OPERATING
+        ):
+            hangar_state = self._hangar_state
+        else:
+            hangar_state = "ND"
+
+        if self._drone_state in DroneState.LANDING:
+            current_distance = self._current_distance
+        else:
+            current_distance = "ND"
+
+        data = {
+            "drone_state": self._drone_state,
+            "hangar_state": hangar_state,
+            "current_distance": current_distance,
+            "can_land": self.is_possible_to_land(),
+            "can_take_off": self.is_possible_to_take_off(),
+        }
+
+        return data

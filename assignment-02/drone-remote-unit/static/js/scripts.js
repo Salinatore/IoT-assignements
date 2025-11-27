@@ -1,11 +1,12 @@
 let ws = null;
 const logsContainer = document.getElementById("logsContainer");
+const msgsContainer = document.getElementById("masgsContainer");
 const statusDiv = document.getElementById("status");
 const statusDrone = document.getElementById("dronestatus");
 const statusHangar = document.getElementById("hangarstatus");
 const current_distance = document.getElementById("distance");
-const commandInput = document.getElementById("commandInput");
-const sendBtn = document.getElementById("sendBtn");
+const takaOffBtn = document.getElementById("takeoffBtn");
+const landingBtn = document.getElementById("landingBtn");
 
 function connect() {
   ws = new WebSocket("ws://localhost:8000/ws");
@@ -14,18 +15,23 @@ function connect() {
     console.log("Connected to WebSocket");
     statusDiv.textContent = "✓ Connected";
     statusDiv.className = "status connected";
-    commandInput.disabled = false;
-    sendBtn.disabled = false;
   };
 
   ws.onmessage = (event) => {
     const data = JSON.parse(event.data);
     console.log(data);
-    if (data.type === "log") {
-      addLogEntry(data.data);
-    }
-    if (data.type === "state") {
-      refreshStatus(data.data);
+
+    switch (data.type) {
+      case "log":
+        addLogEntry(data.data);
+        break;
+      case "state":
+        refreshStatus(data.data);
+        break;
+      case "msg":
+        addMsgEntry(data.data);
+      default:
+        console.warn(`Unknown message type: ${data.type}`);
     }
   };
 
@@ -33,8 +39,6 @@ function connect() {
     console.log("Disconnected from WebSocket");
     statusDiv.textContent = "✗ Disconnected";
     statusDiv.className = "status disconnected";
-    commandInput.disabled = true;
-    sendBtn.disabled = true;
     setTimeout(connect, 3000);
   };
 
@@ -44,7 +48,7 @@ function connect() {
 }
 
 function addLogEntry(log) {
-  const emptyState = logsContainer.querySelector("empty-state");
+  const emptyState = logsContainer.querySelector(".empty-state");
   if (emptyState) {
     emptyState.remove();
   }
@@ -66,23 +70,26 @@ function addLogEntry(log) {
   }
 }
 
-async function sendCommand() {
-  const command = commandInput.value.trim();
-  if (!command) return;
+function addMsgEntry(msg) {
+  const emptyState = msgsContainer.querySelector(".empty-state");
+  if (emptyState) {
+    emptyState.remove();
+  }
 
-  try {
-    const response = await fetch(
-      `http://localhost:8000/send?msg=${encodeURIComponent(command)}`,
-    );
-    const data = await response.json();
+  const msgEntry = document.createElement("div");
+  msgEntry.className = "msg-entry";
 
-    if (data.status === "success") {
-      commandInput.value = "";
-      console.log("Command sent successfully");
-    }
-  } catch (error) {
-    console.error("Error sending command:", error);
-    alert("Failed to send command");
+  const timestamp = new Date(msg.timestamp).toLocaleTimeString();
+
+  msgEntry.innerHTML = `
+          <div class="msg-timestamp">${timestamp}</div>
+          <div class="msg-message">${escapeHtml(msg.message)}</div>
+        `;
+
+  msgsContainer.insertBefore(msgEntry, msgsContainer.firstChild);
+
+  while (msgsContainer.children.length > 50) {
+    msgsContainer.removeChild(msgsContainer.lastChild);
   }
 }
 
@@ -97,26 +104,41 @@ function escapeHtml(text) {
   return div.innerHTML;
 }
 
-commandInput.addEventListener("keypress", (e) => {
-  if (e.key === "Enter") {
-    sendCommand();
+landingBtn.addEventListener("click", async () => {
+  try {
+    const response = await fetch(`http://localhost:8000/landing`);
+    const data = await response.json();
+    console.log(data);
+  } catch (error) {
+    console.error("Error sending command:", error);
+    alert("Failed to send command");
+  }
+});
+
+takaOffBtn.addEventListener("click", async () => {
+  try {
+    const response = await fetch(`http://localhost:8000/take-off`);
+    const data = await response.json();
+    console.log(data);
+  } catch (error) {
+    console.error("Error sending command:", error);
+    alert("Failed to send command");
   }
 });
 
 function refreshStatus(data) {
-  const json_data = JSON.parse(data);
-  statusDrone.textContent = json_data.drone_state;
-  statusHangar.textContent = json_data.hangar_state;
-  current_distance.textContent = json_data.current_distance;
+  statusDrone.textContent = data.drone_state;
+  statusHangar.textContent = data.hangar_state;
+  current_distance.textContent = data.current_distance;
+  takaOffBtn.disabled = !data.can_take_off;
+  landingBtn.disabled = !data.can_land;
 }
 
 async function initializeStatus() {
   try {
     const response = await fetch(`http://localhost:8000/state`);
     const data = await response.json();
-    statusDrone.textContent = data.drone_state;
-    statusHangar.textContent = data.hangar_state;
-    current_distance.textContent = data.current_distance;
+    refreshStatus(data);
   } catch (error) {
     console.error("Error sending command:", error);
     alert("Failed to send command");

@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from config import BAUD, PORT
 from controllers.serial_manager import SerialManager
-from model.state import State
+from model.state import DroneState, HangarState, State
 
 active_websockets: Set[WebSocket] = set()
 
@@ -30,7 +30,7 @@ async def broadcast_to_clients(message: dict):
 def handle_state_change():
     try:
         type = "state"
-        current_state = state.model_dump_json()
+        current_state = state.model_dump()
         asyncio.create_task(broadcast_to_clients({"type": type, "data": current_state}))
     except Exception as e:
         print(f"Error broadcasting message: {e}")
@@ -48,12 +48,27 @@ def handle_serial_message(msg: str):
         entry = {"timestamp": datetime.now().isoformat(), "message": log_content}
     else:
         type = "msg"
+        state_interpreter(msg)
         entry = {"timestamp": datetime.now().isoformat(), "message": msg}
 
     try:
         asyncio.create_task(broadcast_to_clients({"type": type, "data": entry}))
     except Exception as e:
         print(f"Error broadcasting message: {e}")
+
+
+def state_interpreter(msg: str) -> None:
+    match msg:
+        case "st-d-fully-out":
+            state.set_drone_state(DroneState.OPERATING)
+        case "st-d-fully-in":
+            state.set_drone_state(DroneState.REST)
+        case "st-a-prealarm":
+            state.set_hangar_state(HangarState.PREALARM)
+        case "st-a-alarm":
+            state.set_hangar_state(HangarState.ALARM)
+        case "st-a-normal":
+            state.set_hangar_state(HangarState.NORMAL)
 
 
 serial_manager = SerialManager(
@@ -103,15 +118,32 @@ async def get_state() -> State:
     return state
 
 
-@app.get("/send")
-async def send(msg: str):
+@app.get("/landing")
+async def landing():
     """Send command to Arduino"""
-    if not msg:
-        raise HTTPException(status_code=400, detail="Message cannot be empty")
+    if not state.is_possible_to_land():
+        return {"status": "error"}
+
+    state.set_drone_state(DroneState.REST)
 
     try:
-        await serial_manager.send(msg)
-        return {"status": "success", "message": f"Sent: {msg}"}
+        await serial_manager.send("landing")
+        return {"status": "success"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/take-off")
+async def take_off():
+    """Send command to Arduino"""
+    if not state.is_possible_to_take_off():
+        return {"status": "error"}
+
+    state.set_drone_state(DroneState.OPERATING)
+
+    try:
+        await serial_manager.send("free-your-wings")
+        return {"status": "success"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

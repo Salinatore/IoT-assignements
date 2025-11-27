@@ -11,21 +11,22 @@
             <h1>🚁 Drone Control - Real-time Logs</h1>
 
             <div id="status" class="status disconnected">Disconnected</div>
-            <div id="dronestatus">Ciao</div>
-            <div id="hangarstatus">Ciao</div>
-            <div id="distance">Ciao</div>
+            <div id="dronestatus">Waiting...</div>
+            <div id="hangarstatus">Waiting...</div>
+            <div id="distance">Waiting...</div>
 
             <div class="controls">
-                <input
-                    type="text"
-                    id="commandInput"
-                    placeholder="Enter command (e.g., LED_ON, TAKEOFF, LAND)"
-                    disabled
-                />
-                <button id="sendBtn" onclick="sendCommand()" disabled>
-                    Send
+                <button id="takeoffBtn" onclick="click" disabled>
+                    Request TakeOff
+                </button>
+                <button id="landingBtn" onclick="click" disabled>
+                    Request Landing
                 </button>
                 <button onclick="clearLogs()">Clear Logs</button>
+            </div>
+
+            <div class="msgs-container">
+                <div class="empty-state">No messages yet. Waiting...</div>
             </div>
 
             <div class="logs-container" id="logsContainer">
