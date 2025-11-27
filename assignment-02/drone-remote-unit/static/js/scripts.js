@@ -128,8 +128,16 @@ takaOffBtn.addEventListener("click", async () => {
 
 function refreshStatus(data) {
   statusDrone.textContent = data.drone_state;
-  statusHangar.textContent = data.hangar_state;
-  current_distance.textContent = data.current_distance;
+  if (data.hangar_state !== "ND") {
+    statusHangar.textContent = data.hangar_state;
+  } else {
+    statusHangar.textContent = "";
+  }
+  if (data.current_distance !== "ND") {
+    current_distance.textContent = data.current_distance;
+  } else {
+    current_distance.textContent = "";
+  }
   takaOffBtn.disabled = !data.can_take_off;
   landingBtn.disabled = !data.can_land;
 }
