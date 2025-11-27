@@ -7,6 +7,8 @@
 #include "devices/ServoMotor.h"
 #include "devices/TempSensorTMP36.h"
 #include "devices/MyLcd.h"
+#include <devices/Pir.h>
+#include <devices/Sonar.h>
 
 
 class HWPlatform {
