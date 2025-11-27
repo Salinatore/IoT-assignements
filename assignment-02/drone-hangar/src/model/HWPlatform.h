@@ -4,11 +4,10 @@
 #include "config.h"
 #include "devices/Button.h"
 #include "devices/Led.h"
-#include "devices/Pir.h"
-#include "devices/Sonar.h"
 #include "devices/ServoMotor.h"
 #include "devices/TempSensorTMP36.h"
 #include "devices/MyLcd.h"
+
 
 class HWPlatform {
 
@@ -41,7 +40,6 @@ private:
   Pir* presenceDetector;
   Sonar* distanceDetector;
   TempSensorTMP36* tempSensor;
-
 };
 
 #endif
