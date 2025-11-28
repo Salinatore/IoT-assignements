@@ -87,7 +87,7 @@ void DroneTask::tick(){
 
 
 
-        if ((this->time - millis()) > T1 || context->isAlarm()){
+        if ((this->time - millis()) > BLINK_PERIOD || context->isAlarm()){
             //manda messaggio fully out
             MsgService.sendMsg(FULLYOUT);
             this->time = 0;

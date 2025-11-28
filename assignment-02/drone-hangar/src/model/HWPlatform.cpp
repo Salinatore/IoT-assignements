@@ -3,9 +3,7 @@
 #include "devices/ButtonImpl.h"
 #include "kernel/MsgService.h"
 #include "config.h"
-#include "devices/Led.h"
 #include "devices/ServoMotorImpl.h"
-#include "kernel/Logger.h"
 
 void wakeUp(){}
 
