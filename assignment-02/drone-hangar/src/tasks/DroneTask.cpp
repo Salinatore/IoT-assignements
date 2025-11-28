@@ -71,6 +71,8 @@ void DroneTask::tick(){
 
     case TAKE_OFF: {
         if (this->checkAndSetJustEntered()){
+            this->time = 0;
+            this->isTimerActive = false;
             Logger.log(F("TAKE-OFF"));
         }
 
@@ -95,8 +97,6 @@ void DroneTask::tick(){
         if ((millis() - this->time) > T1 || context->isAlarm()){
             //manda messaggio fully out
             MsgService.sendMsg(FULLYOUT);
-            this->time = 0;
-            this->isTimerActive = false;
             this->setState(OUT);
             context->setDroneOut(true);
         }
@@ -156,6 +156,8 @@ void DroneTask::tick(){
 
     case LANDING: {
         if (this->checkAndSetJustEntered()){
+            this->time = 0;
+            this->isTimerActive = false;
             Logger.log(F("LNADING"));
         }
 
@@ -178,8 +180,6 @@ void DroneTask::tick(){
         if ((millis() - this->time) > T2 || context->isAlarm()){
             //manda messaggio fully in
             MsgService.sendMsg(FULLYIN);
-            this->time = 0;
-            this->isTimerActive = false;
             this->setState(IN);
             this->context->setLanding(false);
             this->context->setDroneOut(false);
