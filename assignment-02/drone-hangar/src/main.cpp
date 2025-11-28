@@ -28,7 +28,6 @@ void setup() {
       pContext, 
       pHWPlatform->getDPD(),
       pHWPlatform->getDDD(), 
-      pHWPlatform->getTempSensor(),
       pHWPlatform->getMotor()
   );
   pDroneTask->init(50);
