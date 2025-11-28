@@ -19,6 +19,7 @@ class Context {
     bool isTakeOff();
     bool isAlarm();
     bool isDroneOut();
+    bool isLanding();
     void setDroneOut(bool out);
     void setLanding(bool landing);
     void setTakeOff(bool takeoff);

@@ -5,6 +5,7 @@ Context::Context(){
     alarm = false;
     droneOut = false;
     takeOff = false;
+    landing = false;
 }
 
 bool Context::isPreAlarm(){
@@ -21,6 +22,10 @@ bool Context::isAlarm(){
 
 bool Context::isDroneOut(){
     return this->droneOut;
+}
+
+bool Context::isLanding(){
+    return this->landing;
 }
 
 void Context::setDroneOut(bool out){
