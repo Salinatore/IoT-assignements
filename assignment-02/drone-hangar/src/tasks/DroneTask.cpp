@@ -33,7 +33,6 @@ DroneTask::DroneTask(Context* context, Pir* presenceDetector, Sonar* distanceDet
     this->presenceDetector = presenceDetector;
     this->servo = servo;
     this->context = context;
-    this->time = 0;
     this->isTimerActive = false;
     this->isDoorOpen = false;
     this->imminentLanding = false;
