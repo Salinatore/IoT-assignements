@@ -7,22 +7,25 @@
 
 class DroneTask: public Task {
     public:
-        DroneTask(Context* context, Pir* presenceDetector, Sonar* distanceDetector, TempSensorTMP36* tempSensor, ServoMotor* servo);
+        DroneTask(Context* context, Pir* presenceDetector, Sonar* distanceDetector, ServoMotor* servo);
         void tick();
 
     private:
-        HWPlatform* pHW;
-        Context* context;
+        unsigned long time;
         bool isDoorOpen;
         bool imminentLanding;
-        unsigned long time;
         bool isTimerActive;
+        bool justEntered;
+        HWPlatform* pHW;
+        Context* context;
         Pir* presenceDetector;
         Sonar* distanceDetector;
-        TempSensorTMP36* tempSensor;
         ServoMotor* servo;
 
-        enum { IN, TAKE_OFF, OUT, WAITING_FOR_LANDING, LANDING, ALARM_IN, ALARM_OUT } state;
+        enum State { IN, TAKE_OFF, OUT, WAITING_FOR_LANDING, LANDING, ALARM_IN, ALARM_OUT } state;
+
+        void setState(State state);
+        bool checkAndSetJustEntered();
 };
 
 
