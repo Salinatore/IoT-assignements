@@ -3,7 +3,7 @@
 Context::Context(){
     preAlarm = false;
     alarm = false;
-    fullyOut = false;
+    droneOut = false;
     takeOff = false;
 }
 
@@ -15,20 +15,16 @@ bool Context::isTakeOff(){
     return takeOff;
 }
 
-bool Context::isDroneFullyOut(){
-    return fullyOut;
-}
-
 bool Context::isAlarm(){
     return alarm;
 }
 
-bool Context::isFullyOut(){
-    return this->fullyOut;
+bool Context::isDroneOut(){
+    return this->droneOut;
 }
 
-void Context::setFullyOut(bool out){
-    this->fullyOut = out;
+void Context::setDroneOut(bool out){
+    this->droneOut = out;
 }
 
 void Context::setLanding(bool landing){

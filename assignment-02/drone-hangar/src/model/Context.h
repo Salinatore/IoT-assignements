@@ -6,7 +6,7 @@ class Context {
   private:
     bool preAlarm;
     bool alarm;
-    bool fullyOut;
+    bool droneOut;
     bool takeOff;
     bool landing;
     // bool droneIn;
@@ -17,10 +17,9 @@ class Context {
     Context();
     bool isPreAlarm();
     bool isTakeOff();
-    bool isDroneFullyOut();
     bool isAlarm();
-    bool isFullyOut();
-    void setFullyOut(bool out);
+    bool isDroneOut();
+    void setDroneOut(bool out);
     void setLanding(bool landing);
     void setTakeOff(bool takeoff);
 };
