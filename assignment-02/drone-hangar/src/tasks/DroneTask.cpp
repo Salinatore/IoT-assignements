@@ -122,6 +122,7 @@ void DroneTask::tick(){
         }
         if (MsgService.isMsgAvailable(landing) && !context->isPreAlarm()){
             MsgService.receiveMsg(landing);
+            this->context->setDroneOut(false);
             this->setState(WAITING_FOR_LANDING);
         }
         break;
@@ -182,7 +183,6 @@ void DroneTask::tick(){
             MsgService.sendMsg(FULLYIN);
             this->setState(IN);
             this->context->setLanding(false);
-            this->context->setDroneOut(false);
         }
         break;
     }
