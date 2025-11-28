@@ -39,3 +39,11 @@ void Context::setLanding(bool landing){
 void Context::setTakeOff(bool takeoff){
     this->takeOff = takeOff;
 }
+
+void Context::setAlarm(bool alarm){
+    this->alarm = alarm;
+}
+
+void Context::setPreAlarm(bool preAlarm){
+    this->preAlarm = preAlarm;
+}

@@ -9,20 +9,23 @@ class Context {
     bool droneOut;
     bool takeOff;
     bool landing;
-    // bool droneIn;
-    // bool droneOut;
-    // bool waitingForLanding;
 
   public:
     Context();
-    bool isPreAlarm();
+
     bool isTakeOff();
-    bool isAlarm();
     bool isDroneOut();
     bool isLanding();
+
+    bool isAlarm();
+    bool isPreAlarm();
+
     void setDroneOut(bool out);
     void setLanding(bool landing);
     void setTakeOff(bool takeoff);
+    
+    void setAlarm(bool alarm);
+    void setPreAlarm(bool preAlarm);
 };
 
 #endif
