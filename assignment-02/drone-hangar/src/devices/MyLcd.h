@@ -1,16 +1,13 @@
-#ifndef __MYLCD__
-#define __MYLCD__
+#ifndef MYLCD_H
+#define MYLCD_H
 
-#include <string.h>
+#include <Arduino.h>
 
-class MyLcd{
+class MyLcd {
 private:
-
-
 public:
     MyLcd();
     void writeMessage(String message);
 };
-
 
 #endif

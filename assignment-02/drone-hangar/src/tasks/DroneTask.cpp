@@ -1,6 +1,7 @@
 #include "DroneTask.h"
 #include "Arduino.h"
 #include "kernel/MsgService.h"
+#include "kernel/Logger.h"
 
 
 #define D1 30
@@ -27,13 +28,17 @@ public:
 };
 
 
-DroneTask::DroneTask(HWPlatform *pHW, Context* context){
-    this->pHW = pHW;
+DroneTask::DroneTask(Context* context, Pir* presenceDetector, Sonar* distanceDetector, TempSensorTMP36* tempSensor, ServoMotor* servo){
+    this->distanceDetector = distanceDetector;
+    this->presenceDetector = presenceDetector;
+    this->tempSensor = tempSensor;
+    this->servo = servo;
     this->context = context;
     this->time = 0;
     this->isTimerActive = false;
     this->isDoorOpen = false;
     this->imminentLanding = false;
+    this->state = IN;
     MsgService.init();
 }
 
@@ -42,29 +47,34 @@ void DroneTask::tick(){
 
 
     case IN: {
+        Logger.log(F("in"));
         if (this->isDoorOpen){
-            this->pHW->closeDoor();
+            this->servo->setPosition(0);
             this->isDoorOpen = false;
         }
 
         TakeoffPattern t;
         if (!context->isPreAlarm() && MsgService.receiveMsg(t)){
+            Logger.log(F("TAKE_OFF"));
             state = TAKE_OFF;
             this->context->setTakeOff(true);
         }
         if(context->isAlarm()){
+            Logger.log(F("ALARM_IN"));
             state = ALARM_IN;
-        }
+        }    
+        Logger.log(F("2in"));
         break;
     }
 
 
     case TAKE_OFF: {
+        Logger.log(F("take-off"));
         if (!this->isDoorOpen){
-            this->pHW->openDoor();
+            this->servo->setPosition(180);
             this->isDoorOpen = true;
         } else {
-            float distance = this->pHW->getDistance();
+            float distance = this->distanceDetector->getDistance();
 
             if (distance > D1 && !this->isTimerActive){
                 this->time = millis();
@@ -90,7 +100,7 @@ void DroneTask::tick(){
     case OUT: {
         if (this->isDoorOpen){
             this->context->setTakeOff(false);
-            this->pHW->closeDoor();
+            this->servo->setPosition(0);
             this->isDoorOpen = false;
         }
 
@@ -112,7 +122,7 @@ void DroneTask::tick(){
 
 
     case WAITING_FOR_LANDING: {
-        if (this->pHW->isDetected()){
+        if (this->presenceDetector->isDetected()){
             state = LANDING;
             this->context->setLanding(true);
         }
@@ -122,10 +132,10 @@ void DroneTask::tick(){
     }
     case LANDING: {
         if (!this->isDoorOpen){
-            this->pHW->openDoor();
+            this->servo->setPosition(0);
             this->isDoorOpen = true;
         } else {
-            float distance = this->pHW->getDistance();
+            float distance = this->distanceDetector->getDistance();
 
             if (distance < D2 && !this->isTimerActive){
                 this->time = millis();
@@ -152,5 +162,6 @@ void DroneTask::tick(){
         if(!context->isAlarm()){
             state = IN;
         }
+    }
     }
 }

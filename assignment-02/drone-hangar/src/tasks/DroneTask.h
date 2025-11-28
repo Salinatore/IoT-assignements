@@ -7,7 +7,7 @@
 
 class DroneTask: public Task {
     public:
-        DroneTask(HWPlatform* pHW, Context* context);
+        DroneTask(Context* context, Pir* presenceDetector, Sonar* distanceDetector, TempSensorTMP36* tempSensor, ServoMotor* servo);
         void tick();
 
     private:
@@ -17,6 +17,10 @@ class DroneTask: public Task {
         bool imminentLanding;
         unsigned long time;
         bool isTimerActive;
+        Pir* presenceDetector;
+        Sonar* distanceDetector;
+        TempSensorTMP36* tempSensor;
+        ServoMotor* servo;
 
         enum { IN, TAKE_OFF, OUT, WAITING_FOR_LANDING, LANDING, ALARM_IN, ALARM_OUT } state;
 };

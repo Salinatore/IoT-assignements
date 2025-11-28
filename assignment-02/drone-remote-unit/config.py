@@ -1,2 +1,2 @@
-PORT = "/dev/tty.usbmodem101"
+PORT = "/dev/tty.usbmodem1101"
 BAUD = 115200

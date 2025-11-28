@@ -1,6 +1,5 @@
 #include "MyLcd.h"
 #include "Arduino.h"
-#include <string.h>
 #include <LiquidCrystal_I2C.h>
 
 #define I2C_ADDR    0x27

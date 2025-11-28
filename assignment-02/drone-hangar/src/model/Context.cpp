@@ -1,16 +1,10 @@
 #include "Context.h"
 
 Context::Context(){
-    // preAlarm = false;
-    // alarm = false;
-    // fullyOut = false;
-    // imminentLanding = false;
-    // droneDetected = false;
-    // fullyIn = false;
-    // takeOff = false;
-    // droneIn = true;
-    // droneOut = false;
-    // waitingForLanding = false;
+    preAlarm = false;
+    alarm = false;
+    fullyOut = false;
+    takeOff = false;
 }
 
 bool Context::isPreAlarm(){

@@ -16,10 +16,6 @@ class HWPlatform {
 public:
   HWPlatform();
   void test();
-  void openDoor();
-  void closeDoor();
-  float getDistance();
-  bool isDetected();
 
 
   Button* getButton();

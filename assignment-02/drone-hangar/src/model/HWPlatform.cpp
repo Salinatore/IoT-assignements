@@ -21,25 +21,6 @@ HWPlatform::HWPlatform(){
   this->tempSensor = new TempSensorTMP36(TEMP_PIN);
 }
 
-void HWPlatform::test(){
-}
-
-void HWPlatform::openDoor(){
-  this->getMotor()->setPosition(180);
-}
-
-void HWPlatform::closeDoor(){
-  this->getMotor()->setPosition(0);
-}
-
-float HWPlatform::getDistance(){
-  return this->distanceDetector->getDistance();
-}
-
-bool HWPlatform::isDetected(){
-    return this->presenceDetector->isDetected();
-}
-
 Button* HWPlatform::getButton(){
   return this->resetButton;
 }

@@ -1,22 +1,39 @@
 #include <Arduino.h>
+#include "config.h"
+#include "kernel/Scheduler.h"
 #include "kernel/Logger.h"
 #include "kernel/MsgService.h"
 #include "model/HWPlatform.h"
+#include "tasks/TestHWTask.h"
+#include "tasks/DroneTask.h"
 
 // #define __TESTING_HW__
 
-bool isOn = false;
+Scheduler sched;
+
 HWPlatform* pHWPlatform;
+Context* pContext;
 
 void setup() {
   MsgService.init();
+  sched.init(50);
   Logger.log(":::::: Sweeping System ::::::");
 
   pHWPlatform = new HWPlatform();
-  pHWPlatform->init();
-  
-#ifndef __TESTING_HW__
 
+#ifndef __TESTING_HW__
+  pContext = new Context();
+
+  Task* pDroneTask = new DroneTask(
+      pContext, 
+      pHWPlatform->getDPD(),
+      pHWPlatform->getDDD(), 
+      pHWPlatform->getTempSensor(),
+      pHWPlatform->getMotor()
+  );
+  pDroneTask->init(50);
+
+  sched.addTask(pDroneTask);
 #endif
 
 #ifdef __TESTING_HW__
@@ -25,16 +42,5 @@ void setup() {
 }
 
 void loop() {
-    if (MsgService.isMsgAvailable()) {
-      Msg* msg = MsgService.receiveMsg();
-      delete msg;
-      Led* pLed = pHWPlatform->getLed();
-      if (!isOn) {
-        isOn = true;
-        pLed->switchOn();
-      } else {
-        isOn = false;
-        pLed->switchOff();
-      }
-    }
+    sched.schedule();
 }
