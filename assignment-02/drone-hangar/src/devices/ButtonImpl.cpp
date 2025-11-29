@@ -3,7 +3,7 @@
 
 ButtonImpl::ButtonImpl(int pin){
   this->pin = pin;
-  pinMode(pin, INPUT);     
+  pinMode(pin, INPUT_PULLUP);     
 } 
   
 bool ButtonImpl::isPressed(){

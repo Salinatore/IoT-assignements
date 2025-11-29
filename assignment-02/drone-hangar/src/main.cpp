@@ -31,7 +31,7 @@ void setup() {
       pHWPlatform->getMotor()
   );
   pDroneTask->init(50);
-
+  pHWPlatform->getMotor()->on();
   sched.addTask(pDroneTask);
 #endif
 

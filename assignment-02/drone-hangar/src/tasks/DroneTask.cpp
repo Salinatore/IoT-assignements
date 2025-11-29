@@ -34,7 +34,7 @@ DroneTask::DroneTask(Context* context, Pir* presenceDetector, Sonar* distanceDet
     this->servo = servo;
     this->context = context;
     this->isTimerActive = false;
-    this->isDoorOpen = false;
+    this->isDoorOpen = true;
     this->imminentLanding = false;
     this->setState(IN);
     MsgService.init();
@@ -162,7 +162,7 @@ void DroneTask::tick(){
         }
 
         if (!this->isDoorOpen){
-            this->servo->setPosition(0);
+            this->servo->setPosition(180);
             this->isDoorOpen = true;
         }
 
