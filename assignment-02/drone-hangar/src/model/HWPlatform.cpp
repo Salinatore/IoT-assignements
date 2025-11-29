@@ -4,6 +4,13 @@
 #include "kernel/MsgService.h"
 #include "config.h"
 #include "devices/ServoMotorImpl.h"
+#include "kernel/Logger.h"
+
+#define TEST_ANGLE 56
+#define TEST_MIN_TEMP 0.0
+#define TEST_MAX_TEMP 40
+#define TEST_MAX_DISTANCE 331.5 + 0.6 * SONAR_TIME
+#define TEST_MIN_DISTANCE -1
 
 void wakeUp(){}
 
@@ -53,4 +60,22 @@ Sonar* HWPlatform::getDDD(){
 
 TempSensorTMP36* HWPlatform::getTempSensor(){
   return this->tempSensor;
+}
+
+void HWPlatform::test(){
+  this->led1->switchOn();
+  this->led2->switchOn();
+  this->ledR->switchOn();
+  this->servo->setPosition(TEST_ANGLE);
+  this->lcd->writeMessage("TEST");
+  if(this->presenceDetector->isDetected()){
+    Logger.log(F("TEST: precence detector = detect motion"));
+  }
+  if(this->distanceDetector->getDistance() > TEST_MAX_DISTANCE && this->distanceDetector->getDistance() < TEST_MIN_DISTANCE){
+    Logger.log(F("TEST: distance detector = detect something"));
+  }
+  if(this->tempSensor->getTemperature() >  TEST_MIN_TEMP && this->tempSensor->getTemperature() < TEST_MAX_TEMP ){
+    Logger.log(F("TEST: temperature sensor = acceptable temperature detection"));
+  }
+
 }
