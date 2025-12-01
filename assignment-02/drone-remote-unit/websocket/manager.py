@@ -37,7 +37,7 @@ class WebSocketManager:
                 try:
                     message = json.loads(data)
                     print(message)
-                    await self.websocket_message_handler.handle_message(message)
+                    await self.websocket_message_handler.handle_ws_message(message)
                 except json.JSONDecodeError:
                     print(f"Invalid JSON received: {data}")
 

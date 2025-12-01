@@ -5,7 +5,7 @@ from websocket.manager import WebSocketManager
 
 
 class MessageToWebSocketHandler:
-    """Handles incoming serial messages"""
+    """Handles all communication to websocket"""
 
     def __init__(self, state: State, ws_manager: WebSocketManager):
         self.state = state
@@ -17,15 +17,15 @@ class MessageToWebSocketHandler:
             {"type": "state", "data": self.state.model_dump()}
         )
 
-    async def handle_message(self, msg: str) -> None:
-        """Process incoming serial messages and broadcast to clients"""
+    async def handle_serial_message(self, msg: str) -> None:
+        """Process all incoming serial messages, parse them and then broadcast to clients"""
         if msg.startswith("lo:"):
             await self._handle_log_message(msg)
         else:
             await self._handle_state_message(msg)
 
     async def _handle_log_message(self, msg: str):
-        """Handle log messages (prefixed with 'lo:')"""
+        """Handle log messages"""
         log_content = msg[3:]
         entry = {"timestamp": datetime.now().isoformat(), "message": log_content}
         await self.ws_manager.broadcast({"type": "log", "data": entry})

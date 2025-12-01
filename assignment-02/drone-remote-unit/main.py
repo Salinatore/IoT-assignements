@@ -31,7 +31,7 @@ async def lifespan(app: FastAPI):
     """Manage application lifecycle"""
     try:
         print("Starting serial connection...")
-        await serial_manager.start(message_to_web_socket.handle_message)
+        await serial_manager.start(message_to_web_socket.handle_serial_message)
         print("Serial connection started")
         yield
     except Exception as e:
@@ -57,6 +57,7 @@ app.add_middleware(
 
 @app.get("/")
 async def root() -> dict:
+    """Returns a message indicating the status of the Drone Control API"""
     return {"message": "Drone Control API", "status": "running"}
 
 

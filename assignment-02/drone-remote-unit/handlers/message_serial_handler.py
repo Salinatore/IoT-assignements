@@ -3,11 +3,14 @@ from serial_communication.serial_manager import SerialManager
 
 
 class MessageToSerialHandler:
+    """Handles all communication to serial"""
+
     def __init__(self, state: State, serial_manager: SerialManager):
         self.state = state
         self.serial_manager = serial_manager
 
-    async def handle_message(self, msg: dict) -> None:
+    async def handle_ws_message(self, msg: dict) -> None:
+        """Handles all communication from the websocket"""
         msg_type = msg.get("type")
         data = msg.get("data")
 
