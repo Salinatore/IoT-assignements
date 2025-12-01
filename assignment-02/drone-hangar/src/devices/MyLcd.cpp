@@ -16,15 +16,20 @@ MyLcd::MyLcd(){
 }
 
 void MyLcd::writeStateMessage(String message){
-    lcd.clear();
-    lcd.setCursor(1, 0); 
-    lcd.print("STATE: "+ message);
-    Serial.println(message);
+    this->stateMessage = message;
+    this->refresh();
 };
 
 void MyLcd::writeAlarmMessage(String message){
+    this->alarmMessage = message;
+    this->refresh();
+};
+
+void MyLcd::refresh(){
     lcd.clear();
     lcd.setCursor(0, 0); 
-    lcd.print(message);
-    Serial.println(message);
-};
+    lcd.print(this->alarmMessage);
+    lcd.setCursor(1, 0); 
+    lcd.print("STATE: "+ this->stateMessage);
+    lcd.flush();
+}

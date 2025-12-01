@@ -12,8 +12,8 @@ public:
 private:
     void refresh();
 
-    String alarmMesage;
-    String stateMesage;
+    String alarmMessage;
+    String stateMessage;
 };
 
 #endif

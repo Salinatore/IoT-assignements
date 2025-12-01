@@ -28,13 +28,12 @@ public:
 };
 
 
-DroneTask::DroneTask(Context* context, Pir* presenceDetector, Sonar* distanceDetector, ServoMotor* servo){
+DroneTask::DroneTask(Context* context, Pir* presenceDetector, Sonar* distanceDetector, ServoMotorImpl* servo){
     this->distanceDetector = distanceDetector;
     this->presenceDetector = presenceDetector;
     this->servo = servo;
     this->context = context;
     this->isTimerActive = false;
-    this->isDoorOpen = true;
     this->imminentLanding = false;
     this->setState(IN);
     MsgService.init();
@@ -51,9 +50,8 @@ void DroneTask::tick(){
         }
 
 
-        if (this->isDoorOpen){
+        if (this->isDoorOpen()){
             this->servo->setPosition(0);
-            this->isDoorOpen = false;
         }
 
         TakeoffPattern takeoff;
@@ -77,9 +75,8 @@ void DroneTask::tick(){
         }
 
 
-        if (!this->isDoorOpen){
+        if (!this->isDoorOpen()){
             this->servo->setPosition(180);
-            this->isDoorOpen = true;
         }
         float distance = this->distanceDetector->getDistance();
 
@@ -108,10 +105,9 @@ void DroneTask::tick(){
             Logger.log(F("OUT"));
         }
 
-        if (this->isDoorOpen){
+        if (this->isDoorOpen()){
             this->context->setTakeOff(false);
             this->servo->setPosition(0);
-            this->isDoorOpen = false;
         }
 
 
@@ -161,9 +157,8 @@ void DroneTask::tick(){
             Logger.log(F("LANDING"));
         }
 
-        if (!this->isDoorOpen){
+        if (!this->isDoorOpen()){
             this->servo->setPosition(180);
-            this->isDoorOpen = true;
         }
 
         float distance = this->distanceDetector->getDistance();
@@ -208,4 +203,13 @@ bool DroneTask::checkAndSetJustEntered(){
       justEntered = false;
     }
     return bak;
+}
+
+bool DroneTask::isDoorOpen(){
+    if(this->servo->getAngle() == NULL || this->servo->getAngle() == 0){
+        return false;
+    }
+    else{
+        return true;
+    }
 }
