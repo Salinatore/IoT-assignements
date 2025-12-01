@@ -1,83 +1,28 @@
-import asyncio
-import json
 from contextlib import asynccontextmanager
-from datetime import datetime
-from typing import Set
 
 import uvicorn
-from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from config import BAUD, PORT
-from controllers.serial_manager import SerialManager
-from model.state import DroneState, HangarState, State
-
-active_websockets: Set[WebSocket] = set()
-
-
-async def broadcast_to_clients(message: dict):
-    """Send message to all connected WebSocket clients"""
-    disconnected = set()
-
-    for websocket in active_websockets:
-        try:
-            await websocket.send_json(message)
-        except Exception as e:
-            print(f"Error sending to client: {e}")
-            disconnected.add(websocket)
-
-    active_websockets.difference_update(disconnected)
-
-
-def handle_state_change():
-    try:
-        type = "state"
-        current_state = state.model_dump()
-        asyncio.create_task(broadcast_to_clients({"type": type, "data": current_state}))
-    except Exception as e:
-        print(f"Error broadcasting message: {e}")
-
+from handlers.serial_message_handler import SerialMessageHandler
+from handlers.websocket_message_handler import WebSocketMessageHandler
+from model.state import State
+from serial.serial_manager import SerialManager
+from websocket.manager import WebSocketManager
 
 state = State()
-state.setMessageHandler(on_status_change=handle_state_change)
-
-
-def handle_serial_message(msg: str):
-    """Process incoming serial messages and broadcast to clients"""
-    if msg.startswith("lo:"):
-        log_content = msg[3:]
-        type = "log"
-        entry = {"timestamp": datetime.now().isoformat(), "message": log_content}
-    else:
-        type = "msg"
-        state_interpreter(msg)
-        entry = {"timestamp": datetime.now().isoformat(), "message": msg}
-
-    try:
-        asyncio.create_task(broadcast_to_clients({"type": type, "data": entry}))
-    except Exception as e:
-        print(f"Error broadcasting message: {e}")
-
-
-def state_interpreter(msg: str) -> None:
-    match msg:
-        case "st-d-fully-out":
-            state.set_drone_state(DroneState.OPERATING)
-        case "st-d-fully-in":
-            state.set_drone_state(DroneState.REST)
-        case "st-a-prealarm":
-            state.set_hangar_state(HangarState.PREALARM)
-        case "st-a-alarm":
-            state.set_hangar_state(HangarState.ALARM)
-        case "st-a-normal":
-            state.set_hangar_state(HangarState.NORMAL)
-
 
 serial_manager = SerialManager(
     port=PORT,
     baud=BAUD,
-    on_message=handle_serial_message,
 )
+
+ws_msg_handler = WebSocketMessageHandler(state, serial_manager)
+
+ws_manager = WebSocketManager(ws_msg_handler)
+
+serial_msg_handler = SerialMessageHandler(state, ws_manager)
 
 
 @asynccontextmanager
@@ -85,7 +30,7 @@ async def lifespan(app: FastAPI):
     """Manage application lifecycle"""
     try:
         print("Starting serial connection...")
-        await serial_manager.start()
+        await serial_manager.start(serial_msg_handler.handle_message)
         print("Serial connection started")
         yield
     except Exception as e:
@@ -109,77 +54,15 @@ app.add_middleware(
 )
 
 
-async def await_landing():
-    """Send command to Arduino"""
-    if not state.is_possible_to_land():
-        return {"status": "error"}
-
-    state.set_drone_state(DroneState.LANDING)
-
-    try:
-        await serial_manager.send("landing")
-        return {"status": "success"}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-async def take_off():
-    """Send command to Arduino"""
-    if not state.is_possible_to_take_off():
-        return {"status": "error"}
-
-    state.set_drone_state(DroneState.TAKING_OFF)
-
-    try:
-        await serial_manager.send("free-your-wings")
-        return {"status": "success"}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-
 @app.get("/")
 async def root():
     return {"message": "Drone Control API", "status": "running"}
 
 
 @app.websocket("/ws")
-async def websocket_endpoint(websocket: WebSocket):
-    """WebSocket endpoint for real-time log updates"""
-    await websocket.accept()
-    active_websockets.add(websocket)
-
-    print(f"Client connected. Total clients: {len(active_websockets)}")
-
-    type = "state"
-    current_state = state.model_dump()
-    await websocket.send_json({"type": type, "data": current_state})
-
-    try:
-        while True:
-            data = await websocket.receive_text()
-
-            try:
-                message = json.loads(data)
-                msg_type = message.get("type")
-                data = message.get("data")
-
-                match msg_type:
-                    case "command":
-                        if data == "take-off":
-                            await take_off()
-                        elif data == "await-landing":
-                            await await_landing()
-
-            except json.JSONDecodeError:
-                print(f"Invalid JSON received: {data}")
-
-    except WebSocketDisconnect:
-        print("Client disconnected")
-        active_websockets.remove(websocket)
-    except Exception as e:
-        print(f"WebSocket error: {e}")
-        if websocket in active_websockets:
-            active_websockets.remove(websocket)
+async def websocket_endpoint(websocket):
+    """WebSocket endpoint for real-time updates"""
+    await ws_manager.handle_connection(websocket, state)
 
 
 if __name__ == "__main__":
