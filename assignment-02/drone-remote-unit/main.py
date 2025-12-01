@@ -1,8 +1,10 @@
 import asyncio
+import json
 from contextlib import asynccontextmanager
 from datetime import datetime
 from typing import Set
 
+import uvicorn
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -107,19 +109,7 @@ app.add_middleware(
 )
 
 
-@app.get("/")
-async def root():
-    return {"message": "Drone Control API", "status": "running"}
-
-
-@app.get("/state")
-async def get_state() -> State:
-    """Get current drone/hangar state"""
-    return state
-
-
-@app.get("/landing")
-async def landing():
+async def await_landing():
     """Send command to Arduino"""
     if not state.is_possible_to_land():
         return {"status": "error"}
@@ -133,7 +123,6 @@ async def landing():
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.get("/take-off")
 async def take_off():
     """Send command to Arduino"""
     if not state.is_possible_to_take_off():
@@ -148,6 +137,11 @@ async def take_off():
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.get("/")
+async def root():
+    return {"message": "Drone Control API", "status": "running"}
+
+
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     """WebSocket endpoint for real-time log updates"""
@@ -156,10 +150,28 @@ async def websocket_endpoint(websocket: WebSocket):
 
     print(f"Client connected. Total clients: {len(active_websockets)}")
 
+    type = "state"
+    current_state = state.model_dump()
+    await websocket.send_json({"type": type, "data": current_state})
+
     try:
         while True:
             data = await websocket.receive_text()
-            print(f"Received from client: {data}")
+
+            try:
+                message = json.loads(data)
+                msg_type = message.get("type")
+                data = message.get("data")
+
+                match msg_type:
+                    case "command":
+                        if data == "take-off":
+                            await take_off()
+                        elif data == "await-landing":
+                            await await_landing()
+
+            except json.JSONDecodeError:
+                print(f"Invalid JSON received: {data}")
 
     except WebSocketDisconnect:
         print("Client disconnected")
@@ -168,3 +180,7 @@ async def websocket_endpoint(websocket: WebSocket):
         print(f"WebSocket error: {e}")
         if websocket in active_websockets:
             active_websockets.remove(websocket)
+
+
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

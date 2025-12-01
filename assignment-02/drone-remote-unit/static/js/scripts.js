@@ -107,9 +107,7 @@ function escapeHtml(text) {
 
 landingBtn.addEventListener("click", async () => {
   try {
-    const response = await fetch(`http://localhost:8000/landing`);
-    const data = await response.json();
-    console.log(data);
+    await ws.send(JSON.stringify({ type: "command", data: "await-landing" }));
   } catch (error) {
     console.error("Error sending command:", error);
     alert("Failed to send command");
@@ -118,9 +116,7 @@ landingBtn.addEventListener("click", async () => {
 
 takaOffBtn.addEventListener("click", async () => {
   try {
-    const response = await fetch(`http://localhost:8000/take-off`);
-    const data = await response.json();
-    console.log(data);
+    await ws.send(JSON.stringify({ type: "command", data: "take-off" }));
   } catch (error) {
     console.error("Error sending command:", error);
     alert("Failed to send command");
@@ -145,18 +141,5 @@ function refreshStatus(data) {
   takaOffBtn.disabled = !data.can_take_off;
   landingBtn.disabled = !data.can_land;
 }
-
-async function initializeStatus() {
-  try {
-    const response = await fetch(`http://localhost:8000/state`);
-    const data = await response.json();
-    refreshStatus(data);
-  } catch (error) {
-    console.error("Error sending command:", error);
-    alert("Failed to send command");
-  }
-}
-
-initializeStatus();
 
 connect();
