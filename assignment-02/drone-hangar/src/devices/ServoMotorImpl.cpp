@@ -1,12 +1,12 @@
 #include "ServoMotorImpl.h"
 #include "Arduino.h"
 
-#define NULL_ANGLE 361
+#define NOT_INITIALIZE -1
 
 ServoMotorImpl::ServoMotorImpl(int pin){
   this->pin = pin;  
   _on = false;
-  this->angle = NULL_ANGLE;
+  this->angle = NOT_INITIALIZE;
 }
 
 void ServoMotorImpl::on(){
@@ -34,9 +34,6 @@ void ServoMotorImpl::setPosition(int angle){
 }
 
 int ServoMotorImpl::getAngle(){
-  if(this->angle == NULL_ANGLE){
-    return NULL;
-  }
   return this->angle;
 }
 

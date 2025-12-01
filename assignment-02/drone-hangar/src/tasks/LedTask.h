@@ -7,7 +7,7 @@
 
 class LedTask: public Task {
 public:
-    LedTask(Led* pLed1, Led* pLed2, Led* pLedR, Context* pContext);
+    LedTask(Context* pContext, Led* pLed1, Led* pLed2, Led* pLedR);
     void tick();
 
 private:
@@ -20,10 +20,10 @@ private:
     long timestamp;
     bool justEntered;
 
+    Context* pContext;
     Led* pLed1;
     Led* pLed2;
     Led* pLedR;
-    Context* pContext;
 };
 
 

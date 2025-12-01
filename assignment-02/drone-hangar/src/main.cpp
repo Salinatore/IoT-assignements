@@ -6,6 +6,8 @@
 #include "model/HWPlatform.h"
 #include "tasks/TestHWTask.h"
 #include "tasks/DroneTask.h"
+#include "tasks/AlarmTask.h"
+#include "tasks/LedTask.h"
 
 // #define __TESTING_HW__
 
@@ -33,6 +35,24 @@ void setup() {
   pDroneTask->init(50);
   pHWPlatform->getMotor()->on();
   sched.addTask(pDroneTask);
+
+  Task* pAlarmTask = new AlarmTask(
+      pContext, 
+      pHWPlatform->getTempSensor(),
+      pHWPlatform->getLCD(),
+      pHWPlatform->getButton()
+  );
+  pAlarmTask->init(50);
+  sched.addTask(pAlarmTask);
+
+  Task* pLedTask = new LedTask(
+      pContext, 
+      pHWPlatform->getLed1(),
+      pHWPlatform->getLed2(),
+      pHWPlatform->getLedR()
+  );
+  pLedTask->init(50);
+  sched.addTask(pLedTask);
 #endif
 
 #ifdef __TESTING_HW__

@@ -12,7 +12,6 @@ class DroneTask: public Task {
 
     private:
         unsigned long time;
-        bool isDoorOpen;
         bool imminentLanding;
         bool isTimerActive;
         bool justEntered;

@@ -3,7 +3,7 @@
 #include "kernel/MsgService.h"
 #include "kernel/Logger.h"
 
-
+#define NOT_INITIALIZE -1
 #define D1 1
 #define D2 10000000
 #define T1 5000
@@ -46,7 +46,7 @@ void DroneTask::tick(){
     case IN: {
         if (this->checkAndSetJustEntered()){
             MsgService.sendMsg(FULLYIN);            //manda messaggio fully in
-            Logger.log(F("IN"));
+            Logger.log(F("DroneTask:IN"));
         }
 
 
@@ -71,7 +71,7 @@ void DroneTask::tick(){
         if (this->checkAndSetJustEntered()){
             this->time = 0;
             this->isTimerActive = false;
-            Logger.log(F("TAKE-OFF"));
+            Logger.log(F("DroneTask:TAKE-OFF"));
         }
 
 
@@ -102,7 +102,7 @@ void DroneTask::tick(){
 
     case OUT: {
         if (this->checkAndSetJustEntered()){
-            Logger.log(F("OUT"));
+            Logger.log(F("DroneTask:OUT"));
         }
 
         if (this->isDoorOpen()){
@@ -126,7 +126,7 @@ void DroneTask::tick(){
 
     case ALARM_OUT: {
         if (this->checkAndSetJustEntered()){
-            Logger.log(F("ALARM-OUT"));
+            Logger.log(F("DroneTask:ALARM-OUT"));
         }
         if (!context->isAlarm()){
             this->setState(OUT);
@@ -137,7 +137,7 @@ void DroneTask::tick(){
 
     case WAITING_FOR_LANDING: {
         if (this->checkAndSetJustEntered()){
-            Logger.log(F("WAITING_FOR_LANDING"));
+            Logger.log(F("DroneTask:WAITING_FOR_LANDING"));
         }
 
         if (true){ //this->presenceDetector->isDetected() al posto di true
@@ -154,7 +154,7 @@ void DroneTask::tick(){
         if (this->checkAndSetJustEntered()){
             this->time = 0;
             this->isTimerActive = false;
-            Logger.log(F("LANDING"));
+            Logger.log(F("DroneTask:LANDING"));
         }
 
         if (!this->isDoorOpen()){
@@ -181,7 +181,7 @@ void DroneTask::tick(){
 
     case ALARM_IN: {
         if (this->checkAndSetJustEntered()){
-            Logger.log(F("ALARM_IN"));
+            Logger.log(F("DroneTask:ALARM_IN"));
         }
 
         if(!context->isAlarm()){
@@ -206,10 +206,5 @@ bool DroneTask::checkAndSetJustEntered(){
 }
 
 bool DroneTask::isDoorOpen(){
-    if(this->servo->getAngle() == NULL || this->servo->getAngle() == 0){
-        return false;
-    }
-    else{
-        return true;
-    }
+    return !(this->servo->getAngle() == NOT_INITIALIZE || this->servo->getAngle() == 0);
 }

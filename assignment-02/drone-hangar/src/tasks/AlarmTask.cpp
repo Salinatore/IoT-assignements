@@ -8,6 +8,10 @@
 #define TEMP2 23.0
 #define T4 5000
 
+#define PREALARM_MSG "st-a-prealarm"
+#define ALARM_MSG "st-a-alarm"
+#define NORMAL_MSG "st-a-normal"
+
 AlarmTask::AlarmTask(Context* pContext, TempSensorTMP36* pTempSensor, MyLcd* pLcd, Button* pButton): 
     pContext(pContext), pTempSensor(pTempSensor), pLcd(pLcd), pButton(pButton){
     setState(IDLE);
@@ -22,6 +26,7 @@ void AlarmTask::tick(){
         if (this->checkAndSetJustEntered()){
             Logger.log(F("AlarmTask:IDLE")); 
             this->pLcd->writeAlarmMessage(" ");
+            MsgService.sendMsg(NORMAL_MSG);       
         }
         if (!this->pContext->isDroneOut()){
             if (this->pTempSensor->getTemperature() > TEMP1){
@@ -42,6 +47,7 @@ void AlarmTask::tick(){
         if (this->checkAndSetJustEntered()){
             Logger.log(F("AlarmTask:PRE_ALARM"));
             this->timestamp = millis();
+            MsgService.sendMsg(PREALARM_MSG);   
         }
         if (this->pTempSensor->getTemperature() > TEMP2){
             if(this->elapsedTime() > T4){
@@ -58,6 +64,7 @@ void AlarmTask::tick(){
         if (this->checkAndSetJustEntered()){
             Logger.log(F("AlarmTask:ALARM"));
             this->pLcd->writeAlarmMessage("ALARM");
+            MsgService.sendMsg(ALARM_MSG);   
         }
         if(this->pButton->isPressed()){
             this->pContext->setAlarm(false);

@@ -5,8 +5,8 @@
 
 #define BLINK_PERIOD 500
 
-LedTask::LedTask(Led* pLed1, Led* pLed2, Led* pLedR, Context* pContext): 
-    pLed1(pLed1), pLed2(pLed2), pLedR(pLedR), pContext(pContext) {
+LedTask::LedTask(Context* pContext, Led* pLed1, Led* pLed2, Led* pLedR): 
+    pContext(pContext), pLed1(pLed1), pLed2(pLed2), pLedR(pLedR) {
     setState(IDLE);
 }
 
@@ -28,7 +28,7 @@ void LedTask::tick(){
         break;
     case MOVE_FASE:
         if (this->checkAndSetJustEntered()){
-            Logger.log(F("LedTask:DRONE_OUT"));
+            Logger.log(F("LedTask:MOVE_FASE"));
             this->pLedR->switchOff();
             this->timestamp = millis();
         }
@@ -41,7 +41,7 @@ void LedTask::tick(){
             }
             this->timestamp = currentTime;
         }
-        if (!this->pContext->isLanding() || !this->pContext->isTakeOff()){
+        if (!(this->pContext->isLanding() || this->pContext->isTakeOff())){
             this->setState(IDLE);
         }
         break;

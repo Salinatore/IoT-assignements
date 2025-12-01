@@ -42,7 +42,7 @@ Led*  HWPlatform::getLedR(){
   return this->ledR;
 }
 
-ServoMotor* HWPlatform::getMotor(){
+ServoMotorImpl* HWPlatform::getMotor(){
   return this->servo;
 }
 

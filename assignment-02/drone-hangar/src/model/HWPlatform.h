@@ -23,7 +23,7 @@ public:
   Led*  getLed1();
   Led*  getLed2();
   Led*  getLedR();
-  ServoMotor* getMotor();
+  ServoMotorImpl* getMotor();
   MyLcd* getLCD();
   Pir* getDPD();
   Sonar* getDDD();
@@ -34,7 +34,7 @@ private:
   Led* led1;
   Led* led2;
   Led* ledR;
-  ServoMotor* servo;
+  ServoMotorImpl* servo;
   MyLcd* lcd;
   Pir* presenceDetector;
   Sonar* distanceDetector;
