@@ -8,16 +8,15 @@ class MessageToSerialHandler:
         self.serial_manager = serial_manager
 
     async def handle_message(self, msg: dict) -> None:
-        """Process incoming serial messages and broadcast to clients"""
         msg_type = msg.get("type")
         data = msg.get("data")
 
         if msg_type == "command":
             match data:
                 case "take-off":
-                    await self._await_landing()
-                case "await-landing":
                     await self._take_off()
+                case "await-landing":
+                    await self._await_landing()
 
     async def _await_landing(self):
         """Send command to Arduino"""

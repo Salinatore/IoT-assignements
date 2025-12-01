@@ -20,10 +20,10 @@ serial_manager = SerialManager(
 
 message_to_serial = MessageToSerialHandler(state, serial_manager)
 
-message_to_web_socket = WebSocketManager(message_to_serial)
+web_socket_handler = WebSocketManager(message_to_serial)
 
-serial_msg_handler = MessageToWebSocketHandler(state, message_to_web_socket)
-state.setMessageHandler(serial_msg_handler.notify_status_changes)
+message_to_web_socket = MessageToWebSocketHandler(state, web_socket_handler)
+state.setMessageHandler(message_to_web_socket.notify_status_changes)
 
 
 @asynccontextmanager
@@ -31,7 +31,7 @@ async def lifespan(app: FastAPI):
     """Manage application lifecycle"""
     try:
         print("Starting serial connection...")
-        await serial_manager.start(serial_msg_handler.handle_message)
+        await serial_manager.start(message_to_web_socket.handle_message)
         print("Serial connection started")
         yield
     except Exception as e:
@@ -63,7 +63,7 @@ async def root() -> dict:
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     """WebSocket endpoint for real-time updates"""
-    await message_to_web_socket.handle_connection(websocket, state)
+    await web_socket_handler.handle_connection(websocket, state)
 
 
 if __name__ == "__main__":
