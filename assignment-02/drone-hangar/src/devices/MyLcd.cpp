@@ -15,7 +15,14 @@ MyLcd::MyLcd(){
     lcd.setCursor(0, 0);
 }
 
-void MyLcd::writeMessage(String message){
+void MyLcd::writeStateMessage(String message){
+    lcd.clear();
+    lcd.setCursor(1, 0); 
+    lcd.print("STATE: "+ message);
+    Serial.println(message);
+};
+
+void MyLcd::writeAlarmMessage(String message){
     lcd.clear();
     lcd.setCursor(0, 0); 
     lcd.print(message);

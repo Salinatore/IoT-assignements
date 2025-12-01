@@ -67,7 +67,8 @@ void HWPlatform::test(){
   this->led2->switchOn();
   this->ledR->switchOn();
   this->servo->setPosition(TEST_ANGLE);
-  this->lcd->writeMessage("TEST");
+  this->lcd->writeAlarmMessage("TEST");
+  this->lcd->writeStateMessage("TEST");
   if(this->presenceDetector->isDetected()){
     Logger.log(F("TEST: precence detector = detect motion"));
   }

@@ -21,6 +21,7 @@ void AlarmTask::tick(){
     case IDLE:
         if (this->checkAndSetJustEntered()){
             Logger.log(F("AlarmTask:IDLE")); 
+            this->pLcd->writeAlarmMessage(" ");
         }
         if (!this->pContext->isDroneOut()){
             if (this->pTempSensor->getTemperature() > TEMP1){
@@ -56,6 +57,7 @@ void AlarmTask::tick(){
     case ALARM:
         if (this->checkAndSetJustEntered()){
             Logger.log(F("AlarmTask:ALARM"));
+            this->pLcd->writeAlarmMessage("ALARM");
         }
         if(this->pButton->isPressed()){
             this->pContext->setAlarm(false);
