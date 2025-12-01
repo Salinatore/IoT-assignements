@@ -46,6 +46,7 @@ void DroneTask::tick(){
 
     case IN: {
         if (this->checkAndSetJustEntered()){
+            MsgService.sendMsg(FULLYIN);            //manda messaggio fully in
             Logger.log(F("IN"));
         }
 
@@ -90,7 +91,6 @@ void DroneTask::tick(){
             this->time = 0;
             this->isTimerActive = false;
         }
-
 
 
         if ((millis() - this->time) > T1 || context->isAlarm()){
@@ -158,7 +158,7 @@ void DroneTask::tick(){
         if (this->checkAndSetJustEntered()){
             this->time = 0;
             this->isTimerActive = false;
-            Logger.log(F("LNADING"));
+            Logger.log(F("LANDING"));
         }
 
         if (!this->isDoorOpen){
@@ -178,14 +178,11 @@ void DroneTask::tick(){
         }
 
         if ((millis() - this->time) > T2 || context->isAlarm()){
-            //manda messaggio fully in
-            MsgService.sendMsg(FULLYIN);
             this->setState(IN);
             this->context->setLanding(false);
         }
         break;
     }
-
 
     case ALARM_IN: {
         if (this->checkAndSetJustEntered()){

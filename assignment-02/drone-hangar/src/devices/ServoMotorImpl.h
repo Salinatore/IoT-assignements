@@ -13,10 +13,12 @@ public:
   void on();
   bool isOn();
   void setPosition(int angle);
+  virtual int getAngle();
   void off();
     
 private:
   int pin; 
+  int angle;
   bool _on;
   ServoTimer2 motor; 
 };
