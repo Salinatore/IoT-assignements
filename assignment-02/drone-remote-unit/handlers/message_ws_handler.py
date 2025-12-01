@@ -4,12 +4,18 @@ from model.state import DroneState, HangarState, State
 from websocket.manager import WebSocketManager
 
 
-class SerialMessageHandler:
+class MessageToWebSocketHandler:
     """Handles incoming serial messages"""
 
     def __init__(self, state: State, ws_manager: WebSocketManager):
         self.state = state
         self.ws_manager = ws_manager
+
+    async def notify_status_changes(self) -> None:
+        """Notify clients about state changes"""
+        await self.ws_manager.broadcast(
+            {"type": "state", "data": self.state.model_dump()}
+        )
 
     async def handle_message(self, msg: str) -> None:
         """Process incoming serial messages and broadcast to clients"""

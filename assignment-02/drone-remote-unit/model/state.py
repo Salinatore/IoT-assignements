@@ -1,3 +1,5 @@
+import asyncio
+from collections.abc import Coroutine
 from enum import Enum
 from typing import Any, Callable
 
@@ -22,7 +24,9 @@ class State(BaseModel):
     _hangar_state: HangarState = HangarState.NORMAL
     _current_distance: int = 0
 
-    def setMessageHandler(self, on_status_change: Callable[[], None]) -> None:
+    def setMessageHandler(
+        self, on_status_change: Callable[[], Coroutine[Any, Any, None]]
+    ) -> None:
         self._on_status_change = on_status_change
 
     def is_possible_to_land(self) -> bool:
@@ -37,29 +41,29 @@ class State(BaseModel):
             and self._hangar_state == HangarState.NORMAL
         )
 
-    def set_drone_state(self, new_drone_state: DroneState):
+    def set_drone_state(self, new_drone_state: DroneState) -> None:
         self._drone_state = new_drone_state
         self._handle_status_change()
 
-    def set_hangar_state(self, new_hangar_state: HangarState):
+    def set_hangar_state(self, new_hangar_state: HangarState) -> None:
         self._hangar_state = new_hangar_state
         self._handle_status_change()
 
     def _handle_status_change(self):
         if self._on_status_change:
-            self._on_status_change()
+            asyncio.create_task(self._on_status_change())
 
     @model_serializer
     def ser_model(self) -> dict[str, Any]:
         if (
-            self._hangar_state in HangarState.ALARM
-            and self._drone_state in DroneState.OPERATING
+            self._hangar_state == HangarState.ALARM
+            and self._drone_state == DroneState.OPERATING
         ):
             hangar_state = self._hangar_state
         else:
             hangar_state = "ND"
 
-        if self._drone_state in DroneState.LANDING:
+        if self._drone_state == DroneState.LANDING:
             current_distance = self._current_distance
         else:
             current_distance = "ND"

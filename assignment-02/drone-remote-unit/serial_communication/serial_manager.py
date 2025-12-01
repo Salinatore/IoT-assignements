@@ -9,8 +9,7 @@ class SerialManager:
         self.port = port
         self.baud = baud
         self.command_queue = asyncio.Queue()
-        self.running = True
-        self.on_message = None
+        self.running = False
         self.reader = None
         self.writer = None
         self.read_task = None
@@ -24,6 +23,7 @@ class SerialManager:
 
         self.read_task = asyncio.create_task(self._reader_task())
         self.write_task = asyncio.create_task(self._writer_task())
+        self.running = True
 
     async def stop(self):
         """Stop serial communication and clean up resources"""
@@ -56,7 +56,8 @@ class SerialManager:
             while self.running:
                 line = await self.reader.readline()
                 msg = line.decode().strip()
-                if self.on_message:
+
+                if self.message_handler:
                     await self.message_handler(msg)
 
     async def _writer_task(self):

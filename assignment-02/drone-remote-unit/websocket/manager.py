@@ -3,14 +3,14 @@ from typing import Any, Set
 
 from fastapi import WebSocket, WebSocketDisconnect
 
-from handlers.websocket_message_handler import WebSocketMessageHandler
+from handlers.message_serial_handler import MessageToSerialHandler
 from model.state import State
 
 
 class WebSocketManager:
     """Manages WebSocket connections and broadcasting"""
 
-    def __init__(self, websocket_message_handler: WebSocketMessageHandler):
+    def __init__(self, websocket_message_handler: MessageToSerialHandler):
         self.active_connections: Set[WebSocket] = set()
         self.websocket_message_handler = websocket_message_handler
 

@@ -1,14 +1,14 @@
 from contextlib import asynccontextmanager
 
 import uvicorn
-from fastapi import FastAPI
+from fastapi import FastAPI, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 
 from config import BAUD, PORT
-from handlers.serial_message_handler import SerialMessageHandler
-from handlers.websocket_message_handler import WebSocketMessageHandler
+from handlers.message_serial_handler import MessageToSerialHandler
+from handlers.message_ws_handler import MessageToWebSocketHandler
 from model.state import State
-from serial.serial_manager import SerialManager
+from serial_communication.serial_manager import SerialManager
 from websocket.manager import WebSocketManager
 
 state = State()
@@ -18,11 +18,12 @@ serial_manager = SerialManager(
     baud=BAUD,
 )
 
-ws_msg_handler = WebSocketMessageHandler(state, serial_manager)
+message_to_serial = MessageToSerialHandler(state, serial_manager)
 
-ws_manager = WebSocketManager(ws_msg_handler)
+message_to_web_socket = WebSocketManager(message_to_serial)
 
-serial_msg_handler = SerialMessageHandler(state, ws_manager)
+serial_msg_handler = MessageToWebSocketHandler(state, message_to_web_socket)
+state.setMessageHandler(serial_msg_handler.notify_status_changes)
 
 
 @asynccontextmanager
@@ -55,15 +56,20 @@ app.add_middleware(
 
 
 @app.get("/")
-async def root():
+async def root() -> dict:
     return {"message": "Drone Control API", "status": "running"}
 
 
 @app.websocket("/ws")
-async def websocket_endpoint(websocket):
+async def websocket_endpoint(websocket: WebSocket):
     """WebSocket endpoint for real-time updates"""
-    await ws_manager.handle_connection(websocket, state)
+    await message_to_web_socket.handle_connection(websocket, state)
 
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run(
+        "main:app",
+        host="127.0.0.1",
+        port=8000,
+        reload=True,
+    )
