@@ -9,6 +9,11 @@ public:
     MyLcd();
     void writeAlarmMessage(String message);
     void writeStateMessage(String message);
+private:
+    void refresh();
+
+    String alarmMesage;
+    String stateMesage;
 };
 
 #endif

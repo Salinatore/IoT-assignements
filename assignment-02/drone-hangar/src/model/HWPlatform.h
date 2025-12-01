@@ -5,7 +5,7 @@
 #include "devices/Button.h"
 #include "devices/Led.h"
 #include "devices/LedExt.h"
-#include "devices/ServoMotor.h"
+#include "devices/ServoMotorImpl.h"
 #include "devices/TempSensorTMP36.h"
 #include "devices/MyLcd.h"
 #include <devices/Pir.h>
