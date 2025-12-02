@@ -1,3 +1,5 @@
+"""Main application file for the Drone Control API using FastAPI framework."""
+
 from contextlib import asynccontextmanager
 
 import uvicorn

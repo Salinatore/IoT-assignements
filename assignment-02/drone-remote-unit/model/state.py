@@ -20,6 +20,8 @@ class HangarState(str, Enum):
 
 
 class State(BaseModel):
+    """Represents the state of the drone and hangar"""
+
     _drone_state: DroneState = DroneState.REST
     _hangar_state: HangarState = HangarState.NORMAL
     _current_distance: int = 0
@@ -27,6 +29,7 @@ class State(BaseModel):
     def setMessageHandler(
         self, on_status_change: Callable[[], Coroutine[Any, Any, None]]
     ) -> None:
+        """Sets the callback function to be called on status changes"""
         self._on_status_change = on_status_change
 
     def is_possible_to_land(self) -> bool:

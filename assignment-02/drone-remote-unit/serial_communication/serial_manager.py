@@ -5,7 +5,7 @@ import serial_asyncio
 
 
 class SerialManager:
-    """Manages Serial connection to Arduino"""
+    """Manages Serial connection to Arduino using asyncio tasks for asynchronous communication"""
 
     def __init__(self, port: str, baud: int):
         self.port = port
