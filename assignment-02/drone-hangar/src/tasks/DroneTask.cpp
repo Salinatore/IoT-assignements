@@ -5,7 +5,7 @@
 
 #define NOT_INITIALIZE -1
 #define D1 1
-#define D2 10000000
+#define D2 100
 #define T1 5000
 #define T2 5000
 #define TAKEOFF "free-your-wings"
@@ -36,6 +36,7 @@ DroneTask::DroneTask(Context* context, Pir* presenceDetector, Sonar* distanceDet
     this->context = context;
     this->isTimerActive = false;
     this->imminentLanding = false;
+    this->justEntered = true;
     this->setState(IN);
     MsgService.init();
 }
@@ -46,9 +47,10 @@ void DroneTask::tick(){
 
     case IN: {
         if (this->checkAndSetJustEntered()){
-            MsgService.sendMsg(FULLYIN);            //manda messaggio fully in
+            this->context->setLanding(false);
+            MsgService.sendMsg(FULLYIN);  
+            this->lcd->writeStateMessage("DRONE INSIDE");          //manda messaggio fully in
             Logger.log(F("DroneTask:IN"));
-            this->lcd->writeStateMessage("DRONE INSIDE");
         }
 
 
@@ -56,11 +58,11 @@ void DroneTask::tick(){
             this->servo->setPosition(0);
         }
 
-        TakeoffPattern takeoff;
+        static TakeoffPattern takeoff;
         if (!context->isPreAlarm() && MsgService.isMsgAvailable(takeoff)){
-            MsgService.receiveMsg(takeoff);
+            Msg* msg = MsgService.receiveMsg(takeoff);
+            delete msg;
             this->setState(TAKE_OFF);
-            this->context->setTakeOff(true);
         }
         if(context->isAlarm()){
             this->setState(ALARM_IN);
@@ -71,10 +73,11 @@ void DroneTask::tick(){
 
     case TAKE_OFF: {
         if (this->checkAndSetJustEntered()){
+            this->context->setTakeOff(true);
             this->time = 0;
             this->isTimerActive = false;
+            this->lcd->writeStateMessage("TAKE OFF");
             Logger.log(F("DroneTask:TAKE-OFF"));
-             this->lcd->writeStateMessage("TAKE OFF");
         }
 
 
@@ -93,11 +96,8 @@ void DroneTask::tick(){
         }
 
 
-        if ((millis() - this->time) > T1 || context->isAlarm()){
-            //manda messaggio fully out
-            MsgService.sendMsg(FULLYOUT);
+        if (((millis() - this->time) > T1 && this->isTimerActive) || context->isAlarm()){
             this->setState(OUT);
-            context->setDroneOut(true);
         }
         break;
     }
@@ -105,8 +105,10 @@ void DroneTask::tick(){
 
     case OUT: {
         if (this->checkAndSetJustEntered()){
-            Logger.log(F("DroneTask:OUT"));
+            this->context->setDroneOut(true);
+            MsgService.sendMsg(FULLYOUT);
             this->lcd->writeStateMessage("DRONE OUT");
+            Logger.log(F("DroneTask:OUT"));
         }
 
         if (this->isDoorOpen()){
@@ -115,13 +117,13 @@ void DroneTask::tick(){
         }
 
 
-        ImminentLandingPattern landing;
+        static ImminentLandingPattern landing;
         if (context->isAlarm()){
             this->setState(ALARM_OUT);
         }
         if (MsgService.isMsgAvailable(landing) && !context->isPreAlarm()){
-            MsgService.receiveMsg(landing);
-            this->context->setDroneOut(false);
+            Msg* msg = MsgService.receiveMsg(landing);
+            delete msg;
             this->setState(WAITING_FOR_LANDING);
         }
         break;
@@ -130,8 +132,8 @@ void DroneTask::tick(){
 
     case ALARM_OUT: {
         if (this->checkAndSetJustEntered()){
-            Logger.log(F("DroneTask:ALARM-OUT"));
             this->lcd->writeStateMessage("DRONE OUT");
+            Logger.log(F("DroneTask:ALARM-OUT"));
         }
         if (!context->isAlarm()){
             this->setState(OUT);
@@ -142,8 +144,9 @@ void DroneTask::tick(){
 
     case WAITING_FOR_LANDING: {
         if (this->checkAndSetJustEntered()){
-            Logger.log(F("DroneTask:WAITING_FOR_LANDING"));
+            this->context->setDroneOut(false);
             this->lcd->writeStateMessage("DRONE OUT");
+            Logger.log(F("DroneTask:WAITING_FOR_LANDING"));
         }
 
         if (this->presenceDetector->isDetected()){ //this->presenceDetector->isDetected() al posto di true
@@ -158,10 +161,11 @@ void DroneTask::tick(){
 
     case LANDING: {
         if (this->checkAndSetJustEntered()){
+            this->context->setLanding(true);
             this->time = 0;
             this->isTimerActive = false;
-            Logger.log(F("DroneTask:LANDING"));
             this->lcd->writeStateMessage("LANDING");
+            Logger.log(F("DroneTask:LANDING"));     
         }
 
         if (!this->isDoorOpen()){
@@ -179,17 +183,16 @@ void DroneTask::tick(){
             this->isTimerActive = false;
         }
 
-        if ((millis() - this->time) > T2 || context->isAlarm()){
+        if (((millis() - this->time) > T2 && this->isTimerActive) || context->isAlarm()){
             this->setState(IN);
-            this->context->setLanding(false);
         }
         break;
     }
 
     case ALARM_IN: {
         if (this->checkAndSetJustEntered()){
-            Logger.log(F("DroneTask:ALARM_IN"));
             this->lcd->writeStateMessage("DRONE INSIDE");
+            Logger.log(F("DroneTask:ALARM_IN"));
         }
 
         if(!context->isAlarm()){
