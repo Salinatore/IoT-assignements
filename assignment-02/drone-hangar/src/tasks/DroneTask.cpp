@@ -28,9 +28,10 @@ public:
 };
 
 
-DroneTask::DroneTask(Context* context, Pir* presenceDetector, Sonar* distanceDetector, ServoMotorImpl* servo){
+DroneTask::DroneTask(Context* context, Pir* presenceDetector, Sonar* distanceDetector, ServoMotorImpl* servo, MyLcd* lcd){
     this->distanceDetector = distanceDetector;
     this->presenceDetector = presenceDetector;
+    this->lcd = lcd;
     this->servo = servo;
     this->context = context;
     this->isTimerActive = false;
@@ -47,6 +48,7 @@ void DroneTask::tick(){
         if (this->checkAndSetJustEntered()){
             MsgService.sendMsg(FULLYIN);            //manda messaggio fully in
             Logger.log(F("DroneTask:IN"));
+            this->lcd->writeStateMessage("DRONE INSIDE");
         }
 
 
@@ -72,6 +74,7 @@ void DroneTask::tick(){
             this->time = 0;
             this->isTimerActive = false;
             Logger.log(F("DroneTask:TAKE-OFF"));
+             this->lcd->writeStateMessage("TAKE OFF");
         }
 
 
@@ -80,11 +83,11 @@ void DroneTask::tick(){
         }
         float distance = this->distanceDetector->getDistance();
 
-        if (true && !this->isTimerActive){ //distance > D1 al posto di true
+        if (distance > D1 && !this->isTimerActive){ //distance > D1 al posto di true
             this->time = millis();
             this->isTimerActive = true;
         } 
-        if (false){ //distance < D1 al posto di false
+        if (distance < D1){ //distance < D1 al posto di false
             this->time = 0;
             this->isTimerActive = false;
         }
@@ -103,6 +106,7 @@ void DroneTask::tick(){
     case OUT: {
         if (this->checkAndSetJustEntered()){
             Logger.log(F("DroneTask:OUT"));
+            this->lcd->writeStateMessage("DRONE OUT");
         }
 
         if (this->isDoorOpen()){
@@ -127,6 +131,7 @@ void DroneTask::tick(){
     case ALARM_OUT: {
         if (this->checkAndSetJustEntered()){
             Logger.log(F("DroneTask:ALARM-OUT"));
+            this->lcd->writeStateMessage("DRONE OUT");
         }
         if (!context->isAlarm()){
             this->setState(OUT);
@@ -138,9 +143,10 @@ void DroneTask::tick(){
     case WAITING_FOR_LANDING: {
         if (this->checkAndSetJustEntered()){
             Logger.log(F("DroneTask:WAITING_FOR_LANDING"));
+            this->lcd->writeStateMessage("DRONE OUT");
         }
 
-        if (true){ //this->presenceDetector->isDetected() al posto di true
+        if (this->presenceDetector->isDetected()){ //this->presenceDetector->isDetected() al posto di true
             this->setState(LANDING);
             this->context->setLanding(true);
         }
@@ -155,6 +161,7 @@ void DroneTask::tick(){
             this->time = 0;
             this->isTimerActive = false;
             Logger.log(F("DroneTask:LANDING"));
+            this->lcd->writeStateMessage("LANDING");
         }
 
         if (!this->isDoorOpen()){
@@ -163,11 +170,11 @@ void DroneTask::tick(){
 
         float distance = this->distanceDetector->getDistance();
 
-        if (true && !this->isTimerActive){ //distance < D2 al psoto di true
+        if (distance < D2 && !this->isTimerActive){ //distance < D2 al psoto di true
             this->time = millis();
             this->isTimerActive = true;
         } 
-        if (false){ //distance > D2 al posto di false
+        if (distance > D2){ //distance > D2 al posto di false
             this->time = 0;
             this->isTimerActive = false;
         }
@@ -182,6 +189,7 @@ void DroneTask::tick(){
     case ALARM_IN: {
         if (this->checkAndSetJustEntered()){
             Logger.log(F("DroneTask:ALARM_IN"));
+            this->lcd->writeStateMessage("DRONE INSIDE");
         }
 
         if(!context->isAlarm()){
