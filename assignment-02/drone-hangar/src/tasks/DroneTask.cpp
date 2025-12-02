@@ -147,7 +147,7 @@ void DroneTask::tick(){
             this->lcd->writeStateMessage("DRONE OUT");
             Logger.log(F("DroneTask:WAITING_FOR_LANDING"));
         }
-
+        this->presenceDetector->sync();
         if (this->presenceDetector->isDetected()){ //this->presenceDetector->isDetected() al posto di true
             this->setState(LANDING);
             this->context->setLanding(true);

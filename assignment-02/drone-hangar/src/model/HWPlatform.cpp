@@ -24,6 +24,8 @@ HWPlatform::HWPlatform(){
   this->presenceDetector = new Pir(PIR_PIN);
   this->distanceDetector = new Sonar(ECHO_PIN, TRIG_PIN, SONAR_TIME);
   this->tempSensor = new TempSensorTMP36(TEMP_PIN);
+  
+  this->servo->on();
 }
 
 Button* HWPlatform::getButton(){

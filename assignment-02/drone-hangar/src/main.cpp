@@ -9,7 +9,7 @@
 #include "tasks/AlarmTask.h"
 #include "tasks/LedTask.h"
 
- #define __TESTING_HW__
+//#define __TESTING_HW__
 
 Scheduler sched;
 
@@ -22,7 +22,6 @@ void setup() {
   Logger.log(":::::: Drone System ::::::");
 
   pHWPlatform = new HWPlatform();
-  pHWPlatform->getMotor()->on();
 
 #ifndef __TESTING_HW__
   pContext = new Context();
@@ -30,10 +29,11 @@ void setup() {
       pContext, 
       pHWPlatform->getDPD(),
       pHWPlatform->getDDD(), 
-      pHWPlatform->getMotor()
+      pHWPlatform->getMotor(),
+      pHWPlatform->getLCD()
   );
   pDroneTask->init(50);
-  pHWPlatform->getMotor()->on();
+  
   sched.addTask(pDroneTask);
 
   Task* pAlarmTask = new AlarmTask(
