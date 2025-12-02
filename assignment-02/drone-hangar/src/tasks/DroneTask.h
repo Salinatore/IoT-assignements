@@ -7,7 +7,7 @@
 
 class DroneTask: public Task {
     public:
-        DroneTask(Context* context, Pir* presenceDetector, Sonar* distanceDetector, ServoMotorImpl* servo);
+        DroneTask(Context* context, Pir* presenceDetector, Sonar* distanceDetector, ServoMotorImpl* servo, MyLcd* lcd);
         void tick();
 
     private:
@@ -20,6 +20,7 @@ class DroneTask: public Task {
         Pir* presenceDetector;
         Sonar* distanceDetector;
         ServoMotorImpl* servo;
+        MyLcd* lcd;
 
         enum State { IN, TAKE_OFF, OUT, WAITING_FOR_LANDING, LANDING, ALARM_IN, ALARM_OUT } state;
 
