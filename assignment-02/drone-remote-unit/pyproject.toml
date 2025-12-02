@@ -1,7 +1,7 @@
 [project]
 name = "drone-remote-unit"
 version = "0.1.0"
-description = ""
+description = "A small FastAPI-based service that bridges WebSocket clients to a serial connected Arduino"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [

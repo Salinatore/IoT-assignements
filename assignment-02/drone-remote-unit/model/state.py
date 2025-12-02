@@ -33,26 +33,31 @@ class State(BaseModel):
         self._on_status_change = on_status_change
 
     def is_possible_to_land(self) -> bool:
+        """Checks if it is possible to land the drone"""
         return (
             self._drone_state == DroneState.OPERATING
             and self._hangar_state == HangarState.NORMAL
         )
 
     def is_possible_to_take_off(self) -> bool:
+        """Checks if it is possible to take off the drone"""
         return (
             self._drone_state == DroneState.REST
             and self._hangar_state == HangarState.NORMAL
         )
 
     def set_drone_state(self, new_drone_state: DroneState) -> None:
+        """Sets the drone state and triggers status change handler"""
         self._drone_state = new_drone_state
         self._handle_status_change()
 
     def set_hangar_state(self, new_hangar_state: HangarState) -> None:
+        """Sets the hangar state and triggers status change handler"""
         self._hangar_state = new_hangar_state
         self._handle_status_change()
 
     def _handle_status_change(self):
+        """Handles status change by calling the registered callback"""
         if self._on_status_change:
             asyncio.create_task(self._on_status_change())
 
