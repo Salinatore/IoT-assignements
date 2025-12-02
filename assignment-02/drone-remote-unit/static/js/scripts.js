@@ -40,7 +40,7 @@ function connect() {
     console.log("Disconnected from WebSocket");
     statusDiv.textContent = "✗ Disconnected";
     statusDiv.className = "status disconnected";
-    setTimeout(connect, 3000);
+    setTimeout(connect, 30);
   };
 
   ws.onerror = (error) => {
