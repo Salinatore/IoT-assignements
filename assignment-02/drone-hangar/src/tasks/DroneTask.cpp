@@ -4,6 +4,8 @@
 #include "kernel/Logger.h"
 
 #define NOT_INITIALIZE -1
+#define DOOR_CLOSED_ANGLE 0
+#define DOOR_OPEN_ANGLE 180
 #define D1 1
 #define D2 100
 #define T1 5000
@@ -34,8 +36,8 @@ DroneTask::DroneTask(Context* context, Pir* presenceDetector, Sonar* distanceDet
     this->lcd = lcd;
     this->servo = servo;
     this->context = context;
+    this->time = 0;
     this->isTimerActive = false;
-    this->imminentLanding = false;
     this->justEntered = true;
     this->setState(IN);
     MsgService.init();
@@ -49,13 +51,13 @@ void DroneTask::tick(){
         if (this->checkAndSetJustEntered()){
             this->context->setLanding(false);
             MsgService.sendMsg(FULLYIN);  
-            this->lcd->writeStateMessage("DRONE INSIDE");          //manda messaggio fully in
+            this->lcd->writeStateMessage("DRONE INSIDE");
             Logger.log(F("DroneTask:IN"));
         }
 
 
         if (this->isDoorOpen()){
-            this->servo->setPosition(0);
+            this->servo->setPosition(DOOR_CLOSED_ANGLE);
         }
 
         static TakeoffPattern takeoff;
@@ -74,29 +76,26 @@ void DroneTask::tick(){
     case TAKE_OFF: {
         if (this->checkAndSetJustEntered()){
             this->context->setTakeOff(true);
-            this->time = 0;
-            this->isTimerActive = false;
+            this->resetTimer();
             this->lcd->writeStateMessage("TAKE OFF");
             Logger.log(F("DroneTask:TAKE-OFF"));
         }
 
 
         if (!this->isDoorOpen()){
-            this->servo->setPosition(180);
+            this->servo->setPosition(DOOR_OPEN_ANGLE);
         }
         float distance = this->distanceDetector->getDistance();
 
         if (distance > D1 && !this->isTimerActive){ //distance > D1 al posto di true
-            this->time = millis();
-            this->isTimerActive = true;
+            this->startTimer();
         } 
         if (distance < D1){ //distance < D1 al posto di false
-            this->time = 0;
-            this->isTimerActive = false;
+            this->resetTimer();
         }
 
 
-        if (((millis() - this->time) > T1 && this->isTimerActive) || context->isAlarm()){
+        if (this->isTimerElapsed(T1) || context->isAlarm()){
             this->setState(OUT);
         }
         break;
@@ -113,7 +112,7 @@ void DroneTask::tick(){
 
         if (this->isDoorOpen()){
             this->context->setTakeOff(false);
-            this->servo->setPosition(0);
+            this->servo->setPosition(DOOR_CLOSED_ANGLE);
         }
 
 
@@ -162,28 +161,25 @@ void DroneTask::tick(){
     case LANDING: {
         if (this->checkAndSetJustEntered()){
             this->context->setLanding(true);
-            this->time = 0;
-            this->isTimerActive = false;
+            this->resetTimer();
             this->lcd->writeStateMessage("LANDING");
             Logger.log(F("DroneTask:LANDING"));     
         }
 
         if (!this->isDoorOpen()){
-            this->servo->setPosition(180);
+            this->servo->setPosition(DOOR_OPEN_ANGLE);
         }
 
         float distance = this->distanceDetector->getDistance();
 
         if (distance < D2 && !this->isTimerActive){ //distance < D2 al psoto di true
-            this->time = millis();
-            this->isTimerActive = true;
+            this->startTimer();
         } 
         if (distance > D2){ //distance > D2 al posto di false
-            this->time = 0;
-            this->isTimerActive = false;
+            this->resetTimer();
         }
 
-        if (((millis() - this->time) > T2 && this->isTimerActive) || context->isAlarm()){
+        if (this->isTimerElapsed(T2) || context->isAlarm()){
             this->setState(IN);
         }
         break;
@@ -216,6 +212,20 @@ bool DroneTask::checkAndSetJustEntered(){
     return bak;
 }
 
+void DroneTask::startTimer(){
+    this->time = millis();
+    this->isTimerActive = true;
+}
+
+void DroneTask::resetTimer(){
+    this->time = 0;
+    this->isTimerActive = false;
+}
+
+bool DroneTask::isTimerElapsed(unsigned long t){
+    return (millis() - this->time) > t;
+}
+
 bool DroneTask::isDoorOpen(){
-    return !(this->servo->getAngle() == NOT_INITIALIZE || this->servo->getAngle() == 0);
+    return !(this->servo->getAngle() == NOT_INITIALIZE || this->servo->getAngle() == DOOR_CLOSED_ANGLE);
 }

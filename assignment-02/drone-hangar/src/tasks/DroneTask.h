@@ -12,7 +12,6 @@ class DroneTask: public Task {
 
     private:
         unsigned long time;
-        bool imminentLanding;
         bool isTimerActive;
         bool justEntered;
         HWPlatform* pHW;
@@ -25,6 +24,9 @@ class DroneTask: public Task {
         enum State { IN, TAKE_OFF, OUT, WAITING_FOR_LANDING, LANDING, ALARM_IN, ALARM_OUT } state;
 
         void setState(State state);
+        void startTimer();
+        void resetTimer();
+        bool isTimerElapsed(unsigned long t);
         bool checkAndSetJustEntered();
         bool isDoorOpen();
 };
