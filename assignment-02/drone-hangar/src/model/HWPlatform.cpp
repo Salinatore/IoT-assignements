@@ -22,7 +22,7 @@ HWPlatform::HWPlatform(){
   this->servo = new ServoMotorImpl(MOTOR_PIN);
   this->lcd = new MyLcd();
   this->presenceDetector = new Pir(PIR_PIN);
-  this->distanceDetector = new Sonar(ECHO_PIN, TEMP_PIN, SONAR_TIME);
+  this->distanceDetector = new Sonar(ECHO_PIN, TRIG_PIN, SONAR_TIME);
   this->tempSensor = new TempSensorTMP36(TEMP_PIN);
 }
 
@@ -66,17 +66,39 @@ void HWPlatform::test(){
   this->led1->switchOn();
   this->led2->switchOn();
   this->ledR->switchOn();
-  this->servo->setPosition(TEST_ANGLE);
+
+  if(this->servo->getAngle()  == -1 || this->servo->getAngle() == 1){
+    this->servo->setPosition(179);
+  } 
+   else if (this->servo->getAngle() == 179){
+    this->servo->setPosition(1);
+  }
+
+  if(this->getButton()->isPressed()){
+    Logger.log(F("TEST: button"));
+  }
+
   this->lcd->writeAlarmMessage("TEST");
   this->lcd->writeStateMessage("TEST");
+  
+  this->presenceDetector->sync();
   if(this->presenceDetector->isDetected()){
     Logger.log(F("TEST: precence detector = detect motion"));
   }
-  if(this->distanceDetector->getDistance() > TEST_MAX_DISTANCE && this->distanceDetector->getDistance() < TEST_MIN_DISTANCE){
+  
+  if( this->distanceDetector->getDistance() == TEST_MIN_DISTANCE){
+    Logger.log(F("TEST: distance detector = detect no"));
+    
+  }
+  else {
     Logger.log(F("TEST: distance detector = detect something"));
   }
+
+  
   if(this->tempSensor->getTemperature() >  TEST_MIN_TEMP && this->tempSensor->getTemperature() < TEST_MAX_TEMP ){
     Logger.log(F("TEST: temperature sensor = acceptable temperature detection"));
+    
   }
-
+  Serial.println(this->tempSensor->getTemperature());
+  
 }

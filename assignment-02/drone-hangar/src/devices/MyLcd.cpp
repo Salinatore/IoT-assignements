@@ -29,7 +29,7 @@ void MyLcd::refresh(){
     lcd.clear();
     lcd.setCursor(0, 0); 
     lcd.print(this->alarmMessage);
-    lcd.setCursor(1, 0); 
+    lcd.setCursor(0, 1); 
     lcd.print("STATE: "+ this->stateMessage);
     lcd.flush();
 }
