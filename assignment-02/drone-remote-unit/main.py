@@ -1,3 +1,5 @@
+"""Main application file for the Drone Control API using FastAPI framework."""
+
 from contextlib import asynccontextmanager
 
 import uvicorn
@@ -29,18 +31,8 @@ state.setMessageHandler(message_to_web_socket.notify_status_changes)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Manage application lifecycle"""
-    try:
-        print("Starting serial connection...")
-        await serial_manager.start(message_to_web_socket.handle_serial_message)
-        print("Serial connection started")
-        yield
-    except Exception as e:
-        print(f"Error during startup: {e}")
-        raise
-    finally:
-        print("Stopping serial connection...")
-        await serial_manager.stop()
-        print("Serial connection stopped")
+    await serial_manager.start(message_to_web_socket.handle_serial_message)
+    yield
 
 
 app = FastAPI(lifespan=lifespan)
@@ -63,7 +55,7 @@ async def root() -> dict:
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
-    """WebSocket endpoint for real-time updates"""
+    """WebSocket endpoint for establishing a new connection"""
     await web_socket_handler.handle_connection(websocket, state)
 
 
