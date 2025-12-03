@@ -15,6 +15,8 @@ public:
   void setPosition(int angle);
   virtual int getAngle();
   void off();
+
+  const int NOT_INITIALIZE = -1;
     
 private:
   int pin; 

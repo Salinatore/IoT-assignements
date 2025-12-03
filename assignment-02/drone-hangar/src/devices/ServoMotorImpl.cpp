@@ -1,12 +1,11 @@
 #include "ServoMotorImpl.h"
 #include "Arduino.h"
 
-#define NOT_INITIALIZE -1
 
 ServoMotorImpl::ServoMotorImpl(int pin){
   this->pin = pin;  
   _on = false;
-  this->angle = NOT_INITIALIZE;
+  this->angle = this->NOT_INITIALIZE;
 }
 
 void ServoMotorImpl::on(){
