@@ -37,7 +37,6 @@ class MessageToWebSocketHandler:
         await self.ws_manager.broadcast({"type": "msg", "data": entry})
 
     def _state_interpreter(self, msg: str) -> None:
-        print(f"Interpreting message: {msg}")
         match msg[:3]:
             case "st-":
                 match msg:
@@ -54,7 +53,6 @@ class MessageToWebSocketHandler:
             case "dt-":
                 try:
                     distance = float(msg[3:])
-                    print(distance)
                     self.state.set_current_distance(distance)
                 except ValueError:
                     pass
