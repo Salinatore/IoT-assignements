@@ -37,14 +37,22 @@ class MessageToWebSocketHandler:
         await self.ws_manager.broadcast({"type": "msg", "data": entry})
 
     def _state_interpreter(self, msg: str) -> None:
-        match msg:
-            case "st-d-fully-out":
-                self.state.set_drone_state(DroneState.OPERATING)
-            case "st-d-fully-in":
-                self.state.set_drone_state(DroneState.REST)
-            case "st-a-prealarm":
-                self.state.set_hangar_state(HangarState.PREALARM)
-            case "st-a-alarm":
-                self.state.set_hangar_state(HangarState.ALARM)
-            case "st-a-normal":
-                self.state.set_hangar_state(HangarState.NORMAL)
+        match msg[:3]:
+            case "st-":
+                match msg:
+                    case "st-d-fully-out":
+                        self.state.set_drone_state(DroneState.OPERATING)
+                    case "st-d-fully-in":
+                        self.state.set_drone_state(DroneState.REST)
+                    case "st-a-prealarm":
+                        self.state.set_hangar_state(HangarState.PREALARM)
+                    case "st-a-alarm":
+                        self.state.set_hangar_state(HangarState.ALARM)
+                    case "st-a-normal":
+                        self.state.set_hangar_state(HangarState.NORMAL)
+            case "dt-":
+                try:
+                    distance = int(msg[3:])
+                    self.state.set_current_distance(distance)
+                except ValueError:
+                    pass

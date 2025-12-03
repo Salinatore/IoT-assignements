@@ -56,6 +56,11 @@ class State(BaseModel):
         self._hangar_state = new_hangar_state
         self._handle_status_change()
 
+    def set_current_distance(self, new_distance: int) -> None:
+        """Sets the current distance and triggers status change handler"""
+        self._current_distance = new_distance
+        self._handle_status_change()
+
     def _handle_status_change(self):
         """Handles status change by calling the registered callback"""
         if self._on_status_change:
