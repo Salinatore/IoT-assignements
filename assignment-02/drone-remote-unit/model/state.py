@@ -4,6 +4,7 @@ from enum import Enum
 from typing import Any, Callable
 
 from pydantic import BaseModel, model_serializer
+from pydantic.types import HashableItemType
 
 
 class DroneState(str, Enum):
@@ -68,13 +69,11 @@ class State(BaseModel):
 
     @model_serializer
     def ser_model(self) -> dict[str, Any]:
-        if (
-            self._hangar_state == HangarState.ALARM
-            and self._drone_state == DroneState.OPERATING
-        ):
-            hangar_state = self._hangar_state
-        else:
-            hangar_state = "ND"
+        hangar_state = (
+            self._hangar_state
+            if self._hangar_state == HangarState.ALARM
+            else HangarState.NORMAL
+        )
 
         if self._drone_state == DroneState.LANDING:
             current_distance = self._current_distance
