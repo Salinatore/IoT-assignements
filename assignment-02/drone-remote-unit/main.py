@@ -5,6 +5,8 @@ from contextlib import asynccontextmanager
 import uvicorn
 from fastapi import FastAPI, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 
 from config import BAUD, PORT
 from handlers.message_serial_handler import MessageToSerialHandler
@@ -36,7 +38,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
-
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 app.add_middleware(
     CORSMiddleware,
@@ -47,10 +49,9 @@ app.add_middleware(
 )
 
 
-@app.get("/")
-async def root() -> dict:
-    """Returns a message indicating the status of the Drone Control API"""
-    return {"message": "Drone Control API", "status": "running"}
+@app.get("/", response_class=FileResponse)
+async def get_frontend():
+    return FileResponse("static/index.html")
 
 
 @app.websocket("/ws")
