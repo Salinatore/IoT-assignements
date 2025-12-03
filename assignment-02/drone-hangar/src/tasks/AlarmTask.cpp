@@ -12,88 +12,115 @@
 #define ALARM_MSG "st-a-alarm"
 #define NORMAL_MSG "st-a-normal"
 
-AlarmTask::AlarmTask(Context* pContext, TempSensorTMP36* pTempSensor, MyLcd* pLcd, Button* pButton): 
-    pContext(pContext), pTempSensor(pTempSensor), pLcd(pLcd), pButton(pButton){
+AlarmTask::AlarmTask(Context *pContext, TempSensorTMP36 *pTempSensor, MyLcd *pLcd, Button *pButton) : pContext(pContext), pTempSensor(pTempSensor), pLcd(pLcd), pButton(pButton)
+{
     setState(IDLE);
     this->pContext->setAlarm(false);
     this->pContext->setPreAlarm(false);
 }
 
-void AlarmTask::tick(){
-    switch (state){
-    case IDLE: { 
-        if (this->checkAndSetJustEntered()){
+void AlarmTask::tick()
+{
+    switch (state)
+    {
+    case IDLE:
+    {
+        if (this->checkAndSetJustEntered())
+        {
             this->tempUp = false;
             this->pContext->setPreAlarm(false);
             this->pContext->setAlarm(false);
             this->pLcd->writeAlarmMessage(" ");
-            Logger.log(F("AlarmTask:IDLE")); 
-            MsgService.sendMsg(NORMAL_MSG);       
+            Logger.log(F("AlarmTask:IDLE"));
+            MsgService.sendMsg(NORMAL_MSG);
         }
-        if (!this->pContext->isDroneOut()){
-            if (this->pTempSensor->getTemperature() > TEMP1){
-                if(this->tempUp){
-                    if(this->elapsedTime() > T3){
+        if (!this->pContext->isDroneOut())
+        {
+            if (this->pTempSensor->getTemperature() > TEMP1)
+            {
+                if (this->tempUp)
+                {
+                    if (this->elapsedTime() > T3)
+                    {
                         setState(PRE_ALARM);
                     }
-                } else {
+                }
+                else
+                {
                     this->timestamp = millis();
                     this->tempUp = true;
-                }                    
-            } else {
+                }
+            }
+            else
+            {
                 this->tempUp = false;
             }
         }
-        break; 
+        break;
     }
-    case PRE_ALARM: {
-        if (this->checkAndSetJustEntered()){
+    case PRE_ALARM:
+    {
+        if (this->checkAndSetJustEntered())
+        {
             this->pContext->setPreAlarm(true);
             this->pContext->setAlarm(false);
             Logger.log(F("AlarmTask:PRE_ALARM"));
             this->timestamp = millis();
-            MsgService.sendMsg(PREALARM_MSG);   
+            MsgService.sendMsg(PREALARM_MSG);
         }
-        if (this->pTempSensor->getTemperature() > TEMP2){
-            if(this->elapsedTime() > T4){
+        if (this->pTempSensor->getTemperature() > TEMP2)
+        {
+            if (this->elapsedTime() > T4)
+            {
                 setState(ALARM);
-            }                  
-        } else {
+            }
+        }
+        else if (this->pTempSensor->getTemperature() < TEMP1)
+        {
             this->pContext->setPreAlarm(false);
             this->setState(IDLE);
         }
-        break; }
-    case ALARM: {
-        if (this->checkAndSetJustEntered()){
+        break;
+    }
+    case ALARM:
+    {
+        if (this->checkAndSetJustEntered())
+        {
             this->pContext->setPreAlarm(false);
             this->pContext->setAlarm(true);
             Logger.log(F("AlarmTask:ALARM"));
             this->pLcd->writeAlarmMessage("ALARM");
-            MsgService.sendMsg(ALARM_MSG);   
+            MsgService.sendMsg(ALARM_MSG);
         }
-        if(this->pButton->isPressed()){
+        if (this->pButton->isPressed())
+        {
             this->pContext->setAlarm(false);
             this->setState(IDLE);
         }
-        break; }
+        break;
+    }
     default:
         break;
     }
 }
 
-void AlarmTask::setState(AlarmState s){
+void AlarmTask::setState(AlarmState s)
+{
     state = s;
     justEntered = true;
 }
 
-long AlarmTask::elapsedTime(){
+long AlarmTask::elapsedTime()
+{
     return millis() - timestamp;
 }
 
-bool AlarmTask::checkAndSetJustEntered(){
+bool AlarmTask::checkAndSetJustEntered()
+{
     bool bak = justEntered;
-    if (justEntered){
-      justEntered = false;
+    if (justEntered)
+    {
+        justEntered = false;
     }
     return bak;
 }
