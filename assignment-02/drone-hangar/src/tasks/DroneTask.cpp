@@ -6,7 +6,7 @@
 #define DOOR_CLOSED_ANGLE 0
 #define DOOR_OPEN_ANGLE 180
 #define D1 1
-#define D2 100
+#define D2 0.1
 #define T1 5000
 #define T2 5000
 #define TAKEOFF "free-your-wings"
@@ -85,6 +85,7 @@ void DroneTask::tick(){
             this->servo->setPosition(DOOR_OPEN_ANGLE);
         }
         float distance = this->distanceDetector->getDistance();
+        MsgService.sendMsg("dt-" + String(distance));
 
         if (distance > D1 && !this->isTimerActive){ //distance > D1 al posto di true
             this->startTimer();
@@ -170,8 +171,9 @@ void DroneTask::tick(){
         }
 
         float distance = this->distanceDetector->getDistance();
+        MsgService.sendMsg("dt-" + String(distance));
 
-        if (distance < D2 && !this->isTimerActive){ //distance < D2 al psoto di true
+        if (distance < D2 && distance > -1  && !this->isTimerActive){ //distance < D2 al psoto di true
             this->startTimer();
         } 
         if (distance > D2){ //distance > D2 al posto di false
@@ -222,7 +224,7 @@ void DroneTask::resetTimer(){
 }
 
 bool DroneTask::isTimerElapsed(unsigned long t){
-    return (millis() - this->time) > t;
+    return (millis() - this->time) > t && this->isTimerActive;
 }
 
 bool DroneTask::isDoorOpen(){
