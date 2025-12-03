@@ -3,7 +3,6 @@
 #include "kernel/MsgService.h"
 #include "kernel/Logger.h"
 
-#define NOT_INITIALIZE -1
 #define DOOR_CLOSED_ANGLE 0
 #define DOOR_OPEN_ANGLE 180
 #define D1 1
@@ -227,5 +226,5 @@ bool DroneTask::isTimerElapsed(unsigned long t){
 }
 
 bool DroneTask::isDoorOpen(){
-    return !(this->servo->getAngle() == NOT_INITIALIZE || this->servo->getAngle() == DOOR_CLOSED_ANGLE);
+    return !(this->servo->getAngle() == this->servo->NOT_INITIALIZE || this->servo->getAngle() == DOOR_CLOSED_ANGLE);
 }
