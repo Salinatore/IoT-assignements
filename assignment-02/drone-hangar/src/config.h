@@ -9,7 +9,7 @@
 #define PIR_PIN 5
 #define ECHO_PIN 8
 #define TRIG_PIN 7
-#define TEMP_PIN 10 //da guardare 
+#define TEMP_PIN A0
 #define SONAR_TIME 38000
 
 #endif

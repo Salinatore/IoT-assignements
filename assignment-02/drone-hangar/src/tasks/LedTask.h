@@ -11,8 +11,8 @@ public:
     void tick();
 
 private:
-    enum State { IDLE, MOVE_FASE, ALARM } state;
-    void setState(State state);
+    enum LedState { IDLE, MOVE_FASE, ALARM } state;
+    void setState(LedState state);
     long elapsedTime();
     bool checkAndSetJustEntered();
     

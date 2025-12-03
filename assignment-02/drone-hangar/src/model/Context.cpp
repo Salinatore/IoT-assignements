@@ -1,23 +1,23 @@
 #include "Context.h"
 
 Context::Context(){
-    preAlarm = false;
-    alarm = false;
-    droneOut = false;
-    takeOff = false;
-    landing = false;
+    this->preAlarm = false;
+    this->alarm = false;
+    this->droneOut = false;
+    this->takeOff = false;
+    this->landing = false;
 }
 
 bool Context::isPreAlarm(){
-    return preAlarm;
+    return this->preAlarm;
 }
 
 bool Context::isTakeOff(){
-    return takeOff;
+    return this->takeOff;
 }
 
 bool Context::isAlarm(){
-    return alarm;
+    return this->alarm;
 }
 
 bool Context::isDroneOut(){
@@ -37,7 +37,7 @@ void Context::setLanding(bool landing){
 }
 
 void Context::setTakeOff(bool takeoff){
-    this->takeOff = takeOff;
+    this->takeOff = takeoff;
 }
 
 void Context::setAlarm(bool alarm){

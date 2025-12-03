@@ -54,7 +54,6 @@ void DroneTask::tick(){
             Logger.log(F("DroneTask:IN"));
         }
 
-
         if (this->isDoorOpen()){
             this->servo->setPosition(DOOR_CLOSED_ANGLE);
         }
@@ -106,12 +105,12 @@ void DroneTask::tick(){
         if (this->checkAndSetJustEntered()){
             this->context->setDroneOut(true);
             MsgService.sendMsg(FULLYOUT);
+            this->context->setTakeOff(false);
             this->lcd->writeStateMessage("DRONE OUT");
             Logger.log(F("DroneTask:OUT"));
         }
 
         if (this->isDoorOpen()){
-            this->context->setTakeOff(false);
             this->servo->setPosition(DOOR_CLOSED_ANGLE);
         }
 
@@ -200,7 +199,7 @@ void DroneTask::tick(){
     }
 }
 
-void DroneTask::setState(State s){
+void DroneTask::setState(DroneState s){
     state = s;
     justEntered = true;
 }

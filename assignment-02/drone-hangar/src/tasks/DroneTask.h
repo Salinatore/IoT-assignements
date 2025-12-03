@@ -21,9 +21,9 @@ class DroneTask: public Task {
         ServoMotorImpl* servo;
         MyLcd* lcd;
 
-        enum State { IN, TAKE_OFF, OUT, WAITING_FOR_LANDING, LANDING, ALARM_IN, ALARM_OUT } state;
+        enum DroneState { IN, TAKE_OFF, OUT, WAITING_FOR_LANDING, LANDING, ALARM_IN, ALARM_OUT } state;
 
-        void setState(State state);
+        void setState(DroneState state);
         void startTimer();
         void resetTimer();
         bool isTimerElapsed(unsigned long t);

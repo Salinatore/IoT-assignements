@@ -11,9 +11,9 @@ public:
     void tick();
 
 private:
-    enum State { IDLE, ALARM, PRE_ALARM } state;
+    enum AlarmState { IDLE, ALARM, PRE_ALARM } state;
 
-    void setState(State state);
+    void setState(AlarmState state);
     long elapsedTime();
     bool checkAndSetJustEntered();
 

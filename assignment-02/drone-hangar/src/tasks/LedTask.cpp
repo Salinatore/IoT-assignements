@@ -12,7 +12,7 @@ LedTask::LedTask(Context* pContext, Led* pLed1, Led* pLed2, Led* pLedR):
 
 void LedTask::tick(){
     switch (state){
-    case IDLE:
+    case IDLE: { 
         if (this->checkAndSetJustEntered()){
             Logger.log(F("LedTask:IDLE"));
             this->pLed1->switchOn();
@@ -25,18 +25,21 @@ void LedTask::tick(){
         if (this->pContext->isLanding() || this->pContext->isTakeOff()){
             this->setState(MOVE_FASE);
         }
-        break;
-    case MOVE_FASE:
+        break; }
+    case MOVE_FASE: {
         if (this->checkAndSetJustEntered()){
+            this->isOn = false;
             Logger.log(F("LedTask:MOVE_FASE"));
             this->pLedR->switchOff();
             this->timestamp = millis();
-        }
+        } 
         long currentTime = millis();
-        if (currentTime - this->elapsedTime() > BLINK_PERIOD){
+        if (currentTime - this->timestamp > BLINK_PERIOD){
             if (isOn){
+                isOn = false;
                 this->pLed2->switchOff();    
             } else {
+                isOn = true;
                 this->pLed2->switchOn();
             }
             this->timestamp = currentTime;
@@ -44,8 +47,8 @@ void LedTask::tick(){
         if (!(this->pContext->isLanding() || this->pContext->isTakeOff())){
             this->setState(IDLE);
         }
-        break;
-    case ALARM:
+        break; }
+    case ALARM: { 
         if (this->checkAndSetJustEntered()){
             Logger.log(F("LedTask:ALARM"));
             this->pLed2->switchOff();
@@ -56,11 +59,11 @@ void LedTask::tick(){
         }
         break;
     default:
-        break;
+        break; }
     }
 }
 
-void LedTask::setState(State s){
+void LedTask::setState(LedState s){
     state = s;
     justEntered = true;
 }
