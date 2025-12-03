@@ -24,7 +24,7 @@ class State(BaseModel):
 
     _drone_state: DroneState = DroneState.REST
     _hangar_state: HangarState = HangarState.NORMAL
-    _current_distance: int = 0
+    _current_distance: float = 0
 
     def setMessageHandler(
         self, on_status_change: Callable[[], Coroutine[Any, Any, None]]
@@ -56,7 +56,7 @@ class State(BaseModel):
         self._hangar_state = new_hangar_state
         self._handle_status_change()
 
-    def set_current_distance(self, new_distance: int) -> None:
+    def set_current_distance(self, new_distance: float) -> None:
         """Sets the current distance and triggers status change handler"""
         self._current_distance = new_distance
         self._handle_status_change()

@@ -124,6 +124,7 @@ takaOffBtn.addEventListener("click", async () => {
 });
 
 function refreshStatus(data) {
+  console.log(data);
   statusDrone.textContent = data.drone_state;
   if (data.hangar_state !== "ND") {
     statusHangar.textContent = data.hangar_state;
