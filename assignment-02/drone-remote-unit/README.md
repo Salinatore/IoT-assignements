@@ -12,7 +12,7 @@ It exposes a simple HTTP health endpoint and a WebSocket endpoint for real-time 
 - `model/` — Application `State` model.
 
 ## Quick set
-You can create a virtual enviroment using `uv venv`.
+If you have [uv](https://docs.astral.sh/uv/), you can create a virtual enviroment using `uv venv`.
 After activating it you can run `uv sync` to install all the dependencies and then `uv run main.py` to run the project.
 Make sure that you set the correct PORT and BOUD rate in the confi.py before running.
 

@@ -1,7 +1,7 @@
 #ifndef __CONFIG__
 #define __CONFIG__
 
-#define RST_BT_PIN 9 //
+#define RST_BT_PIN 9
 #define LED_PIN1 13
 #define LED_PIN2 12
 #define LED_PINR 11
