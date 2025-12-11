@@ -5,9 +5,7 @@
 #include "kernel/MsgService.h"
 #include "model/HWPlatform.h"
 #include "tasks/TestHWTask.h"
-#include "tasks/DroneTask.h"
 #include "tasks/AlarmTask.h"
-#include "tasks/LedTask.h"
 
 // #define __TESTING_HW__
 
@@ -26,32 +24,7 @@ void setup()
 
 #ifndef __TESTING_HW__
   pContext = new Context();
-  Task *pDroneTask = new DroneTask(
-      pContext,
-      pHWPlatform->getDPD(),
-      pHWPlatform->getDDD(),
-      pHWPlatform->getMotor(),
-      pHWPlatform->getLCD());
-  pDroneTask->init(50);
-
-  sched.addTask(pDroneTask);
-
-  Task *pAlarmTask = new AlarmTask(
-      pContext,
-      pHWPlatform->getTempSensor(),
-      pHWPlatform->getLCD(),
-      pHWPlatform->getButton());
-  pAlarmTask->init(100);
-  sched.addTask(pAlarmTask);
-
-  Task *pLedTask = new LedTask(
-      pContext,
-      pHWPlatform->getLed1(),
-      pHWPlatform->getLed2(),
-      pHWPlatform->getLedR());
-  pLedTask->init(90);
-  sched.addTask(pLedTask);
-
+  
 #endif
 
 #ifdef __TESTING_HW__

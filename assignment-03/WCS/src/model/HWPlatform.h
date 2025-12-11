@@ -3,12 +3,10 @@
 
 #include "config.h"
 #include "devices/Button.h"
-#include "devices/Led.h"
 #include "devices/ServoMotorImpl.h"
-#include "devices/TempSensorTMP36.h"
 #include "devices/MyLcd.h"
-#include <devices/Pir.h>
-#include <devices/Sonar.h>
+#include "devices/Pot.h"
+
 
 class HWPlatform
 {
@@ -18,25 +16,15 @@ public:
   void test();
 
   Button *getButton();
-  Led *getLed1();
-  Led *getLed2();
-  Led *getLedR();
   ServoMotorImpl *getMotor();
   MyLcd *getLCD();
-  Pir *getDPD();
-  Sonar *getDDD();
-  TempSensorTMP36 *getTempSensor();
+  Potentiometer *getPot();
 
 private:
   Button *resetButton;
-  Led *led1;
-  Led *led2;
-  Led *ledR;
   ServoMotorImpl *servo;
   MyLcd *lcd;
-  Pir *presenceDetector;
-  Sonar *distanceDetector;
-  TempSensorTMP36 *tempSensor;
+  Potentiometer *pot;
 };
 
 #endif
