@@ -5,14 +5,13 @@
 #include "kernel/MsgService.h"
 #include "model/HWPlatform.h"
 #include "tasks/TestHWTask.h"
-#include "tasks/AlarmTask.h"
+#include "tasks/WCSTask.h"
 
 // #define __TESTING_HW__
 
 Scheduler sched;
 
 HWPlatform *pHWPlatform;
-Context *pContext;
 
 void setup()
 {
@@ -23,7 +22,6 @@ void setup()
   pHWPlatform = new HWPlatform();
 
 #ifndef __TESTING_HW__
-  pContext = new Context();
   
 #endif
 

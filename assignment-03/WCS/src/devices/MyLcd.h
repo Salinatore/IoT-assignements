@@ -7,13 +7,13 @@ class MyLcd {
 private:
 public:
     MyLcd();
-    void writeAlarmMessage(String message);
-    void writeStateMessage(String message);
+    void writeModeMessage(String message);
+    void writePercMessage(String message);
 private:
     void refresh();
 
-    String alarmMessage;
-    String stateMessage;
+    String modeMessage;
+    String percMessage;
 };
 
 #endif

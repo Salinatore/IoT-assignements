@@ -50,7 +50,7 @@ void HWPlatform::test(){
     Logger.log(F("TEST: button"));
   }
 
-  this->lcd->writeAlarmMessage("TEST");
-  this->lcd->writeStateMessage("TEST");
+  this->lcd->writeModeMessage("TEST");
+  this->lcd->writePercMessage("TEST");
   
 }

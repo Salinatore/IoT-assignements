@@ -15,21 +15,21 @@ MyLcd::MyLcd(){
     lcd.setCursor(0, 0);
 }
 
-void MyLcd::writeStateMessage(String message){
-    this->stateMessage = message;
+void MyLcd::writeModeMessage(String message){
+    this->modeMessage = message;
     this->refresh();
 };
 
-void MyLcd::writeAlarmMessage(String message){
-    this->alarmMessage = message;
+void MyLcd::writePercMessage(String message){
+    this->percMessage = message;
     this->refresh();
 };
 
 void MyLcd::refresh(){
     lcd.clear();
     lcd.setCursor(0, 0); 
-    lcd.print(this->alarmMessage);
+    lcd.print(this->modeMessage);
     lcd.setCursor(0, 1); 
-    lcd.print("STATE: "+ this->stateMessage);
+    lcd.print("VALVE: "+ this->percMessage +"%");
     lcd.flush();
 }

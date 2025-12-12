@@ -1,0 +1,28 @@
+#ifndef __ALARM_TASK__
+#define __ALARM_TASK__
+
+#include "kernel/Task.h"
+#include "model/HWPlatform.h"
+
+class WCSTask: public Task {
+public:
+    WCSTask(ServoMotor* pServo, MyLcd* pLcd, Button* pButton, Potentiometer* pPot);
+    void tick();
+
+private:
+    enum WCSState { AUTOMATIC, LOC_MANUAL, REM_MANUAL, UNCONECTED } state;
+
+    void setState(WCSState state);
+    bool checkAndSetJustEntered();
+
+    HWPlatform* pHW;
+
+    bool justEntered;
+
+    ServoMotor* pServo;
+    MyLcd* pLcd;
+    Button* pButton;
+    Potentiometer* pPot;
+};
+
+#endif
