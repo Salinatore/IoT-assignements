@@ -4,7 +4,7 @@
 #include "config.h"
 #include "devices/Button.h"
 #include "devices/ServoMotorImpl.h"
-#include "devices/MyLcd.h"
+#include "devices/Lcd.h"
 #include "devices/Pot.h"
 
 
@@ -17,13 +17,13 @@ public:
 
   Button *getButton();
   ServoMotorImpl *getMotor();
-  MyLcd *getLCD();
+  Lcd *getLCD();
   Potentiometer *getPot();
 
 private:
   Button *resetButton;
   ServoMotorImpl *servo;
-  MyLcd *lcd;
+  Lcd *lcd;
   Potentiometer *pot;
 };
 

@@ -7,7 +7,7 @@
 #define ALARM_MSG "st-a-alarm"
 #define NORMAL_MSG "st-a-normal"
 
-WCSTask::WCSTask(ServoMotor* pServo, MyLcd *pLcd, Button *pButton, Potentiometer* pPot) : pServo(pServo), pLcd(pLcd), pButton(pButton), pPot(pPot)
+WCSTask::WCSTask(ServoMotor* pServo, Lcd *pLcd, Button *pButton, Potentiometer* pPot) : pServo(pServo), pLcd(pLcd), pButton(pButton), pPot(pPot)
 {
     setState(AUTOMATIC);
 }

@@ -14,7 +14,7 @@ void wakeUp(){}
 HWPlatform::HWPlatform(){
   this->resetButton = new ButtonImpl(RST_BT_PIN);
   this->servo = new ServoMotorImpl(MOTOR_PIN);
-  this->lcd = new MyLcd();
+  this->lcd = new Lcd();
   this->pot = new Potentiometer(POT_PIN);
   
   this->servo->on();
@@ -29,7 +29,7 @@ ServoMotorImpl* HWPlatform::getMotor(){
   return this->servo;
 }
 
-MyLcd* HWPlatform::getLCD(){
+Lcd* HWPlatform::getLCD(){
   return this->lcd;
 }
 

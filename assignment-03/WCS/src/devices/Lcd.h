@@ -3,10 +3,10 @@
 
 #include <Arduino.h>
 
-class MyLcd {
+class Lcd {
 private:
 public:
-    MyLcd();
+    Lcd();
     void writeModeMessage(String message);
     void writePercMessage(String message);
 private:

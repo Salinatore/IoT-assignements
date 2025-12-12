@@ -6,7 +6,7 @@
 
 class WCSTask: public Task {
 public:
-    WCSTask(ServoMotor* pServo, MyLcd* pLcd, Button* pButton, Potentiometer* pPot);
+    WCSTask(ServoMotor* pServo, Lcd* pLcd, Button* pButton, Potentiometer* pPot);
     void tick();
 
 private:
@@ -20,7 +20,7 @@ private:
     bool justEntered;
 
     ServoMotor* pServo;
-    MyLcd* pLcd;
+    Lcd* pLcd;
     Button* pButton;
     Potentiometer* pPot;
 };
