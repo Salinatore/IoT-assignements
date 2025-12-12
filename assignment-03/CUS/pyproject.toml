@@ -1,0 +1,11 @@
+[project]
+name = "control-unit-subsystem"
+version = "0.1.0"
+description = ""
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi>=0.124.2",
+    "pyserial-asyncio>=0.6",
+    "uvicorn[standard]>=0.38.0",
+]
