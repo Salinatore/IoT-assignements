@@ -14,6 +14,7 @@ private:
 
     void setState(WCSState state);
     bool checkAndSetJustEntered();
+    int msgMotorPerc(String message);
 
     HWPlatform* pHW;
 
