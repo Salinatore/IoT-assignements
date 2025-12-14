@@ -14,9 +14,12 @@ from handlers.mqtt import MqttHandler
 from handlers.serial import SerialHandler
 from handlers.websocket import WebSocketHandler
 from logger_config import setup_logging
+from model.model import State
 
 setup_logging()
 logger = logging.getLogger(__name__)
+
+state = State()
 
 mqtt_manager = MqttManager(broker=BROKER, topic=TOPIC)
 serial_manager = SerialManager(port=PORT, baud=BAUD)
