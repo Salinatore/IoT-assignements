@@ -23,7 +23,7 @@ class WebSocketManager:
                 disconnected.add(websocket)
         self._active_connections.difference_update(disconnected)
 
-    async def handle_connection(self, websocket: WebSocket):
+    async def manage_new_connection(self, websocket: WebSocket):
         """Accepts websocket and start to listen for messages continuously"""
         await self._connect(websocket)
 

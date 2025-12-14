@@ -30,7 +30,6 @@ websocket_handler = WebSocketHandler(websocket_manager)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Manage application lifecycle"""
-    # add startup of managers
     yield
 
 
@@ -40,7 +39,7 @@ app = FastAPI(lifespan=lifespan)
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     """WebSocket endpoint for establishing a new connection"""
-    await websocket_manager.handle_connection(websocket)
+    await websocket_manager.manage_new_connection(websocket)
 
 
 if __name__ == "__main__":

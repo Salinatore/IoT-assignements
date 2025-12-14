@@ -25,14 +25,14 @@ class SerialManager:
             url=self._port, baudrate=self._baud
         )
 
-        asyncio.create_task(self._reader_task())
-        asyncio.create_task(self._writer_task())
+        asyncio.create_task(self._reader_loop())
+        asyncio.create_task(self._writer_loop())
 
     async def send(self, msg: str):
         """Enqueue message to be sent through serial"""
         await self._command_queue.put(msg)
 
-    async def _reader_task(self):
+    async def _reader_loop(self):
         """Reads from serial continuously"""
         if self._reader:
             while True:
@@ -42,7 +42,7 @@ class SerialManager:
                 if self._message_handler:
                     await self._message_handler(msg)
 
-    async def _writer_task(self):
+    async def _writer_loop(self):
         """Sends commands through serial continuously if the queue is not empty"""
         if self._writer:
             while True:
