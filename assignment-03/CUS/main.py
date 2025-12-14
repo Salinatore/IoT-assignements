@@ -1,58 +1,46 @@
 """Main application file for the Drone Control API using FastAPI framework."""
 
+import logging
 from contextlib import asynccontextmanager
 
 import uvicorn
 from fastapi import FastAPI, WebSocket
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
-from fastapi.staticfiles import StaticFiles
 
-from config import BAUD, PORT
+from config import BAUD, BROKER, PORT, TOPIC
+from connections.mqtt import MqttManager
+from connections.serial import SerialManager
 from connections.websocket import WebSocketManager
-from handlers.serial import MessageToSerialHandler
-from handlers.websocket import MessageToWebSocketHandler
+from handlers.mqtt import MqttHandler
+from handlers.serial import SerialHandler
+from handlers.websocket import WebSocketHandler
+from logger_config import setup_logging
 
-serial_manager = SerialManager(
-    port=PORT,
-    baud=BAUD,
-)
+setup_logging()
+logger = logging.getLogger(__name__)
 
-message_to_serial = MessageToSerialHandler(serial_manager)
+mqtt_manager = MqttManager(broker=BROKER, topic=TOPIC)
+serial_manager = SerialManager(port=PORT, baud=BAUD)
+websocket_manager = WebSocketManager()
 
-web_socket_handler = WebSocketManager(message_to_serial)
-
-message_to_web_socket = MessageToWebSocketHandler(web_socket_handler)
+mqtt_handler = MqttHandler(mqtt_manager)
+serial_handler = SerialHandler(serial_manager)
+websocket_handler = WebSocketHandler(websocket_manager)
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Manage application lifecycle"""
-    await serial_manager.start(message_to_web_socket.handle_serial_message)
+    # add startup of managers
     yield
 
 
 app = FastAPI(lifespan=lifespan)
-app.mount("/static", StaticFiles(directory="static"), name="static")
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-
-@app.get("/", response_class=FileResponse)
-async def get_frontend():
-    return FileResponse("static/index.html")
 
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     """WebSocket endpoint for establishing a new connection"""
-    await web_socket_handler.handle_connection(websocket, state)
+    await websocket_manager.handle_connection(websocket)
 
 
 if __name__ == "__main__":

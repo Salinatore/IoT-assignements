@@ -1,30 +1,28 @@
 import asyncio
+import logging
+from typing import Any, Callable, Coroutine
 
-from paho.mqtt.client import CallbackAPIVersion, Client
-from typing_extensions import Awaitable, Callable
+from asyncio_mqtt import Client
+
+logger = logging.getLogger(__name__)
 
 
-class MqttMenager:
-    def __init__(self, message_handler: Callable[[str], Awaitable[None]]):
-        self._client = Client(CallbackAPIVersion.VERSION2)
+class MqttManager:
+    """Manages Mqtt connection"""
 
-        self._client.on_connect = self._on_connect
-        self._client.on_message = self._on_message
+    def __init__(self, broker: str, topic: str):
+        self._broker = broker
+        self._topic = topic
 
-    async def start(
-        self,
-    ):
-        asyncio.create_task(self._recive_task())
+    async def start(self, handle_message: Callable[[str], Coroutine[Any, Any, None]]):
+        """Start mqtt listener task"""
+        self._handle_message = handle_message
+        asyncio.create_task(self._listen())
 
-    async def _recive_task(self):
-        self._client.loop_forever()
-
-    @staticmethod
-    def _on_connect(client, userdata, flags, reason_code, properties):
-        print(f"Connected with result code {reason_code}")
-        client.subscribe("esiot-2025-fgor")
-
-    @staticmethod
-    def _on_message(client, userdata, msg):
-        print(msg.topic + " " + str(msg.payload))
-        # real handeling here
+    async def _listen(self):
+        """Listen on mqtt port for messages continuously"""
+        async with Client(hostname=self._broker) as client:
+            await client.subscribe(self._topic)
+            async with client.messages() as messages:
+                async for message in messages:
+                    asyncio.create_task(self._handle_message(str(message.payload)))

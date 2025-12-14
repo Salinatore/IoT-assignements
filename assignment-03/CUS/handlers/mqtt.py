@@ -1,4 +1,8 @@
+import logging
+
 from connections.mqtt import MqttMenager
+
+logger = logging.getLogger(__name__)
 
 
 class MqttHandler:

@@ -1,4 +1,8 @@
-from serial_communication.serial_manager import SerialManager
+import logging
+
+from connections.serial import SerialManager
+
+logger = logging.getLogger(__name__)
 
 
 class SerialHandler:

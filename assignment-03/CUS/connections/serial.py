@@ -1,11 +1,14 @@
 import asyncio
+import logging
 from typing import Awaitable, Callable
 
 import serial_asyncio
 
+logger = logging.getLogger(__name__)
+
 
 class SerialManager:
-    """Manages Serial connection to Arduino using asyncio tasks for asynchronous communication"""
+    """Manages Serial connection"""
 
     def __init__(self, port: str, baud: int):
         self._port = port
@@ -17,8 +20,8 @@ class SerialManager:
 
     async def start(self, message_handler: Callable[[str], Awaitable[None]]):
         """Start serial connection. Creates reader and writer tasks"""
-        self.message_handler = message_handler
-        self.reader, self.writer = await serial_asyncio.open_serial_connection(
+        self._message_handler = message_handler
+        self._reader, self._writer = await serial_asyncio.open_serial_connection(
             url=self._port, baudrate=self._baud
         )
 
@@ -31,18 +34,18 @@ class SerialManager:
 
     async def _reader_task(self):
         """Reads from serial continuously"""
-        if self.reader:
+        if self._reader:
             while True:
-                line = await self.reader.readline()
+                line = await self._reader.readline()
                 msg = line.decode().strip()
 
-                if self.message_handler:
-                    await self.message_handler(msg)
+                if self._message_handler:
+                    await self._message_handler(msg)
 
     async def _writer_task(self):
         """Sends commands through serial continuously if the queue is not empty"""
-        if self.writer:
+        if self._writer:
             while True:
                 msg = await self._command_queue.get()
-                self.writer.write((msg + "\n").encode())
-                await self.writer.drain()
+                self._writer.write((msg + "\n").encode())
+                await self._writer.drain()

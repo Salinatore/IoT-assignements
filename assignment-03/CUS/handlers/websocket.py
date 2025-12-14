@@ -1,4 +1,8 @@
+import logging
+
 from connections.websocket import WebSocketManager
+
+logger = logging.getLogger(__name__)
 
 
 class WebSocketHandler:
