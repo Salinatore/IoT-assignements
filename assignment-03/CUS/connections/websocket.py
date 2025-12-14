@@ -7,17 +7,17 @@ class WebSocketManager:
     """Manages WebSocket connections and broadcasting"""
 
     def __init__(self):
-        self.active_connections: Set[WebSocket] = set()
+        self._active_connections: Set[WebSocket] = set()
 
     async def broadcast(self, message: dict):
         disconnected = set()
-        for websocket in self.active_connections:
+        for websocket in self._active_connections:
             try:
                 await websocket.send_json(message)
             except Exception as e:
                 print(f"Error sending to client: {e}")
                 disconnected.add(websocket)
-        self.active_connections.difference_update(disconnected)
+        self._active_connections.difference_update(disconnected)
 
     async def handle_connection(self, websocket: WebSocket):
         """Handle WebSocket connection lifecycle"""
@@ -36,9 +36,9 @@ class WebSocketManager:
 
     async def _connect(self, websocket: WebSocket):
         await websocket.accept()
-        self.active_connections.add(websocket)
-        print(f"Client connected. Total clients: {len(self.active_connections)}")
+        self._active_connections.add(websocket)
+        print(f"Client connected. Total clients: {len(self._active_connections)}")
 
     def _disconnect(self, websocket: WebSocket):
-        if websocket in self.active_connections:
-            self.active_connections.remove(websocket)
+        if websocket in self._active_connections:
+            self._active_connections.remove(websocket)
