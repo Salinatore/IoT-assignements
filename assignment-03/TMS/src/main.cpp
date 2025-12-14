@@ -1,22 +1,19 @@
 #include <Arduino.h>
 #include "config.h"
-#include "kernel/Scheduler.h"
 #include "model/HWPlatform.h"
 #include "tasks/TestHWTask.h"
 #include "tasks/WCSTask.h"
 
 // #define __TESTING_HW__
 
-Scheduler sched;
 
 HWPlatform *pHWPlatform;
 
 void setup()
 {
-
-
   pHWPlatform = new HWPlatform();
-
+  WCSTask* mainTask = new WCSTask(pHWPlatform->getSonar());
+  xTaskCreatePinnedToCore(mainTask->task(),"Task1",10000,NULL,1,&Task1,0);
 #ifndef __TESTING_HW__
   
 #endif
@@ -30,5 +27,5 @@ void setup()
 
 void loop()
 {
-  sched.schedule();
+
 }

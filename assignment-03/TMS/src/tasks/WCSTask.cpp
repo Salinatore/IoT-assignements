@@ -12,30 +12,12 @@ WCSTask::WCSTask(Sonar* pSonar) : pSonar(pSonar)
 
 void WCSTask::tick()
 {
-    switch (state)
-    {
-    case AUTOMATIC:
-    {
-        
-    }
-    case LOC_MANUAL:
-    {
-        
-        break;
-    }
-    case REM_MANUAL:
-    {
-        
-        break;
-    }
-    case UNCONECTED:
-    {
-        
-        break;
-    }   
-    default:
-        break;
-    }
+    
+}
+
+TaskFunction_t task() 
+{
+    return WCSTask::taskWrapper;
 }
 
 void WCSTask::setState(WCSState s)

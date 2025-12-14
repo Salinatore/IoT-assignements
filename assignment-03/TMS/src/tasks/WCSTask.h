@@ -3,11 +3,20 @@
 
 #include "kernel/Task.h"
 #include "model/HWPlatform.h"
+#include <Arduino.h>
 
-class WCSTask: public Task {
+TaskHandle_t Task1;
+
+class WCSTask {
 public:
     WCSTask(Sonar* pSonar);
-    void tick();
+    static void tick();
+    TaskFunction_t task();
+
+    static void taskWrapper(void* param) {
+        WCSTask* self = static_cast<WCSTask*>(param);
+        self->tick();
+    }
 
 private:
     enum WCSState { AUTOMATIC, LOC_MANUAL, REM_MANUAL, UNCONECTED } state;
