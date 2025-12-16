@@ -10,7 +10,7 @@ public:
     void tick();
 
 private:
-    enum WCSState { AUTOMATIC, LOC_MANUAL, REM_MANUAL, UNCONECTED } state;
+    enum WCSState { AUTOMATIC, LOCAL_MANUAL, REMOTE_MANUAL, UNCONECTED } state;
 
     void setState(WCSState state);
     bool checkAndSetJustEntered();
