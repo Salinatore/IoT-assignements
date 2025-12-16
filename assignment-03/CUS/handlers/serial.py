@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 
 class SerialHandler:
-    """Handles all communication to serial"""
+    """Handles all communication to and from serial"""
 
     # Message protocol constants
     _CUS_TO_WCS_STATUS_AUTOMATIC = "cus->wcs-st-automatic"
@@ -18,6 +18,7 @@ class SerialHandler:
     _WCS_TO_CUS_STATUS_AUTOMATIC = "wcs->cus-st-automatic"
     _WCS_TO_CUS_STATUS_LOCAL_MANUAL = "wcs->cus-st-local-manual"
     _WCS_TO_CUS_OPENING_PERCENTAGE_PREFIX = "wcs->cus-op-"
+    _EXPECTED_SENDER_PREFIX = "wcs->"
 
     # Validation constants
     _MIN_PERCENTAGE = 0
@@ -32,7 +33,7 @@ class SerialHandler:
             Mode.UNCONNECTED: self._CUS_TO_WCS_STATUS_UNCONNECTED,
         }
 
-    def send_opening_percentage_to_serial(self, percentage: int):
+    def send_opening_percentage_to_serial(self, percentage: int) -> None:
         """Send opening percentage command to serial device.
 
         Args:
@@ -48,7 +49,7 @@ class SerialHandler:
             )
         asyncio.create_task(self._process_send_op_update_async(percentage))
 
-    def send_mode_update_to_serial(self, mode: Mode):
+    def send_mode_update_to_serial(self, mode: Mode) -> None:
         """Send mode update command to serial device.
 
         Args:
@@ -64,7 +65,7 @@ class SerialHandler:
             )
         asyncio.create_task(self._process_send_mode_update_async(mode))
 
-    def handle_message_from_serial(self, msg: str):
+    def handle_message_from_serial(self, msg: str) -> None:
         """Handle incoming message from serial device.
 
         Args:
@@ -83,7 +84,7 @@ class SerialHandler:
 
     async def _process_incoming_message_async(self, msg: str):
         """Process incoming message from serial device."""
-        if not msg.startswith("wcs->"):
+        if not msg.startswith(self._EXPECTED_SENDER_PREFIX):
             logger.error(
                 f"Invalid message sender. Expected 'wcs->' prefix. Message: [{msg}]"
             )
