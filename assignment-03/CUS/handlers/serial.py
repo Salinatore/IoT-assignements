@@ -52,8 +52,16 @@ class SerialHandler:
         """Send mode update command to serial device.
 
         Args:
-            mode: Target operating mode
+            mode: Target operating mode (AUTOMATIC, REMOTE_MANUAL or UNCONNETED)
+
+        Raises:
+            ValueError: If mode is not valid
         """
+        if mode not in self._mode_to_message:
+            raise ValueError(
+                f"Invalid mode. Expected one of {list(self._mode_to_message.keys())}, "
+                f"got: {mode}"
+            )
         asyncio.create_task(self._process_send_mode_update_async(mode))
 
     def handle_message_from_serial(self, msg: str):
@@ -71,11 +79,6 @@ class SerialHandler:
 
     async def _process_send_mode_update_async(self, mode: Mode):
         """Send mode update to serial device."""
-        if mode not in self._mode_to_message:
-            raise ValueError(
-                f"Invalid mode. Expected one of {list(self._mode_to_message.keys())}, "
-                f"got: {mode}"
-            )
         await self._connection_manager.send(self._mode_to_message[mode])
 
     async def _process_incoming_message_async(self, msg: str):
