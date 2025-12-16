@@ -13,9 +13,13 @@ class Mode(str, Enum):
 class State(BaseModel):
     _mode: Mode = Mode.AUTOMATIC
     _water_level: float = 0
+    _opening_percentage: int = 0
 
     def set_mode(self, mode: Mode):
         pass
 
-    def set_level(self, mode: Mode):
+    def set_level(self, level: float):
+        pass
+
+    def set_opening_percentage(self, opening_percentage: int):
         pass
