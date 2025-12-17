@@ -31,6 +31,14 @@ serial_handler = SerialHandler(serial_connection, state)
 websocket_handler = WebSocketHandler(websocket_connection, state)
 
 
+def notify_listeners():
+    websocket_handler.send_state_update_to_websocket()
+    serial_handler.send_mode_update_to_serial()
+
+
+state.setListeners(notify_listeners)
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Manage application lifecycle"""

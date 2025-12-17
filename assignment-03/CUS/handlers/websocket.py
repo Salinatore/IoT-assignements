@@ -6,7 +6,7 @@ from ast import Await
 from typing_extensions import Dict
 
 from connections.websocket import WebSocketConnection
-from model.model import State
+from model.model import Mode, State
 
 logger = logging.getLogger(__name__)
 
@@ -30,24 +30,6 @@ class WebSocketHandler:
             self._connection_manager.broadcast(self._state.model_dump())
         )
 
-    def _handle_switch_mode(self, data: dict):
-        state = data["state"]
-        if state not in self._ACCEPTABLE_STATES:
-            logger.error(f"State change not acceptable. State: [{state}]")
-            return
-
-        self._state.set_mode(state)
-
-    def _handle_update_op(self, data: dict):
-        percentage = data["state"]
-        if not self._MIN_PERCENTAGE <= percentage <= self._MAX_PERCENTAGE:
-            logger.error(
-                f"Percentage change not acceptable. Percentage: [{percentage}]"
-            )
-            return
-
-        self._state.set_opening_percentage(percentage)
-
     async def _process_message_from_websocket(self, msg: str):
         data = json.loads(msg)
         match data["type"]:
@@ -59,3 +41,21 @@ class WebSocketHandler:
 
             case _:
                 logger.error(f"Unknown message type from WebSocket. Message: [{msg}]")
+
+    def _handle_switch_mode(self, data: dict):
+        mode_srt = data["mode"]
+        if mode_srt not in self._ACCEPTABLE_STATES:
+            logger.error(f"State change not acceptable. Mode: [{mode_srt}]")
+            return
+
+        self._state.set_mode(Mode(mode_srt))
+
+    def _handle_update_op(self, data: dict):
+        percentage = data["percentage"]
+        if not self._MIN_PERCENTAGE <= percentage <= self._MAX_PERCENTAGE:
+            logger.error(
+                f"Percentage change not acceptable. Percentage: [{percentage}]"
+            )
+            return
+
+        self._state.set_opening_percentage(percentage)

@@ -84,4 +84,5 @@ function clearData() {
 // Initialize on page load
 window.onload = () => {
   initChart();
+  connect();
 };

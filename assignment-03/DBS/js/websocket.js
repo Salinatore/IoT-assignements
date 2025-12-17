@@ -61,9 +61,9 @@ function handleControlBtn() {
   }
 }
 
-window.onload = () => {
-  connect();
-};
+function disconnectWebSocket() {
+  ws.disconnectWebSocket();
+}
 
 window.onbeforeunload = () => {
   disconnectWebSocket();

@@ -49,7 +49,7 @@ class SerialHandler:
             )
         asyncio.create_task(self._process_send_op_update_async(percentage))
 
-    def send_mode_update_to_serial(self, mode: Mode) -> None:
+    def send_mode_update_to_serial(self) -> None:
         """Send mode update command to serial device.
 
         Args:
@@ -58,6 +58,7 @@ class SerialHandler:
         Raises:
             ValueError: If mode is not valid
         """
+        mode = self._state.get_mode()
         if mode not in self._mode_to_message:
             raise ValueError(
                 f"Invalid mode. Expected one of {list(self._mode_to_message.keys())}, "
