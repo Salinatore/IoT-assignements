@@ -22,7 +22,7 @@ class SerialHandler:
 
     # Validation constants
     _MIN_PERCENTAGE = 0
-    _MAX_PERCENTAGE = 90
+    _MAX_PERCENTAGE = 100
 
     def __init__(self, connection_manager: SerialConnection, state: State):
         self._connection_manager = connection_manager
@@ -37,7 +37,7 @@ class SerialHandler:
         """Send opening percentage command to serial device.
 
         Args:
-            percentage: Opening percentage (0-90)
+            percentage: Opening percentage (0-100)
 
         Raises:
             ValueError: If percentage is outside valid range
@@ -71,7 +71,7 @@ class SerialHandler:
         Args:
             msg: Raw message string from serial
         """
-        asyncio.create_task(self._process_incoming_message_async(msg))
+        asyncio.create_task(self._process_message_from_serial(msg))
 
     async def _process_send_op_update_async(self, percentage: int):
         """Send opening percentage update to serial device."""
@@ -82,7 +82,7 @@ class SerialHandler:
         """Send mode update to serial device."""
         await self._connection_manager.send(self._mode_to_message[mode])
 
-    async def _process_incoming_message_async(self, msg: str):
+    async def _process_message_from_serial(self, msg: str):
         """Process incoming message from serial device."""
         if not msg.startswith(self._EXPECTED_SENDER_PREFIX):
             logger.error(
