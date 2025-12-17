@@ -24,4 +24,4 @@ class MqttConnection:
         async with Client(hostname=self._broker) as client:
             await client.subscribe(self._topic)
             async for message in client.messages:
-                print(message.payload)
+                self._handle_message(str(message.payload))
