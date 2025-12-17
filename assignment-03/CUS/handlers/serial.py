@@ -1,7 +1,7 @@
 import asyncio
 import logging
 
-from connections.serial import SerialManager
+from connections.serial import SerialConnection
 from model.model import Mode, State
 
 logger = logging.getLogger(__name__)
@@ -24,7 +24,7 @@ class SerialHandler:
     _MIN_PERCENTAGE = 0
     _MAX_PERCENTAGE = 90
 
-    def __init__(self, connection_manager: SerialManager, state: State):
+    def __init__(self, connection_manager: SerialConnection, state: State):
         self._connection_manager = connection_manager
         self._state = state
         self._mode_to_message = {

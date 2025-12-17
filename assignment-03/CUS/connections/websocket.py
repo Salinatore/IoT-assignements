@@ -7,7 +7,7 @@ from typing_extensions import Callable
 logger = logging.getLogger(__name__)
 
 
-class WebSocketManager:
+class WebSocketConnection:
     """Manages WebSocket connections and broadcasting"""
 
     def __init__(self):

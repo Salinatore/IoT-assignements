@@ -1,7 +1,7 @@
 import asyncio
 import logging
 
-from connections.mqtt import MqttManager
+from connections.mqtt import MqttConnection
 from model.model import State
 
 logger = logging.getLogger(__name__)
@@ -14,7 +14,7 @@ class MqttHandler:
     _TSM_CUS_WATER_LEVEL_PREFIX = "tsm->cus-wl-"
     _EXPECTED_SENDER_PREFIX = "tsm->"
 
-    def __init__(self, connection_manager: MqttManager, state: State):
+    def __init__(self, connection_manager: MqttConnection, state: State):
         self._connection_manager = connection_manager
         self._state = state
 

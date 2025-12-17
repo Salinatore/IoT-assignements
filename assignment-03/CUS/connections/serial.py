@@ -7,7 +7,7 @@ import serial_asyncio
 logger = logging.getLogger(__name__)
 
 
-class SerialManager:
+class SerialConnection:
     """Manages Serial connection"""
 
     def __init__(self, port: str, baud: int):

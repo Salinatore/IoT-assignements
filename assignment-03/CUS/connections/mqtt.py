@@ -7,7 +7,7 @@ from asyncio_mqtt import Client
 logger = logging.getLogger(__name__)
 
 
-class MqttManager:
+class MqttConnection:
     """Manages Mqtt connection"""
 
     def __init__(self, broker: str, topic: str):
