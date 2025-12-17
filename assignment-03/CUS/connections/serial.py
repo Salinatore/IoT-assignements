@@ -1,6 +1,6 @@
 import asyncio
 import logging
-from typing import Awaitable, Callable
+from typing import Callable
 
 import serial_asyncio
 
@@ -18,7 +18,7 @@ class SerialManager:
         self._reader = None
         self._writer = None
 
-    async def start(self, message_handler: Callable[[str], Awaitable[None]]):
+    async def start(self, message_handler: Callable[[str], None]):
         """Start serial connection. Creates reader and writer tasks"""
         self._message_handler = message_handler
         self._reader, self._writer = await serial_asyncio.open_serial_connection(
@@ -40,7 +40,7 @@ class SerialManager:
                 msg = line.decode().strip()
 
                 if self._message_handler:
-                    await self._message_handler(msg)
+                    self._message_handler(msg)
 
     async def _writer_loop(self):
         """Sends commands through serial continuously if the queue is not empty"""

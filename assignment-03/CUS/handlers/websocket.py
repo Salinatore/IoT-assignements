@@ -10,3 +10,6 @@ class WebSocketHandler:
 
     def __init__(self, connection_manager: WebSocketManager):
         self._connection_manager = connection_manager
+
+    def handle_message_from_websocket(self, msg: str):
+        pass

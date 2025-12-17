@@ -2,6 +2,7 @@ import logging
 from typing import Set
 
 from fastapi import WebSocket, WebSocketDisconnect
+from typing_extensions import Callable
 
 logger = logging.getLogger(__name__)
 
@@ -11,6 +12,9 @@ class WebSocketManager:
 
     def __init__(self):
         self._active_connections: Set[WebSocket] = set()
+
+    async def start(self, message_handeler: Callable[[str], None]):
+        self._message_handeler = message_handeler
 
     async def broadcast(self, message: dict):
         """Send message to all active websockets"""

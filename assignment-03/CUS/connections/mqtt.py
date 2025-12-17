@@ -1,6 +1,6 @@
 import asyncio
 import logging
-from typing import Any, Callable, Coroutine
+from typing import Callable
 
 from asyncio_mqtt import Client
 
@@ -14,9 +14,9 @@ class MqttManager:
         self._broker = broker
         self._topic = topic
 
-    def start(self, handle_message: Callable[[str], Coroutine[Any, Any, None]]):
+    async def start(self, message_handler: Callable[[str], None]):
         """Start mqtt listener task"""
-        self._handle_message = handle_message
+        self._handle_message = message_handler
         asyncio.create_task(self._listener_loop())
 
     async def _listener_loop(self):
@@ -25,4 +25,4 @@ class MqttManager:
             await client.subscribe(self._topic)
             async with client.messages() as messages:
                 async for message in messages:
-                    asyncio.create_task(self._handle_message(str(message.payload)))
+                    self._handle_message(str(message.payload))

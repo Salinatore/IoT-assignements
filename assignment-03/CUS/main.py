@@ -1,5 +1,6 @@
 """Main application file for the Drone Control API using FastAPI framework."""
 
+import asyncio
 import logging
 from contextlib import asynccontextmanager
 
@@ -25,14 +26,21 @@ mqtt_manager = MqttManager(broker=BROKER, topic=TOPIC)
 serial_manager = SerialManager(port=PORT, baud=BAUD)
 websocket_manager = WebSocketManager()
 
-mqtt_handler = MqttHandler(mqtt_manager)
-serial_handler = SerialHandler(serial_manager)
+mqtt_handler = MqttHandler(mqtt_manager, state)
+serial_handler = SerialHandler(serial_manager, state)
 websocket_handler = WebSocketHandler(websocket_manager)
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Manage application lifecycle"""
+    await asyncio.gather(
+        serial_manager.start(message_handler=serial_handler.handle_message_from_serial),
+        mqtt_manager.start(message_handler=mqtt_handler.handle_message_from_mqtt),
+        websocket_manager.start(
+            message_handeler=websocket_handler.handle_message_from_websocket
+        ),
+    )
     yield
 
 
