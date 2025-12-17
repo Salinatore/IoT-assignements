@@ -28,17 +28,17 @@ websocket_connection = WebSocketConnection()
 
 mqtt_handler = MqttHandler(mqtt_connection, state)
 serial_handler = SerialHandler(serial_connection, state)
-websocket_handler = WebSocketHandler(websocket_connection)
+websocket_handler = WebSocketHandler(websocket_connection, state)
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Manage application lifecycle"""
     await asyncio.gather(
-        serial_connection.start(
-            message_handler=serial_handler.handle_message_from_serial
-        ),
-        mqtt_connection.start(message_handler=mqtt_handler.handle_message_from_mqtt),
+        # serial_connection.start(
+        #    message_handler=serial_handler.handle_message_from_serial
+        # ),
+        # mqtt_connection.start(message_handler=mqtt_handler.handle_message_from_mqtt),
         websocket_connection.start(
             message_handeler=websocket_handler.handle_message_from_websocket
         ),
@@ -47,6 +47,12 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
+
+
+@app.get("/")
+async def root():
+    """Root endpoint for the application"""
+    return state
 
 
 @app.websocket("/ws")

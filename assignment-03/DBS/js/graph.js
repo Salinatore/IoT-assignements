@@ -1,0 +1,87 @@
+let chart = null;
+let dataPoints = [];
+let maxDataPoints = 50;
+
+function initChart() {
+  const ctx = document.getElementById("waterChart").getContext("2d");
+  chart = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: [],
+      datasets: [
+        {
+          label: "Water Level (cm)",
+          data: [],
+          borderColor: "#3498db",
+          backgroundColor: "rgba(52, 152, 219, 0.1)",
+          borderWidth: 2,
+          tension: 0.4,
+          fill: true,
+          pointRadius: 2,
+          pointHoverRadius: 5,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: {
+        duration: 300,
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          title: {
+            display: true,
+            text: "Water Level (cm)",
+          },
+        },
+        x: {
+          title: {
+            display: true,
+            text: "Time",
+          },
+        },
+      },
+      plugins: {
+        legend: {
+          display: true,
+        },
+      },
+    },
+  });
+}
+
+function addDataPoint(level, timestamp) {
+  const time = new Date(timestamp).toLocaleTimeString();
+
+  dataPoints.push(level);
+
+  // Keep only last N points
+  if (chart.data.labels.length >= maxDataPoints) {
+    chart.data.labels.shift();
+    chart.data.datasets[0].data.shift();
+  }
+
+  chart.data.labels.push(time);
+  chart.data.datasets[0].data.push(level);
+  chart.update("none");
+
+  // Update current level display
+  document.getElementById("currentWaterLevel").textContent =
+    level.toFixed(1) + " cm";
+}
+
+function clearData() {
+  chart.data.labels = [];
+  chart.data.datasets[0].data = [];
+  dataPoints = [];
+  chart.update();
+  document.getElementById("currentWaterLevel").textContent = "-- cm";
+  document.getElementById("avgLevel").textContent = "-- cm";
+}
+
+// Initialize on page load
+window.onload = () => {
+  initChart();
+};

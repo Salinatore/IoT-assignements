@@ -2,7 +2,7 @@ import asyncio
 import logging
 from typing import Callable
 
-from asyncio_mqtt import Client
+from aiomqtt import Client
 
 logger = logging.getLogger(__name__)
 
@@ -23,6 +23,5 @@ class MqttConnection:
         """Listen on mqtt port for messages continuously"""
         async with Client(hostname=self._broker) as client:
             await client.subscribe(self._topic)
-            async with client.messages() as messages:
-                async for message in messages:
-                    self._handle_message(str(message.payload))
+            async for message in client.messages:
+                print(message.payload)

@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Dashboard subsystem</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+        <link rel="stylesheet" href="./css/styles.css" />
+    </head>
+    <body>
+        <header>
+            <h1>Real-Time Water Level Monitor</h1>
+        </header>
+        <main>
+            <div class="status">
+                <div class="current-water-level-item">
+                    <div class="current-water-level-label">Current Level</div>
+                    <div
+                        class="current-water-level-value"
+                        id="currentWaterLevel"
+                    >
+                        -- cm
+                    </div>
+                </div>
+                <div class="connection-status-item">
+                    <div class="connection-status-label">Connection</div>
+                    <div class="connection-status-value" id="currentStatus">
+                        NOT AVAILABLE
+                    </div>
+                </div>
+            </div>
+
+            <div id="chartContainer">
+                <canvas id="waterChart"></canvas>
+            </div>
+
+            <div class="controls">
+                <button
+                    class="request-remote-control"
+                    id="control-btn"
+                    onclick="handleControlBtn()"
+                >
+                    Request Remote Control
+                </button>
+            </div>
+
+            <div class="controls">
+                <button class="clear" onclick="clearData()">Clear Data</button>
+            </div>
+        </main>
+
+        <script src="./js/script.js"></script>
+    </body>
+</html>
