@@ -93,7 +93,6 @@ class SerialHandler:
         match msg:
             case self._WCS_TO_CUS_STATUS_AUTOMATIC:
                 self._state.set_mode(Mode.AUTOMATIC)
-
             case self._WCS_TO_CUS_STATUS_LOCAL_MANUAL:
                 self._state.set_mode(Mode.LOCAL_MANUAL)
 
