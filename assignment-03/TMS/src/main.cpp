@@ -2,18 +2,19 @@
 #include "config.h"
 #include "model/HWPlatform.h"
 #include "tasks/TestHWTask.h"
-#include "tasks/WCSTask.h"
+#include "tasks/HWTask.h"
 
 // #define __TESTING_HW__
 
 
 HWPlatform *pHWPlatform;
+TaskHandle_t Task1;
 
 void setup()
 {
   pHWPlatform = new HWPlatform();
-  WCSTask* mainTask = new WCSTask(pHWPlatform->getSonar());
-  xTaskCreatePinnedToCore(mainTask->task(),"Task1",10000,NULL,1,&Task1,0);
+  HWTask* hwTask = new HWTask(pHWPlatform->getSonar());
+  xTaskCreatePinnedToCore(&HWTask::taskWrapper,"hwTask",10000,NULL,1,&Task1,0);
 #ifndef __TESTING_HW__
   
 #endif
