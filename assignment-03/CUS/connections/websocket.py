@@ -52,7 +52,6 @@ class WebSocketConnection:
     async def _connect(self, websocket: WebSocket):
         await websocket.accept()
         self._active_connections.add(websocket)
-        logger.info(f"Client connected. Total clients: {len(self._active_connections)}")
 
     def _disconnect(self, websocket: WebSocket):
         if websocket in self._active_connections:
