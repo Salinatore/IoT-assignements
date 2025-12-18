@@ -1,7 +1,7 @@
 let ws = null;
 const statusDiv = document.getElementById("currentStatus");
 const controlBtn = document.getElementById("control-btn");
-let currentMode = null;
+let currentMode = "AUTOMATIC";
 
 function connect() {
   ws = new WebSocket("ws://localhost:8000/ws");
@@ -9,6 +9,7 @@ function connect() {
   ws.onopen = () => {
     console.log("Connected to WebSocket");
     statusDiv.textContent = "Connected";
+    statusDiv.textContent = currentMode;
   };
 
   ws.onmessage = (event) => {
@@ -34,7 +35,7 @@ function updateMode(mode) {
   if (mode === currentMode) return;
   currentMode = mode;
 
-  statusDiv.textContent = mode;
+  statusDiv.textContent = currentMode;
   if (mode === "REMOTE_MANUAL") {
     controlBtn.disabled = false;
     controlBtn.textContent = "Give back Control";
@@ -59,6 +60,7 @@ function handleControlBtn() {
       }),
     );
   }
+  updateMode(nextState);
 }
 
 function disconnectWebSocket() {
