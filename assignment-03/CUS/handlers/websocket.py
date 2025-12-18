@@ -1,9 +1,6 @@
 import asyncio
 import json
 import logging
-from ast import Await
-
-from typing_extensions import Dict
 
 from connections.websocket import WebSocketConnection
 from model.model import Mode, State
@@ -27,8 +24,11 @@ class WebSocketHandler:
 
     def send_state_update_to_websocket(self):
         asyncio.create_task(
-            self._connection_manager.broadcast(self._state.model_dump())
+            self._connection_manager.broadcast(self._state.model_dump_json())
         )
+
+    def generate_state_update(self) -> str:
+        return self._state.model_dump_json()
 
     async def _process_message_from_websocket(self, msg: str):
         data = json.loads(msg)

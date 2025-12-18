@@ -13,15 +13,20 @@ class WebSocketConnection:
     def __init__(self):
         self._active_connections: Set[WebSocket] = set()
 
-    async def start(self, message_handeler: Callable[[str], None]):
+    async def start(
+        self,
+        generate_first_msg: Callable[[], str],
+        message_handeler: Callable[[str], None],
+    ):
         self._message_handeler = message_handeler
+        self._generate_first_msg = generate_first_msg
 
-    async def broadcast(self, message: dict):
+    async def broadcast(self, message: str):
         """Send message to all active websockets"""
         disconnected = set()
         for websocket in self._active_connections:
             try:
-                await websocket.send_json(message)
+                await websocket.send_text(message)
             except Exception as e:
                 logger.exception(f"Error sending to client: {e}")
                 disconnected.add(websocket)
@@ -30,6 +35,8 @@ class WebSocketConnection:
     async def manage_new_connection(self, websocket: WebSocket):
         """Accepts websocket and start to listen for messages continuously"""
         await self._connect(websocket)
+
+        await websocket.send_text(self._generate_first_msg())
 
         try:
             while True:

@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any, Callable
 
 from pydantic import BaseModel, model_serializer
@@ -8,7 +8,7 @@ from pydantic import BaseModel, model_serializer
 logger = logging.getLogger(__name__)
 
 
-class Mode(str, Enum):
+class Mode(StrEnum):
     AUTOMATIC = "AUTOMATIC"
     REMOTE_MANUAL = "REMOTE_MANUAL"
     LOCAL_MANUAL = "LOCAL_MANUAL"
@@ -73,7 +73,10 @@ class State(BaseModel):
         data = {
             "timestamp": datetime.now().isoformat(),
             "water_level": self._water_level,
-            "mode": self._mode,
+            "mode": str(self._mode),
             "opening_percentage": self._opening_percentage,
         }
         return data
+
+
+state = State()

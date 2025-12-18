@@ -15,12 +15,11 @@ from handlers.mqtt import MqttHandler
 from handlers.serial import SerialHandler
 from handlers.websocket import WebSocketHandler
 from logger_config import setup_logging
-from model.model import State
+from model.model import state
+from routers.test import router
 
 setup_logging()
 logger = logging.getLogger(__name__)
-
-state = State()
 
 mqtt_connection = MqttConnection(broker=BROKER, topic=TOPIC)
 serial_connection = SerialConnection(port=PORT, baud=BAUD)
@@ -48,19 +47,15 @@ async def lifespan(app: FastAPI):
         # ),
         # mqtt_connection.start(message_handler=mqtt_handler.handle_message_from_mqtt),
         websocket_connection.start(
-            message_handeler=websocket_handler.handle_message_from_websocket
+            message_handeler=websocket_handler.handle_message_from_websocket,
+            generate_first_msg=websocket_handler.generate_state_update,
         ),
     )
     yield
 
 
 app = FastAPI(lifespan=lifespan)
-
-
-@app.get("/")
-async def root():
-    """Root endpoint for the application"""
-    return state
+app.include_router(router)
 
 
 @app.websocket("/ws")

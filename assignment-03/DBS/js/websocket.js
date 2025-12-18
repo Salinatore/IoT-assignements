@@ -1,23 +1,20 @@
 let ws = null;
 const statusDiv = document.getElementById("currentStatus");
 const controlBtn = document.getElementById("control-btn");
-let currentMode = "AUTOMATIC";
+let currentMode = "NOT AVAILABLE";
 
 function connect() {
   ws = new WebSocket("ws://localhost:8000/ws");
 
   ws.onopen = () => {
     console.log("Connected to WebSocket");
-    statusDiv.textContent = "Connected";
-    statusDiv.textContent = currentMode;
   };
 
   ws.onmessage = (event) => {
     const data = JSON.parse(event.data);
-    console.log(data);
 
-    statusDiv.textContent = mode;
-    addDataPoint(data.water_level, data.opening_percentage);
+    updateMode(data.mode);
+    addDataPoint(data.water_level, data.timestamp);
   };
 
   ws.onclose = () => {
@@ -35,13 +32,15 @@ function updateMode(mode) {
   if (mode === currentMode) return;
   currentMode = mode;
 
+  console.log(mode);
+
   statusDiv.textContent = currentMode;
-  if (mode === "REMOTE_MANUAL") {
+  if (currentMode === "REMOTE_MANUAL") {
     controlBtn.disabled = false;
     controlBtn.textContent = "Give back Control";
   } else {
     controlBtn.textContent = "Request Remote Control";
-    controlBtn.disabled = mode !== "AUTOMATIC";
+    controlBtn.disabled = currentMode !== "AUTOMATIC";
   }
 }
 
@@ -60,13 +59,15 @@ function handleControlBtn() {
       }),
     );
   }
-  updateMode(nextState);
 }
 
 function disconnectWebSocket() {
-  ws.disconnectWebSocket();
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.close();
+    console.log("WebSocket disconnected");
+  }
 }
 
-window.onbeforeunload = () => {
+window.addEventListener("beforeunload", () => {
   disconnectWebSocket();
-};
+});
