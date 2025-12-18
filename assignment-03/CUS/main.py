@@ -7,7 +7,7 @@ from contextlib import asynccontextmanager
 import uvicorn
 from fastapi import FastAPI, WebSocket
 
-from config import BAUD, BROKER, PORT, TOPIC
+from config import BAUD, BROKER, PORT, TESTING, TOPIC
 from connections.mqtt import MqttConnection
 from connections.serial import SerialConnection
 from connections.websocket import WebSocketConnection
@@ -41,6 +41,9 @@ state.setListeners(notify_listeners)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Manage application lifecycle"""
+    if TESTING:
+        logger.warning("Testing mode enabled")
+
     await asyncio.gather(
         # serial_connection.start(
         #    message_handler=serial_handler.handle_message_from_serial
@@ -55,7 +58,8 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
-app.include_router(router)
+if TESTING:
+    app.include_router(router)
 
 
 @app.websocket("/ws")

@@ -1,15 +1,19 @@
+from turtle import resetscreen
+
 from fastapi import APIRouter
 
 from model.model import Mode, State, state
 
 # Router for testing endpoints that manipulate system state
+# NOTE: These endpoints use GET methods for easy manual testing (can be triggered
+# directly from a browser).
 router = APIRouter(prefix="/test", tags=["testing"])
 
 
-@router.get("/")
+@router.get("/", response_model=State)
 async def root() -> State:
     """
-    Get the current system state.
+    [TEST ONLY] Get the current system state.
 
     Returns:
         State: The current state object containing mode and water level information.
@@ -17,10 +21,10 @@ async def root() -> State:
     return state
 
 
-@router.get("/remote_manual")
+@router.get("/remote_manual", response_model=State)
 async def change_state_to_remote_manual() -> State:
     """
-    Switch the system to remote manual mode.
+    [TEST ONLY] Switch the system to remote manual mode.
 
     Sets the operating mode to REMOTE_MANUAL, allowing manual control
     of the system remotely.
@@ -32,10 +36,10 @@ async def change_state_to_remote_manual() -> State:
     return state
 
 
-@router.get("/automatic")
+@router.get("/automatic", response_model=State)
 async def change_state_to_automatic() -> State:
     """
-    Switch the system to automatic mode.
+    [TEST ONLY] Switch the system to automatic mode.
 
     Sets the operating mode to AUTOMATIC, enabling autonomous system operation.
 
@@ -46,10 +50,10 @@ async def change_state_to_automatic() -> State:
     return state
 
 
-@router.get("/increase_water_level")
+@router.get("/increase_water_level", response_model=State)
 async def increase_water_level() -> State:
     """
-    Increment the water level by 1.
+    [TEST ONLY] Increment the water level by 1.
 
     Increases the current water level value by one unit for testing purposes.
 
@@ -60,10 +64,10 @@ async def increase_water_level() -> State:
     return state
 
 
-@router.get("/decrease_water_level")
+@router.get("/decrease_water_level", response_model=State)
 async def decrease_water_level() -> State:
     """
-    Decrement the water level by 1.
+    [TEST ONLY] Decrement the water level by 1.
 
     Decreases the current water level value by one unit for testing purposes.
 
