@@ -1,5 +1,3 @@
-from turtle import resetscreen
-
 from fastapi import APIRouter
 
 from model.model import Mode, State, state
