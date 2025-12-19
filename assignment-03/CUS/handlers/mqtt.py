@@ -21,6 +21,8 @@ class MqttHandler:
     def handle_message_from_mqtt(self, msg: str) -> None:
         """Handle incoming message from MQTT broker.
 
+        Creates a background task without blocking.
+
         Args:
             msg: Raw message string from MQTT
         """

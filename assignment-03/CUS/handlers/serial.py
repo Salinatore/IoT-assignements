@@ -36,6 +36,8 @@ class SerialHandler:
     def send_opening_percentage_to_serial(self, percentage: int) -> None:
         """Send opening percentage command to serial device.
 
+        Creates a background task without blocking.
+
         Args:
             percentage: Opening percentage (0-100)
 
@@ -51,6 +53,8 @@ class SerialHandler:
 
     def send_mode_update_to_serial(self) -> None:
         """Send mode update command to serial device.
+
+        Creates a background task without blocking.
 
         Args:
             mode: Target operating mode (AUTOMATIC, REMOTE_MANUAL or UNCONNETED)
@@ -68,6 +72,8 @@ class SerialHandler:
 
     def handle_message_from_serial(self, msg: str) -> None:
         """Handle incoming message from serial device.
+
+        Creates a background task without blocking.
 
         Args:
             msg: Raw message string from serial
