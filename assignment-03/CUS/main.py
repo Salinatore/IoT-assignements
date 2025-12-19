@@ -42,7 +42,9 @@ state.setListeners(notify_listeners)
 async def lifespan(app: FastAPI):
     """Manage application lifecycle"""
     if TESTING:
-        logger.warning("Testing mode enabled")
+        logger.warning(
+            "Testing mode enabled, please put TESTING False in config file if you are not testing"
+        )
 
     await asyncio.gather(
         # serial_connection.start(
