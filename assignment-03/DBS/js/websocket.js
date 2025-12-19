@@ -8,6 +8,7 @@ function connect() {
 
   ws.onopen = () => {
     console.log("Connected to WebSocket");
+    statusDiv.textContent = "NOT AVAILABLE";
   };
 
   ws.onmessage = (event) => {
@@ -55,7 +56,7 @@ function handleControlBtn() {
     ws.send(
       JSON.stringify({
         type: "switch-mode",
-        data: { state: nextState },
+        data: { mode: nextState },
       }),
     );
   }
