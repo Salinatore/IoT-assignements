@@ -41,7 +41,7 @@ class WebSocketConnection:
         try:
             while True:
                 data = await websocket.receive_text()
-                # add input handeling with task create
+                self._message_handeler(data)
 
         except WebSocketDisconnect:
             self._disconnect(websocket)
