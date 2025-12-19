@@ -24,4 +24,7 @@ class MqttConnection:
         async with Client(hostname=self._broker) as client:
             await client.subscribe(self._topic)
             async for message in client.messages:
-                self._handle_message(str(message.payload))
+                if isinstance(message.payload, bytes):
+                    self._handle_message(message.payload.decode("utf-8"))
+                else:
+                    logger.error(f"Received non-string payload: {message.payload}")

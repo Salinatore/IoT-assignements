@@ -50,7 +50,7 @@ async def lifespan(app: FastAPI):
         # serial_connection.start(
         #    message_handler=serial_handler.handle_message_from_serial
         # ),
-        # mqtt_connection.start(message_handler=mqtt_handler.handle_message_from_mqtt),
+        mqtt_connection.start(message_handler=mqtt_handler.handle_message_from_mqtt),
         websocket_connection.start(
             message_handeler=websocket_handler.handle_message_from_websocket,
             generate_first_msg=websocket_handler.generate_state_update,
