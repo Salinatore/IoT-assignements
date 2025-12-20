@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 
 class MqttHandler:
-    """Handles all communication from MQTT. All connection are not blocking"""
+    """Handles all communication from MQTT."""
 
     # Message protocol constant
     _TSM_CUS_WATER_LEVEL_PREFIX = "tsm->cus-wl-"

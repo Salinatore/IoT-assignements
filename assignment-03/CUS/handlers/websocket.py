@@ -9,11 +9,11 @@ logger = logging.getLogger(__name__)
 
 
 class WebSocketHandler:
-    """Handles bidirectional communication with WebSocket clients."""
+    """Handles all communication to and from websockets."""
 
     _MIN_PERCENTAGE = 0
     _MAX_PERCENTAGE = 100
-    _ACCEPTABLE_STATES = ["AUTOMATIC", "REMOTE_MANUAL"]
+    _ACCEPTABLE_MODES = ["AUTOMATIC", "REMOTE_MANUAL"]
 
     def __init__(self, connection_manager: WebSocketConnection, state: State):
         self._connection_manager = connection_manager
@@ -21,7 +21,7 @@ class WebSocketHandler:
 
     def handle_message_from_websocket(self, msg: str):
         """
-        Queue an incoming WebSocket message for asynchronous processing.
+        Handle an incoming WebSocket message.
 
         Creates a background task without blocking.
 
@@ -63,8 +63,8 @@ class WebSocketHandler:
     def _handle_switch_mode(self, data: dict):
         """Handle mode switching requests."""
         mode_srt = data["mode"]
-        if mode_srt not in self._ACCEPTABLE_STATES:
-            logger.error(f"State change not acceptable. Mode: [{mode_srt}]")
+        if mode_srt not in self._ACCEPTABLE_MODES:
+            logger.error(f"Mode change not acceptable. Mode: [{mode_srt}]")
             return
         self._state.set_mode(Mode(mode_srt))
 

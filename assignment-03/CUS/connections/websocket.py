@@ -18,6 +18,11 @@ class WebSocketConnection:
         generate_first_msg: Callable[[], str],
         message_handeler: Callable[[str], None],
     ):
+        """
+        Set up the WebSocket connection manager.
+
+        Does not start any tasks, those will be created by the FastAPI application.
+        """
         self._message_handeler = message_handeler
         self._generate_first_msg = generate_first_msg
 
