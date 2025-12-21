@@ -88,8 +88,6 @@ class State(BaseModel):
             return
 
         self._water_level = level
-        if self._mode == Mode.AUTOMATIC:
-            self._compute_new_opening_percentage()
 
         self._time_since_last_wl_update = time.time()
         if self._mode == Mode.UNCONNECTED:
@@ -112,9 +110,6 @@ class State(BaseModel):
     def _notify_listeners(self):
         if self._on_status_change:
             self._on_status_change()
-
-    def _compute_new_opening_percentage(self):
-        pass
 
     @model_serializer
     def ser_model(self) -> dict[str, Any]:
