@@ -16,6 +16,7 @@ from handlers.serial import SerialHandler
 from handlers.websocket import WebSocketHandler
 from logger_config import setup_logging
 from model.model import state
+from monitoring.water_level_monitor import WaterLevelMonitor
 from routers.test import router
 
 setup_logging()
@@ -29,13 +30,15 @@ mqtt_handler = MqttHandler(mqtt_connection, state)
 serial_handler = SerialHandler(serial_connection, state)
 websocket_handler = WebSocketHandler(websocket_connection, state)
 
+water_level_monitor = WaterLevelMonitor(state)
+
 
 def notify_listeners():
     websocket_handler.send_state_update_to_websocket()
     serial_handler.send_mode_update_to_serial()
 
 
-state.setListeners(notify_listeners)
+state.set_listeners(notify_listeners)
 
 
 @asynccontextmanager
@@ -46,6 +49,7 @@ async def lifespan(app: FastAPI):
             "Testing mode enabled, please put TESTING False in config file if you are not testing"
         )
 
+    # Start all the connections
     await asyncio.gather(
         # serial_connection.start(
         #    message_handler=serial_handler.handle_message_from_serial
@@ -56,6 +60,10 @@ async def lifespan(app: FastAPI):
             generate_first_msg=websocket_handler.generate_state_update,
         ),
     )
+
+    # Start monitor
+    water_level_monitor.start()
+
     yield
 
 

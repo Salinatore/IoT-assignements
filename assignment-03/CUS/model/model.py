@@ -1,4 +1,5 @@
 import logging
+import time
 from datetime import datetime
 from enum import StrEnum
 from typing import Any, Callable
@@ -15,15 +16,57 @@ class Mode(StrEnum):
     UNCONNECTED = "UNCONNECTED"
 
 
+# unconneted
+T2: float = 1
+
+# water level
+T1: float = 10
+L1: float = 10
+L2: float = 20
+
+
 class State(BaseModel):
+    starting_time: float
+
     _mode: Mode = Mode.AUTOMATIC
     _water_level: float = 0
     _opening_percentage: int = 0
+    _time_since_last_wl_update: None | float = None
 
     def get_mode(self) -> Mode:
         return self._mode
 
-    def setListeners(self, on_status_change: Callable[[], None]) -> None:
+    def check_unconnected(self, current_time: float) -> None:
+        if not self._time_since_last_wl_update:
+            self._time_since_last_wl_update = self.starting_time
+
+        if (
+            self._mode != Mode.UNCONNECTED
+            and current_time - self._time_since_last_wl_update > T2
+        ):
+            self.set_mode(Mode.UNCONNECTED)
+            logger.info("State is now in Unconnected mode")
+
+    def check_water_level(self, current_time: float) -> None:
+        if self._mode != Mode.AUTOMATIC:
+            return
+
+        if self._water_level > L2:
+            self._opening_percentage = 100
+            self._notify_listeners()
+            return
+
+        if self._water_level > L1:
+            if not self._time_since_L1:
+                self._time_since_L1 = current_time
+            else:
+                if current_time - self._time_since_L1 > T1:
+                    self._opening_percentage = 50
+                    self._notify_listeners()
+        else:
+            self._time_since_L1 = None
+
+    def set_listeners(self, on_status_change: Callable[[], None]) -> None:
         """Sets the callback function to be called on status changes"""
         self._on_status_change = on_status_change
 
@@ -47,6 +90,11 @@ class State(BaseModel):
         self._water_level = level
         if self._mode == Mode.AUTOMATIC:
             self._compute_new_opening_percentage()
+
+        self._time_since_last_wl_update = time.time()
+        if self._mode == Mode.UNCONNECTED:
+            self.set_mode(Mode.AUTOMATIC)
+            logger.info("State is now in Automatic mode")
 
         self._notify_listeners()
 
@@ -79,4 +127,4 @@ class State(BaseModel):
         return data
 
 
-state = State()
+state = State(starting_time=time.time())
