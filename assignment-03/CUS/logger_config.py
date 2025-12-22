@@ -4,7 +4,6 @@ import colorlog
 
 
 def setup_logging():
-    # Create a colored formatter
     formatter = colorlog.ColoredFormatter(
         "%(log_color)s%(levelname)s%(reset)s: [%(name)s] %(message)s [%(asctime)s]",
         datefmt="%Y-%m-%d %H:%M:%S",
@@ -17,12 +16,10 @@ def setup_logging():
         },
     )
 
-    # Get the root logger
     handler = logging.StreamHandler()
     handler.setFormatter(formatter)
 
-    # Configure root logger
     root_logger = logging.getLogger()
     root_logger.setLevel(logging.INFO)
-    root_logger.handlers.clear()  # Remove default handlers
+    root_logger.handlers.clear()
     root_logger.addHandler(handler)
