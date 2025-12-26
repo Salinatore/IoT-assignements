@@ -12,6 +12,12 @@ public:
 private:
     enum WCSState { AUTOMATIC, LOCAL_MANUAL, REMOTE_MANUAL, UNCONECTED } state;
 
+    void checkUnconnectedMessage();
+    void checkAutomaticMessage();
+    void checkControlMessage();
+    void checkRemoteMessage();
+    void processPotentiometerInput();
+
     void setState(WCSState state);
     bool checkAndSetJustEntered();
     int msgMotorPerc(String message);
