@@ -6,6 +6,7 @@
 #define UNCONECTED_MSG "cus->wcs-st-unconnected"
 #define AUTOMATIC_MSG "cus->wcs-st-automatic"
 #define REMOTE_MANUAL_MSG "cus->wcs-st-remote-manual"
+#define LOCAL_MANUAL_MSG "cus->wcs-st-local-manual"
 #define CONTROL_MSG "cus->wcs-op-"
 
 #define LOCAL_MANUAL_SEND_MSG "wcs->cus-st-local-manual"
@@ -37,6 +38,13 @@ public:
   }
 };
 
+class LocalPattern : public Pattern {
+public:
+  boolean match(const Msg& m) override {
+    return m.getContent() == LOCAL_MANUAL_MSG;
+  }
+};
+
 class ControlPattern : public Pattern {
 public:
   boolean match(const Msg& m) override {
@@ -46,14 +54,14 @@ public:
 
 static UnconectedPattern unconected;
 static RemotePattern remote;
+static LocalPattern local;
 static AutomaticPattern automatic;
 static ControlPattern control;
 
 WCSTask::WCSTask(ServoMotor* pServo, Lcd *pLcd, Button *pButton, Potentiometer* pPot) : 
         pServo(pServo), pLcd(pLcd), pButton(pButton), pPot(pPot)
 {
-    this->setState(AUTOMATIC);
-    
+    this->setState(AUTOMATIC);    
 }
 
 void WCSTask::tick()
@@ -67,13 +75,16 @@ void WCSTask::tick()
             pLcd->writeModeMessage("AUTOMATIC");
         }
         
+        // Message Handling 
         this->checkUnconnectedMessage();
         this->checkControlMessage();
         this->checkRemoteMessage();
+        this->checkLocalMessage();
 
+        // Mode change requests
         if(pButton->isPressed())
         {
-            this->setState(LOCAL_MANUAL);
+            MsgService.sendMsg(LOCAL_MANUAL_SEND_MSG);
         }
 
         break;
@@ -83,15 +94,16 @@ void WCSTask::tick()
         if (checkAndSetJustEntered())
         {
             pLcd->writeModeMessage("LOCAL MANUAL");
-            MsgService.sendMsg(LOCAL_MANUAL_SEND_MSG);  
         }
 
+        // Message Handling 
         this->checkUnconnectedMessage();
+        this->checkAutomaticMessage();
 
+        // Mode change requests
         if(pButton->isPressed())
         {
             MsgService.sendMsg(AUTOMATIC_SEND_MSG);  
-            setState(AUTOMATIC);
         } 
 
         this->processPotentiometerInput();
@@ -105,6 +117,7 @@ void WCSTask::tick()
             pLcd->writeModeMessage("REMOTE MANUAL");
         }
 
+        // Message Handling 
         this->checkUnconnectedMessage();
         this->checkAutomaticMessage();
         this->checkControlMessage();
@@ -118,6 +131,7 @@ void WCSTask::tick()
             pLcd->writeModeMessage("UNCONECTED");
         }
 
+        // Message Handling 
         this->checkAutomaticMessage();
 
         break;
@@ -161,6 +175,15 @@ void WCSTask::checkRemoteMessage(){
         Msg* msg = MsgService.receiveMsg(remote);
         delete msg;
         this->setState(REMOTE_MANUAL);
+    }
+}
+
+void WCSTask::checkLocalMessage(){
+    if(MsgService.isMsgAvailable(local))
+    {
+        Msg* msg = MsgService.receiveMsg(local);
+        delete msg;
+        this->setState(LOCAL_MANUAL);
     }
 }
 

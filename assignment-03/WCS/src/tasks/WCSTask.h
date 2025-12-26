@@ -16,6 +16,7 @@ private:
     void checkAutomaticMessage();
     void checkControlMessage();
     void checkRemoteMessage();
+    void checkLocalMessage();
     void processPotentiometerInput();
 
     void setState(WCSState state);
