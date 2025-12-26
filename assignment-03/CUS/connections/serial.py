@@ -49,3 +49,4 @@ class SerialConnection:
                 msg = await self._command_queue.get()
                 self._writer.write((msg + "\n").encode())
                 await self._writer.drain()
+                await asyncio.sleep(0.4)

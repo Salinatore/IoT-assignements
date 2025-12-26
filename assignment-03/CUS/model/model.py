@@ -16,7 +16,7 @@ class Mode(StrEnum):
 
 
 # unconneted
-T2: float = 1
+T2: float = 10
 
 # water level
 T1: float = 10
@@ -30,10 +30,12 @@ class State(BaseModel):
     _opening_percentage: int = 0
     _time_since_last_wl_update: None | float = None
 
-    def get_mode(self) -> Mode:
+    @property
+    def mode(self) -> Mode:
         return self._mode
 
-    def get_opening_percentage(self) -> int:
+    @property
+    def opening_percentage(self) -> int:
         return self._opening_percentage
 
     def set_listeners(self, on_status_change: Callable[[], None]) -> None:

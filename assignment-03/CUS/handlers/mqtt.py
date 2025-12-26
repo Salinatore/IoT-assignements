@@ -1,5 +1,6 @@
 import asyncio
 import logging
+from time import time
 
 from connections.mqtt import MqttConnection
 from model.model import State
@@ -47,6 +48,6 @@ class MqttHandler:
         water_level_str = msg.removeprefix(self._TSM_CUS_WATER_LEVEL_PREFIX)
         try:
             water_level = float(water_level_str)
-            self._state.set_level(water_level)
+            self._state.set_level(water_level, time())
         except ValueError:
             logger.error(f"Invalid water level value. Message: [{msg}]")

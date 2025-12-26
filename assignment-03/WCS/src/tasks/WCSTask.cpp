@@ -54,12 +54,6 @@ public:
   }
 };
 
-static UnconectedPattern unconected;
-static RemotePattern remote;
-static LocalPattern local;
-static AutomaticPattern automatic;
-static ControlPattern control;
-
 WCSTask::WCSTask(ServoMotor* pServo, Lcd *pLcd, Button *pButton, Potentiometer* pPot) : 
         pServo(pServo), pLcd(pLcd), pButton(pButton), pPot(pPot)
 {
@@ -74,6 +68,7 @@ void WCSTask::tick()
     {
         if (checkAndSetJustEntered())
         {
+            Logger.log(F("WCSTask:AUTOMATIC"));
             pLcd->writeModeMessage("AUTOMATIC");
         }
         
@@ -95,6 +90,7 @@ void WCSTask::tick()
     {
         if (checkAndSetJustEntered())
         {
+            Logger.log(F("WCSTask:LOCAL_MANUAL"));
             pLcd->writeModeMessage("LOCAL MANUAL");
         }
 
@@ -116,6 +112,7 @@ void WCSTask::tick()
     {
         if (checkAndSetJustEntered())
         {
+            Logger.log(F("WCSTask:REMOTE_MANUAL"));
             pLcd->writeModeMessage("REMOTE MANUAL");
         }
 
@@ -130,6 +127,7 @@ void WCSTask::tick()
     {
         if (checkAndSetJustEntered())
         {
+            Logger.log(F("WCSTask:UNCONECTED"));
             pLcd->writeModeMessage("UNCONECTED");
         }
 
@@ -144,6 +142,7 @@ void WCSTask::tick()
 }
 
 void WCSTask::checkUnconnectedMessage(){
+    static UnconectedPattern unconected;
     if(MsgService.isMsgAvailable(unconected))
     {
         Msg* msg = MsgService.receiveMsg(unconected);
@@ -153,6 +152,7 @@ void WCSTask::checkUnconnectedMessage(){
 }
 
 void WCSTask::checkAutomaticMessage(){
+    static AutomaticPattern automatic;
     if(MsgService.isMsgAvailable(automatic))
     {
         Msg* msg = MsgService.receiveMsg(automatic);
@@ -162,8 +162,10 @@ void WCSTask::checkAutomaticMessage(){
 }
 
 void WCSTask::checkControlMessage(){
+    static ControlPattern control;
     if(MsgService.isMsgAvailable(control))
     {
+        Logger.log(F("Servo angle is chaning"));
         Msg* msg = MsgService.receiveMsg(control);
         int perc = this->msgMotorPerc(msg->getContent());
         int angle =  map(perc, PERCENTAGE_MIN, PERCENTAGE_MAX, 0, 90);
@@ -173,6 +175,7 @@ void WCSTask::checkControlMessage(){
 }
 
 void WCSTask::checkRemoteMessage(){
+    static RemotePattern remote;
     if(MsgService.isMsgAvailable(remote))
     {
         Msg* msg = MsgService.receiveMsg(remote);
@@ -182,6 +185,7 @@ void WCSTask::checkRemoteMessage(){
 }
 
 void WCSTask::checkLocalMessage(){
+    static LocalPattern local;
     if(MsgService.isMsgAvailable(local))
     {
         Msg* msg = MsgService.receiveMsg(local);

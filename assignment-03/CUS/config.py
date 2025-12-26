@@ -2,7 +2,7 @@
 TESTING = True
 
 # serial
-PORT = "/dev/tty.usbmodem101"
+PORT = "/dev/ttyACM0"
 BAUD = 115200
 
 # mqtt

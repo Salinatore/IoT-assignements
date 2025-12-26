@@ -19,6 +19,7 @@ class SerialHandler:
     _WCS_TO_CUS_STATUS_AUTOMATIC = "wcs->cus-st-automatic"
     _WCS_TO_CUS_STATUS_LOCAL_MANUAL = "wcs->cus-st-local-manual"
     _WCS_TO_CUS_OPENING_PERCENTAGE_PREFIX = "wcs->cus-op-"
+    _EXPECTED_LOG_MSG_PREFIX = "wcs->cus-lo:"
     _EXPECTED_SENDER_PREFIX = "wcs->"
 
     # Validation constants
@@ -34,16 +35,16 @@ class SerialHandler:
             Mode.REMOTE_MANUAL: self._CUS_TO_WCS_STATUS_REMOTE_MANUAL,
             Mode.UNCONNECTED: self._CUS_TO_WCS_STATUS_UNCONNECTED,
         }
-        self._last_mode: None | Mode = None
-        self._last_opening_percentage: None | int = None
+        self._last_mode: Mode = self._state.mode
+        self._last_opening_percentage: int = self._state.opening_percentage
 
     def send_state_update_to_serial(self) -> None:
         """Send state updates to serial interface when changes are detected.
 
         Creates a background task without blocking.
         """
-        current_mode = self._state.get_mode()
-        current_opening_percentage = self._state.get_opening_percentage()
+        current_mode = self._state.mode
+        current_opening_percentage = self._state.opening_percentage
 
         if self._last_mode != current_mode:
             if current_mode not in self._mode_to_message:
@@ -60,6 +61,7 @@ class SerialHandler:
                 <= current_opening_percentage
                 <= self._MAX_PERCENTAGE
             ):
+                logger.info("Persentage: ")
                 raise ValueError(
                     f"Invalid opening percetage. Expected between 0 and 100"
                     f"Current in state: {current_opening_percentage}"
@@ -94,6 +96,11 @@ class SerialHandler:
             logger.error(
                 f"Invalid message sender. Expected 'wcs->' prefix. Message: [{msg}]"
             )
+            return
+
+        if msg.startswith(self._EXPECTED_LOG_MSG_PREFIX):
+            msg = msg.removeprefix(self._EXPECTED_LOG_MSG_PREFIX)
+            logger.info(f"Log message from serial: [{msg}]")
             return
 
         match msg:
