@@ -16,6 +16,8 @@
 #define POTENTIOMETER_MIN 0
 #define POTENTIOMETER_MAX 1023
 
+#define PERCENTAGE_MIN 0
+#define PERCENTAGE_MAX 100
 
 class AutomaticPattern : public Pattern {
 public:
@@ -164,7 +166,8 @@ void WCSTask::checkControlMessage(){
     {
         Msg* msg = MsgService.receiveMsg(control);
         int perc = this->msgMotorPerc(msg->getContent());
-        this->pServo->setPosition(perc);
+        int angle =  map(perc, PERCENTAGE_MIN, PERCENTAGE_MAX, 0, 90);
+        this->pServo->setPosition(angle);
         delete msg;
     }
 }
