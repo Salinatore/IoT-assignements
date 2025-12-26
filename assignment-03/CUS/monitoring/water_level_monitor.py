@@ -21,4 +21,3 @@ class WaterLevelMonitor:
             await asyncio.sleep(self.POLLING_RATE)
             current_time = time.time()
             self._state.check_unconnected(current_time)
-            self._state.check_water_level(current_time)

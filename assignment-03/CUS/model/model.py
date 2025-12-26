@@ -1,5 +1,4 @@
 import logging
-import time
 from datetime import datetime
 from enum import StrEnum
 from typing import Any, Callable
@@ -26,8 +25,6 @@ L2: float = 20
 
 
 class State(BaseModel):
-    starting_time: float
-
     _mode: Mode = Mode.AUTOMATIC
     _water_level: float = 0
     _opening_percentage: int = 0
@@ -36,39 +33,24 @@ class State(BaseModel):
     def get_mode(self) -> Mode:
         return self._mode
 
+    def get_opening_percentage(self) -> int:
+        return self._opening_percentage
+
+    def set_listeners(self, on_status_change: Callable[[], None]) -> None:
+        """Sets the callback function to be called on status changes"""
+        self._on_status_change = on_status_change
+
     def check_unconnected(self, current_time: float) -> None:
         if not self._time_since_last_wl_update:
-            self._time_since_last_wl_update = self.starting_time
+            self._time_since_last_wl_update = current_time
 
         if (
             self._mode != Mode.UNCONNECTED
             and current_time - self._time_since_last_wl_update > T2
         ):
             self.set_mode(Mode.UNCONNECTED)
-            logger.info("State is now in Unconnected mode")
-
-    def check_water_level(self, current_time: float) -> None:
-        if self._mode != Mode.AUTOMATIC:
-            return
-
-        if self._water_level > L2:
-            self._opening_percentage = 100
             self._notify_listeners()
-            return
-
-        if self._water_level > L1:
-            if not self._time_since_L1:
-                self._time_since_L1 = current_time
-            else:
-                if current_time - self._time_since_L1 > T1:
-                    self._opening_percentage = 50
-                    self._notify_listeners()
-        else:
-            self._time_since_L1 = None
-
-    def set_listeners(self, on_status_change: Callable[[], None]) -> None:
-        """Sets the callback function to be called on status changes"""
-        self._on_status_change = on_status_change
+            logger.info("State is now in Unconnected mode")
 
     def set_mode(self, mode: Mode):
         if (mode == Mode.LOCAL_MANUAL and self._mode == Mode.REMOTE_MANUAL) or (
@@ -80,16 +62,20 @@ class State(BaseModel):
             return
 
         self._mode = mode
+
         self._notify_listeners()
 
-    def set_level(self, level: float):
+    def set_level(self, level: float, current_time: float):
         if level < 0:
             logger.error(f"Unexpected water level. Water level: [{level}]")
             return
 
         self._water_level = level
 
-        self._time_since_last_wl_update = time.time()
+        self._time_since_last_wl_update = current_time
+        if self._mode == Mode.AUTOMATIC:
+            self._update_opening_presentage(current_time)
+
         if self._mode == Mode.UNCONNECTED:
             self.set_mode(Mode.AUTOMATIC)
             logger.info("State is now in Automatic mode")
@@ -107,6 +93,21 @@ class State(BaseModel):
 
         self._notify_listeners()
 
+    def _update_opening_presentage(self, current_time: float) -> None:
+        if self._water_level > L2:
+            self._opening_percentage = 100
+            return
+
+        if self._water_level > L1:
+            if not self._time_since_L1:
+                self._time_since_L1 = current_time
+            else:
+                if current_time - self._time_since_L1 > T1:
+                    self._opening_percentage = 50
+        else:
+            self._opening_percentage = 0
+            self._time_since_L1 = None
+
     def _notify_listeners(self):
         if self._on_status_change:
             self._on_status_change()
@@ -122,4 +123,4 @@ class State(BaseModel):
         return data
 
 
-state = State(starting_time=time.time())
+state = State()

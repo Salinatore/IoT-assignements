@@ -12,6 +12,7 @@ class SerialHandler:
 
     # Message protocol constants
     _CUS_TO_WCS_STATUS_AUTOMATIC = "cus->wcs-st-automatic"
+    _CUS_TO_WCS_STATUS_LOCAL_MANUAL = "cus->wcs-st-local-manual"
     _CUS_TO_WCS_STATUS_REMOTE_MANUAL = "cus->wcs-st-remote-manual"
     _CUS_TO_WCS_STATUS_UNCONNECTED = "cus->wcs-st-unconnected"
     _CUS_TO_WCS_OPENING_PERCENTAGE_PREFIX = "cus->wcs-op-"
@@ -25,50 +26,48 @@ class SerialHandler:
     _MAX_PERCENTAGE = 100
 
     def __init__(self, connection_manager: SerialConnection, state: State):
-        self._connection_manager = connection_manager
-        self._state = state
+        self._connection_manager: SerialConnection = connection_manager
+        self._state: State = state
         self._mode_to_message = {
             Mode.AUTOMATIC: self._CUS_TO_WCS_STATUS_AUTOMATIC,
+            Mode.LOCAL_MANUAL: self._CUS_TO_WCS_STATUS_LOCAL_MANUAL,
             Mode.REMOTE_MANUAL: self._CUS_TO_WCS_STATUS_REMOTE_MANUAL,
             Mode.UNCONNECTED: self._CUS_TO_WCS_STATUS_UNCONNECTED,
         }
+        self._last_mode: None | Mode = None
+        self._last_opening_percentage: None | int = None
 
-    def send_opening_percentage_to_serial(self, percentage: int) -> None:
-        """Send opening percentage command to serial device.
-
-        Creates a background task without blocking.
-
-        Args:
-            percentage: Opening percentage (0-100)
-
-        Raises:
-            ValueError: If percentage is outside valid range
-        """
-        if not self._MIN_PERCENTAGE <= percentage <= self._MAX_PERCENTAGE:
-            raise ValueError(
-                f"Percentage must be between {self._MIN_PERCENTAGE} and "
-                f"{self._MAX_PERCENTAGE}. Got: {percentage}"
-            )
-        asyncio.create_task(self._process_send_op_update_async(percentage))
-
-    def send_mode_update_to_serial(self) -> None:
-        """Send mode update command to serial device.
+    def send_state_update_to_serial(self) -> None:
+        """Send state updates to serial interface when changes are detected.
 
         Creates a background task without blocking.
-
-        Args:
-            mode: Target operating mode (AUTOMATIC, REMOTE_MANUAL or UNCONNETED)
-
-        Raises:
-            ValueError: If mode is not valid
         """
-        mode = self._state.get_mode()
-        if mode not in self._mode_to_message:
-            raise ValueError(
-                f"Invalid mode. Expected one of {list(self._mode_to_message.keys())}, "
-                f"got: {mode}"
+        current_mode = self._state.get_mode()
+        current_opening_percentage = self._state.get_opening_percentage()
+
+        if self._last_mode != current_mode:
+            if current_mode not in self._mode_to_message:
+                raise ValueError(
+                    f"Invalid mode. Expected one of {list(self._mode_to_message.keys())}, "
+                    f"Current in state: {current_mode}"
+                )
+            asyncio.create_task(self._process_send_mode_update_async(current_mode))
+            self._last_mode = current_mode
+
+        if self._last_opening_percentage != current_opening_percentage:
+            if not (
+                self._MIN_PERCENTAGE
+                <= current_opening_percentage
+                <= self._MAX_PERCENTAGE
+            ):
+                raise ValueError(
+                    f"Invalid opening percetage. Expected between 0 and 100"
+                    f"Current in state: {current_opening_percentage}"
+                )
+            asyncio.create_task(
+                self._process_send_op_update_async(current_opening_percentage)
             )
-        asyncio.create_task(self._process_send_mode_update_async(mode))
+            self._last_opening_percentage = current_opening_percentage
 
     def handle_message_from_serial(self, msg: str) -> None:
         """Handle incoming message from serial device.
@@ -81,7 +80,7 @@ class SerialHandler:
         asyncio.create_task(self._process_message_from_serial(msg))
 
     async def _process_send_op_update_async(self, percentage: int):
-        """Send opening percentage update to serial device."""
+        """Send opening percentage update to serial devicnote."""
         msg = f"{self._CUS_TO_WCS_OPENING_PERCENTAGE_PREFIX}{percentage}"
         await self._connection_manager.send(msg)
 

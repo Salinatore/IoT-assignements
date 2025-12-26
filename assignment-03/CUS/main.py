@@ -35,7 +35,7 @@ water_level_monitor = WaterLevelMonitor(state)
 
 def notify_listeners():
     websocket_handler.send_state_update_to_websocket()
-    serial_handler.send_mode_update_to_serial()
+    serial_handler.send_state_update_to_serial()
 
 
 state.set_listeners(notify_listeners)
