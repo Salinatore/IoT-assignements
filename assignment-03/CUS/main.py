@@ -47,22 +47,22 @@ async def lifespan(app: FastAPI):
             "Testing mode enabled, please put TESTING False in config file if you are not testing"
         )
 
-    # Start all connections concurrently
+    startup_tasks = [
+        serial_connection.start(
+            message_handler=serial_handler.handle_message_from_serial
+        ),
+        mqtt_connection.start(message_handler=mqtt_handler.handle_message_from_mqtt),
+        websocket_connection.start(
+            message_handeler=websocket_handler.handle_message_from_websocket,
+            generate_first_msg=websocket_handler.generate_state_update,
+        ),
+    ]
+
     async with asyncio.TaskGroup() as tg:
-        tg.create_task(
-            serial_connection.start(
-                message_handler=serial_handler.handle_message_from_serial
-            )
-        )
-        tg.create_task(
-            mqtt_connection.start(message_handler=mqtt_handler.handle_message_from_mqtt)
-        )
-        tg.create_task(
-            websocket_connection.start(
-                message_handeler=websocket_handler.handle_message_from_websocket,
-                generate_first_msg=websocket_handler.generate_state_update,
-            )
-        )
+        for coro in startup_tasks:
+            tg.create_task(coro)
+
+    water_level_monitor.start()
 
     # Start monitor
     water_level_monitor.start()
