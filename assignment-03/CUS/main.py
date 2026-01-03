@@ -58,6 +58,7 @@ async def lifespan(app: FastAPI):
         ),
     ]
 
+    # Stat all connections
     async with asyncio.TaskGroup() as tg:
         for coro in startup_tasks:
             tg.create_task(coro)
