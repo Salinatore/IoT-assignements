@@ -26,7 +26,7 @@ class WebSocketConnection:
         self._message_handeler = message_handeler
         self._generate_first_msg = generate_first_msg
 
-    async def broadcast(self, message: str):
+    async def broadcast(self, message: str) -> None:
         """Send message to all active websockets"""
         disconnected = set()
         for websocket in self._active_connections:
@@ -37,7 +37,7 @@ class WebSocketConnection:
                 disconnected.add(websocket)
         self._active_connections.difference_update(disconnected)
 
-    async def manage_new_connection(self, websocket: WebSocket):
+    async def manage_new_connection(self, websocket: WebSocket) -> None:
         """Accepts websocket and start to listen for messages continuously"""
         await self._connect(websocket)
 
@@ -54,10 +54,10 @@ class WebSocketConnection:
             logger.exception(f"WebSocket error: {e}")
             self._disconnect(websocket)
 
-    async def _connect(self, websocket: WebSocket):
+    async def _connect(self, websocket: WebSocket) -> None:
         await websocket.accept()
         self._active_connections.add(websocket)
 
-    def _disconnect(self, websocket: WebSocket):
+    def _disconnect(self, websocket: WebSocket) -> None:
         if websocket in self._active_connections:
             self._active_connections.remove(websocket)

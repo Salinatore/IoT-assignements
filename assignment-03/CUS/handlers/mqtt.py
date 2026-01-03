@@ -29,7 +29,7 @@ class MqttHandler:
         """
         asyncio.create_task(self._process_incoming_message_async(msg))
 
-    async def _process_incoming_message_async(self, msg: str):
+    async def _process_incoming_message_async(self, msg: str) -> None:
         """Process incoming message from MQTT broker."""
         if not msg.startswith(self._EXPECTED_SENDER_PREFIX):
             logger.error(
@@ -43,7 +43,7 @@ class MqttHandler:
             case _:
                 logger.error(f"Unknown message type from MQTT. Message: [{msg}]")
 
-    def _handle_water_level_message(self, msg: str):
+    def _handle_water_level_message(self, msg: str) -> None:
         """Extract and process water level from message."""
         water_level_str = msg.removeprefix(self._TSM_CUS_WATER_LEVEL_PREFIX)
         try:

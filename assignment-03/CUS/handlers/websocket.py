@@ -1,6 +1,6 @@
 import asyncio
 import logging
-from typing import Literal, Union
+from typing import Literal
 
 from pydantic import BaseModel, Field, TypeAdapter, ValidationError
 
@@ -29,7 +29,7 @@ class _UpdateOpMessage(BaseModel):
     data: _UpdateOpData
 
 
-WebSocketMessage = Union[_SwitchModeMessage, _UpdateOpMessage]
+type WebSocketMessage = _SwitchModeMessage | _UpdateOpMessage
 adapter = TypeAdapter(WebSocketMessage)
 
 
@@ -40,7 +40,7 @@ class WebSocketHandler:
         self._connection_manager = connection_manager
         self._state = state
 
-    def handle_message_from_websocket(self, msg: str):
+    def handle_message_from_websocket(self, msg: str) -> None:
         """
         Handle an incoming WebSocket message.
 
@@ -51,7 +51,7 @@ class WebSocketHandler:
         """
         asyncio.create_task(self._process_message_from_websocket(msg))
 
-    def send_state_update_to_websocket(self):
+    def send_state_update_to_websocket(self) -> None:
         """
         Broadcast the current state to all connected WebSocket clients.
 
@@ -70,7 +70,7 @@ class WebSocketHandler:
         """
         return self._state.model_dump_json()
 
-    async def _process_message_from_websocket(self, msg: str):
+    async def _process_message_from_websocket(self, msg: str) -> None:
         """Parse and route incoming WebSocket messages to appropriate handlers."""
         try:
             parsed_msg = adapter.validate_json(msg)
@@ -86,10 +86,10 @@ class WebSocketHandler:
         except Exception as e:
             logger.error(f"Error processing WebSocket message: {e}. Message: {msg}")
 
-    def _handle_switch_mode(self, data: _SwitchModeData):
+    def _handle_switch_mode(self, data: _SwitchModeData) -> None:
         """Handle mode switching requests."""
         self._state.set_mode(Mode(data.mode))
 
-    def _handle_update_op(self, data: _UpdateOpData):
+    def _handle_update_op(self, data: _UpdateOpData) -> None:
         """Handle opening percentage update requests."""
         self._state.set_opening_percentage(data.percentage)

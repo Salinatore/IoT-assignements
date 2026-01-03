@@ -47,17 +47,22 @@ async def lifespan(app: FastAPI):
             "Testing mode enabled, please put TESTING False in config file if you are not testing"
         )
 
-    # Start all the connections
-    await asyncio.gather(
-        serial_connection.start(
-            message_handler=serial_handler.handle_message_from_serial
-        ),
-        mqtt_connection.start(message_handler=mqtt_handler.handle_message_from_mqtt),
-        websocket_connection.start(
-            message_handeler=websocket_handler.handle_message_from_websocket,
-            generate_first_msg=websocket_handler.generate_state_update,
-        ),
-    )
+    # Start all connections concurrently
+    async with asyncio.TaskGroup() as tg:
+        tg.create_task(
+            serial_connection.start(
+                message_handler=serial_handler.handle_message_from_serial
+            )
+        )
+        tg.create_task(
+            mqtt_connection.start(message_handler=mqtt_handler.handle_message_from_mqtt)
+        )
+        tg.create_task(
+            websocket_connection.start(
+                message_handeler=websocket_handler.handle_message_from_websocket,
+                generate_first_msg=websocket_handler.generate_state_update,
+            )
+        )
 
     # Start monitor
     water_level_monitor.start()
@@ -71,8 +76,13 @@ if TESTING:
 
 
 @app.websocket("/ws")
-async def websocket_endpoint(websocket: WebSocket):
-    """WebSocket endpoint for establishing a new connection"""
+async def websocket_endpoint(websocket: WebSocket) -> None:
+    """
+    WebSocket endpoint for real-time bidirectional communication.
+
+    Args:
+        websocket: The WebSocket connection to manage
+    """
     await websocket_connection.manage_new_connection(websocket)
 
 

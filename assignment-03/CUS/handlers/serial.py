@@ -81,16 +81,16 @@ class SerialHandler:
         """
         asyncio.create_task(self._process_message_from_serial(msg))
 
-    async def _process_send_op_update_async(self, percentage: int):
+    async def _process_send_op_update_async(self, percentage: int) -> None:
         """Send opening percentage update to serial devicnote."""
         msg = f"{self._CUS_TO_WCS_OPENING_PERCENTAGE_PREFIX}{percentage}"
         await self._connection_manager.send(msg)
 
-    async def _process_send_mode_update_async(self, mode: Mode):
+    async def _process_send_mode_update_async(self, mode: Mode) -> None:
         """Send mode update to serial device."""
         await self._connection_manager.send(self._mode_to_message[mode])
 
-    async def _process_message_from_serial(self, msg: str):
+    async def _process_message_from_serial(self, msg: str) -> None:
         """Process incoming message from serial device."""
         if not msg.startswith(self._EXPECTED_SENDER_PREFIX):
             logger.error(
@@ -115,7 +115,7 @@ class SerialHandler:
             case _:
                 logger.error(f"Unknown message type from serial. Message: [{msg}]")
 
-    def _handle_percentage_message(self, msg: str):
+    def _handle_percentage_message(self, msg: str) -> None:
         """Extract and process percentage from message."""
         percentage_str = msg.removeprefix(self._WCS_TO_CUS_OPENING_PERCENTAGE_PREFIX)
         try:
