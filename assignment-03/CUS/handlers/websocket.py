@@ -1,6 +1,8 @@
 import asyncio
-import json
 import logging
+from typing import Literal, Union
+
+from pydantic import BaseModel, Field, TypeAdapter, ValidationError
 
 from connections.websocket import WebSocketConnection
 from model.model import Mode, State
@@ -8,12 +10,31 @@ from model.model import Mode, State
 logger = logging.getLogger(__name__)
 
 
+# Pydantic models for incoming messages
+class _SwitchModeData(BaseModel):
+    mode: Literal["AUTOMATIC", "REMOTE_MANUAL"]
+
+
+class _UpdateOpData(BaseModel):
+    percentage: int = Field(ge=0, le=100)
+
+
+class _SwitchModeMessage(BaseModel):
+    type: Literal["switch-mode"]
+    data: _SwitchModeData
+
+
+class _UpdateOpMessage(BaseModel):
+    type: Literal["update-op"]
+    data: _UpdateOpData
+
+
+WebSocketMessage = Union[_SwitchModeMessage, _UpdateOpMessage]
+adapter = TypeAdapter(WebSocketMessage)
+
+
 class WebSocketHandler:
     """Handles all communication to and from websockets."""
-
-    _MIN_PERCENTAGE = 0
-    _MAX_PERCENTAGE = 100
-    _ACCEPTABLE_MODES = ["AUTOMATIC", "REMOTE_MANUAL"]
 
     def __init__(self, connection_manager: WebSocketConnection, state: State):
         self._connection_manager = connection_manager
@@ -51,29 +72,24 @@ class WebSocketHandler:
 
     async def _process_message_from_websocket(self, msg: str):
         """Parse and route incoming WebSocket messages to appropriate handlers."""
-        data = json.loads(msg)
-        match data["type"]:
-            case "switch-mode":
-                self._handle_switch_mode(data["data"])
-            case "update-op":
-                self._handle_update_op(data["data"])
-            case _:
-                logger.error(f"Unknown message type from WebSocket. Message: [{msg}]")
+        try:
+            parsed_msg = adapter.validate_json(msg)
 
-    def _handle_switch_mode(self, data: dict):
+            match parsed_msg:
+                case _SwitchModeMessage(data=data):
+                    self._handle_switch_mode(data)
+                case _UpdateOpMessage(data=data):
+                    self._handle_update_op(data)
+
+        except ValidationError as e:
+            logger.error(f"Invalid message from WebSocket: {e}. Message: {msg}")
+        except Exception as e:
+            logger.error(f"Error processing WebSocket message: {e}. Message: {msg}")
+
+    def _handle_switch_mode(self, data: _SwitchModeData):
         """Handle mode switching requests."""
-        mode_srt = data["mode"]
-        if mode_srt not in self._ACCEPTABLE_MODES:
-            logger.error(f"Mode change not acceptable. Mode: [{mode_srt}]")
-            return
-        self._state.set_mode(Mode(mode_srt))
+        self._state.set_mode(Mode(data.mode))
 
-    def _handle_update_op(self, data: dict):
+    def _handle_update_op(self, data: _UpdateOpData):
         """Handle opening percentage update requests."""
-        percentage = data["percentage"]
-        if not self._MIN_PERCENTAGE <= percentage <= self._MAX_PERCENTAGE:
-            logger.error(
-                f"Percentage change not acceptable. Percentage: [{percentage}]"
-            )
-            return
-        self._state.set_opening_percentage(percentage)
+        self._state.set_opening_percentage(data.percentage)

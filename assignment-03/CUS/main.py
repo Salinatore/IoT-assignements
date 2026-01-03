@@ -1,5 +1,3 @@
-"""Main application file for the Drone Control API using FastAPI framework."""
-
 import asyncio
 import logging
 from contextlib import asynccontextmanager
