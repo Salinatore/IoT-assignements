@@ -1,3 +1,4 @@
+from time import time
 from fastapi import APIRouter
 
 from model.model import Mode, State, state
@@ -58,7 +59,7 @@ async def increase_water_level() -> State:
     Returns:
         State: The updated state object with the new water level.
     """
-    state.set_level(state._water_level + 1)
+    state.set_level(state._water_level + 1, time())
     return state
 
 
@@ -72,5 +73,5 @@ async def decrease_water_level() -> State:
     Returns:
         State: The updated state object with the new water level.
     """
-    state.set_level(state._water_level - 1)
+    state.set_level(state._water_level - 1, time())
     return state
