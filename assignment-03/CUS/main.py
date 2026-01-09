@@ -58,10 +58,7 @@ async def lifespan(app: FastAPI):
         ),
     ]
 
-    # Stat all connections
-    async with asyncio.TaskGroup() as tg:
-        for coro in startup_tasks:
-            tg.create_task(coro)
+    await asyncio.gather(*startup_tasks)
 
     water_level_monitor.start()
 
