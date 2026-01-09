@@ -4,7 +4,7 @@ import json
 from datetime import datetime
 from pathlib import Path
 
-class JSONFormatter(logging.Formatter):
+class _JSONFormatter(logging.Formatter):
     def format(self, record):
         log_data = {
             "timestamp": datetime.fromtimestamp(record.created).isoformat(),
@@ -40,7 +40,7 @@ def setup_logging(log_dir="logs", log_filename="app.log"):
     console_handler.setLevel(logging.INFO)
 
     file_handler = logging.FileHandler(log_path, mode='w', encoding='utf-8')
-    file_handler.setFormatter(JSONFormatter())
+    file_handler.setFormatter(_JSONFormatter())
     file_handler.setLevel(logging.DEBUG)
 
     root_logger = logging.getLogger()
