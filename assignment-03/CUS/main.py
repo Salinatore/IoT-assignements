@@ -18,18 +18,18 @@ from monitoring.water_level_monitor import WaterLevelMonitor
 from routers.test import router
 
 setup_logging()
-logger = logging.getLogger(__name__)
-config = Config()
+logger: logging.Logger = logging.getLogger(__name__)
+config: Config = Config()
 
-mqtt_connection = MqttConnection(broker=config.broker, topic=config.topic)
-serial_connection = SerialConnection(port=config.serial_port, baud=config.baud)
-websocket_connection = WebSocketConnection()
+mqtt_connection: MqttConnection = MqttConnection(broker=config.broker, topic=config.topic)
+serial_connection: SerialConnection = SerialConnection(port=config.serial_port, baud=config.baud)
+websocket_connection: WebSocketConnection = WebSocketConnection()
 
-mqtt_handler = MqttHandler(mqtt_connection, state)
-serial_handler = SerialHandler(serial_connection, state)
-websocket_handler = WebSocketHandler(websocket_connection, state)
+mqtt_handler: MqttHandler = MqttHandler(mqtt_connection, state)
+serial_handler: SerialHandler = SerialHandler(serial_connection, state)
+websocket_handler: WebSocketHandler = WebSocketHandler(websocket_connection, state)
 
-water_level_monitor = WaterLevelMonitor(state)
+water_level_monitor: WaterLevelMonitor = WaterLevelMonitor(state)
 
 
 def notify_listeners():
@@ -60,8 +60,6 @@ async def lifespan(app: FastAPI):
     ]
 
     await asyncio.gather(*startup_tasks)
-
-    water_level_monitor.start()
 
     # Start monitor
     water_level_monitor.start()
