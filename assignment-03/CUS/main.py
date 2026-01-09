@@ -5,7 +5,7 @@ from contextlib import asynccontextmanager
 import uvicorn
 from fastapi import FastAPI, WebSocket
 
-from config import BAUD, BROKER, PORT, TESTING, TOPIC
+from config import Config
 from connections.mqtt import MqttConnection
 from connections.serial import SerialConnection
 from connections.websocket import WebSocketConnection
@@ -19,9 +19,10 @@ from routers.test import router
 
 setup_logging()
 logger = logging.getLogger(__name__)
+config = Config()
 
-mqtt_connection = MqttConnection(broker=BROKER, topic=TOPIC)
-serial_connection = SerialConnection(port=PORT, baud=BAUD)
+mqtt_connection = MqttConnection(broker=config.broker, topic=config.topic)
+serial_connection = SerialConnection(port=config.serial_port, baud=config.baud)
 websocket_connection = WebSocketConnection()
 
 mqtt_handler = MqttHandler(mqtt_connection, state)
@@ -42,7 +43,7 @@ state.set_listeners(notify_listeners)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Manage application lifecycle"""
-    if TESTING:
+    if config.in_development:
         logger.warning(
             "Testing mode enabled, please put TESTING False in config file if you are not testing"
         )
@@ -69,7 +70,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
-if TESTING:
+if config.in_development:
     app.include_router(router)
 
 
@@ -87,7 +88,7 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
 if __name__ == "__main__":
     uvicorn.run(
         "main:app",
-        host="127.0.0.1",
-        port=8000,
-        reload=True,
+        host=config.host,
+        port=config.port,
+        reload=config.in_development, # set auto reload only on development
     )
