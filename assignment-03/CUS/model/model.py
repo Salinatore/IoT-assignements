@@ -52,7 +52,6 @@ class State(BaseModel):
         ):
             self.set_mode(Mode.UNCONNECTED)
             self._notify_listeners()
-            logger.info("State is now in Unconnected mode")
 
     def set_mode(self, mode: Mode):
         if (mode == Mode.LOCAL_MANUAL and self._mode == Mode.REMOTE_MANUAL) or (
@@ -63,6 +62,7 @@ class State(BaseModel):
             )
             return
 
+        logger.debug(f"Mode change. From [{self._mode}] to [{mode}]")
         self._mode = mode
 
         self._notify_listeners()
@@ -72,6 +72,7 @@ class State(BaseModel):
             logger.error(f"Unexpected water level. Water level: [{level}]")
             return
 
+        logger.debug(f"Water level change. From [{self._water_level}] to [{level}]")
         self._water_level = level
 
         self._time_since_last_wl_update = current_time
@@ -80,7 +81,6 @@ class State(BaseModel):
 
         if self._mode == Mode.UNCONNECTED:
             self.set_mode(Mode.AUTOMATIC)
-            logger.info("State is now in Automatic mode")
 
         self._notify_listeners()
 
@@ -91,6 +91,7 @@ class State(BaseModel):
             )
             return
 
+        logger.debug(f"Opening percentage set from [{self._opening_percentage}] to [{opening_percentage}]")
         self._opening_percentage = opening_percentage
 
         self._notify_listeners()
