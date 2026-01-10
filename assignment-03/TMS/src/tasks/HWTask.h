@@ -3,6 +3,9 @@
 
 #include "kernel/Task.h"
 #include "model/HWPlatform.h"
+#include "kernel/MesageHandler.h"
+#include "kernel/ConnectionHandler.h"
+#include "config.h"
 #include <Arduino.h>
 
 
@@ -23,8 +26,11 @@ private:
 
     void setState(WCSState state);
     bool checkAndSetJustEntered();
+    void sendMsg(float value);
 
     HWPlatform* pHW;
+    ConnectionHandlerClass* connection;
+    MessageHandlerClass* msgHandler;
 
     bool justEntered;
 

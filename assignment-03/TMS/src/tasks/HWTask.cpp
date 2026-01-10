@@ -1,14 +1,14 @@
 #include "HWTask.h"
 #include "Arduino.h"
 
-#define PREALARM_MSG "st-a-prealarm"
-#define ALARM_MSG "st-a-alarm"
-#define NORMAL_MSG "st-a-normal"
 
-
-HWTask::HWTask(Sonar* pSonar) : pSonar(pSonar)
+HWTask::HWTask(Sonar* pSonar)
 {
+    this->pSonar = pSonar;
     this->setState(IDLE);
+    this->connection = new ConnectionHandlerClass();
+    this->msgHandler = new MessageHandlerClass(this->connection);
+
 }
 
 void HWTask::task(void * pvParameters)
@@ -38,13 +38,24 @@ void HWTask::tick()
         if(this->checkAndSetJustEntered()){
             //ledverde
         }
-        this->pSonar->getDistance();
+        if(!msgHandler->isConnectionOn()){
+            this->setState(UNCONECTED);
+        }
+
+        float distance = this->pSonar->getDistance();
+        this->sendMsg(distance);
         break;
     }
     case UNCONECTED:
     {
         if(this->checkAndSetJustEntered()){
             //led rosso
+        }
+        
+        this->msgHandler->tryReconection();
+
+        if(this->msgHandler->isConnectionOn()){
+            this->setState(IDLE);
         }
         break;
     }
@@ -66,4 +77,11 @@ bool HWTask::checkAndSetJustEntered()
         justEntered = false;
     }
     return bak;
+}
+
+void HWTask::sendMsg(float value)
+{
+    char msg[50];
+    snprintf(msg, sizeof(msg), MQTT_PREFIX_MSG "%.2f", value);
+    this->msgHandler->sendMsg(msg);
 }
