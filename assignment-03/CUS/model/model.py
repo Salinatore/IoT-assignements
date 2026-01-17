@@ -84,7 +84,7 @@ class State(BaseModel):
         self._notify_listeners()
 
     def set_opening_percentage(self, opening_percentage: int):
-        if not self._mode == Mode.LOCAL_MANUAL or self._mode == Mode.REMOTE_MANUAL:
+        if not (self._mode == Mode.LOCAL_MANUAL or self._mode == Mode.REMOTE_MANUAL):
             logger.error(
                 f"Cannot change the opening percentage due to the current mode. Current mode: [{self._mode}]"
             )
