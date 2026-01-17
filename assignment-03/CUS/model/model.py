@@ -51,7 +51,6 @@ class State(BaseModel):
             and current_time - self._time_since_last_wl_update > T2
         ):
             self.set_mode(Mode.UNCONNECTED)
-            self._notify_listeners()
 
     def set_mode(self, mode: Mode):
         if (mode == Mode.LOCAL_MANUAL and self._mode == Mode.REMOTE_MANUAL) or (
