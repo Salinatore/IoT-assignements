@@ -1,27 +1,36 @@
-let ws = null;
-const statusDiv = document.getElementById("currentStatus");
 const controlBtn = document.getElementById("control-btn");
+
+const slider = document.getElementsByClassName("slider")[0];
+const inputSlider = document.getElementById("slider");
+
+const waterLevelTag = document.getElementById("waterLevel");
+const openingPercentageTag = document.getElementById("openingPercentage");
+const connectionStatusTag = document.getElementById("displayConnection");
+
 let currentMode = "NOT AVAILABLE";
+let ws = null;
 
 function connect() {
   ws = new WebSocket("ws://localhost:8000/ws");
 
   ws.onopen = () => {
     console.log("Connected to WebSocket");
-    statusDiv.textContent = "NOT AVAILABLE";
+    connectionStatusTag.textContent = "NOT AVAILABLE";
   };
 
   ws.onmessage = (event) => {
     const data = JSON.parse(event.data);
 
     updateMode(data.mode);
+    updateOP(data.opening_percentage);
+    updateWaterLevel(data.water_level);
+
     addDataPoint(data.water_level, data.timestamp);
   };
 
   ws.onclose = () => {
     console.log("Disconnected to WebSocket");
-    statusDiv.textContent = "NOT AVAILABLE";
-    setTimeout(connect, 30);
+    connectionStatusTag.textContent = "NOT AVAILABLE";
   };
 
   ws.onerror = (error) => {
@@ -33,16 +42,24 @@ function updateMode(mode) {
   if (mode === currentMode) return;
   currentMode = mode;
 
-  console.log(mode);
-
-  statusDiv.textContent = currentMode;
+  connectionStatusTag.textContent = currentMode;
   if (currentMode === "REMOTE_MANUAL") {
+    slider.hidden = false;
     controlBtn.disabled = false;
     controlBtn.textContent = "Give back Control";
   } else {
+    slider.hidden = true;
     controlBtn.textContent = "Request Remote Control";
     controlBtn.disabled = currentMode !== "AUTOMATIC";
   }
+}
+
+function updateOP(openingPercentage) {
+  openingPercentageTag.textContent = openingPercentage + " %";
+}
+
+function updateWaterLevel(waterLevel) {
+  waterLevelTag.textContent = waterLevel + " cm";
 }
 
 function handleControlBtn() {
@@ -62,13 +79,11 @@ function handleControlBtn() {
   }
 }
 
-function disconnectWebSocket() {
-  if (ws && ws.readyState === WebSocket.OPEN) {
-    ws.close();
-    console.log("WebSocket disconnected");
-  }
+function sendOpeningPercentage() {
+  ws.send(
+      JSON.stringify({
+        type: "update-op",
+        data: { percentage: inputSlider.value },
+      }),
+    );
 }
-
-window.addEventListener("beforeunload", () => {
-  disconnectWebSocket();
-});

@@ -12,36 +12,30 @@
             <h1>Real-Time Water Level Monitor</h1>
         </header>
         <main>
-            <div class="status">
-                <div class="current-water-level-item">
-                    <div class="current-water-level-label">Current Level</div>
-                    <div
-                        class="current-water-level-value"
-                        id="currentWaterLevel"
-                    >
-                        -- cm
-                    </div>
-                </div>
-                <div class="connection-status-item">
-                    <div class="connection-status-label">Connection</div>
-                    <div class="connection-status-value" id="currentStatus">
-                        NOT AVAILABLE
-                    </div>
-                </div>
+            Current Level
+            <div id="waterLevel" >
+                -- cm
+            </div>
+            Opening Percentage
+            <div id="openingPercentage">
+                -- %
+            </div>
+            Connection
+            <div id="displayConnection">
+                NOT AVAILABLE
             </div>
 
             <div id="chartContainer">
                 <canvas id="waterChart"></canvas>
             </div>
 
-            <div class="controls">
-                <button
-                    class="request-remote-control"
-                    id="control-btn"
-                    onclick="handleControlBtn()"
-                >
-                    Request Remote Control
-                </button>
+            <button id="control-btn" onclick="handleControlBtn()">
+                Request Remote Control
+            </button>
+
+            <div class="slider" hidden>
+                <input id="slider" type="range" min="0" max="100">
+                <button onclick="sendOpeningPercentage()">Send</button>
             </div>
 
             <div class="controls">

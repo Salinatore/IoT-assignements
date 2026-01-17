@@ -66,22 +66,8 @@ function addDataPoint(level, timestamp) {
   chart.data.labels.push(time);
   chart.data.datasets[0].data.push(level);
   chart.update("none");
-
-  // Update current level display
-  document.getElementById("currentWaterLevel").textContent =
-    level.toFixed(1) + " cm";
 }
 
-function clearData() {
-  chart.data.labels = [];
-  chart.data.datasets[0].data = [];
-  dataPoints = [];
-  chart.update();
-  document.getElementById("currentWaterLevel").textContent = "-- cm";
-  document.getElementById("avgLevel").textContent = "-- cm";
-}
-
-// Initialize on page load
 window.onload = () => {
   initChart();
   connect();
