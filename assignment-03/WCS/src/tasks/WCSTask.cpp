@@ -3,14 +3,21 @@
 #include "kernel/MsgService.h"
 #include "kernel/Logger.h"
 
-#define UNCONECTED_MSG "wcs-unconected"
-#define AUTOMATIC_MSG "wcs-automatic"
-#define REMOTE_MANUAL_MSG "wcs-remote"
-#define LOCAL_MANUAL_MSG "wcs-local"
-#define CONTROL_MSG "wcs-perc:"
+#define UNCONECTED_MSG "cus->wcs-st-unconnected"
+#define AUTOMATIC_MSG "cus->wcs-st-automatic"
+#define REMOTE_MANUAL_MSG "cus->wcs-st-remote-manual"
+#define LOCAL_MANUAL_MSG "cus->wcs-st-local-manual"
+#define CONTROL_MSG "cus->wcs-op-"
+
+#define LOCAL_MANUAL_SEND_MSG "wcs->cus-st-local-manual"
+#define AUTOMATIC_SEND_MSG "wcs->cus-st-automatic"
+#define CONTROL_SEND_MSG "wcs->cus-op-"
+
 #define POTENTIOMETER_MIN 0
 #define POTENTIOMETER_MAX 1023
 
+#define PERCENTAGE_MIN 0
+#define PERCENTAGE_MAX 100
 
 class AutomaticPattern : public Pattern {
 public:
@@ -33,6 +40,13 @@ public:
   }
 };
 
+class LocalPattern : public Pattern {
+public:
+  boolean match(const Msg& m) override {
+    return m.getContent() == LOCAL_MANUAL_MSG;
+  }
+};
+
 class ControlPattern : public Pattern {
 public:
   boolean match(const Msg& m) override {
@@ -40,15 +54,10 @@ public:
   }
 };
 
-static UnconectedPattern unconected;
-static RemotePattern remote;
-static AutomaticPattern automatic;
-static ControlPattern control;
-
-WCSTask::WCSTask(ServoMotor* pServo, Lcd *pLcd, Button *pButton, Potentiometer* pPot) : pServo(pServo), pLcd(pLcd), pButton(pButton), pPot(pPot)
+WCSTask::WCSTask(ServoMotor* pServo, Lcd *pLcd, Button *pButton, Potentiometer* pPot) : 
+        pServo(pServo), pLcd(pLcd), pButton(pButton), pPot(pPot)
 {
-    this->setState(AUTOMATIC);
-    
+    this->setState(AUTOMATIC);    
 }
 
 void WCSTask::tick()
@@ -59,106 +68,139 @@ void WCSTask::tick()
     {
         if (checkAndSetJustEntered())
         {
+            Logger.log(F("WCSTask:AUTOMATIC"));
             pLcd->writeModeMessage("AUTOMATIC");
         }
         
-        if(pButton->isPressed()){
-            this->setState(LOC_MANUAL);
-        }
-        if(MsgService.isMsgAvailable(unconected)){
-            Msg* msg = MsgService.receiveMsg(unconected);
-            delete msg;
-            this->setState(UNCONECTED);
-        }
-        if(MsgService.isMsgAvailable(remote)){
-            Msg* msg = MsgService.receiveMsg(remote);
-            delete msg;
-            this->setState(REM_MANUAL);
-        }
-        if(MsgService.isMsgAvailable(control)){
-            Msg* msg = MsgService.receiveMsg(control);
-            int perc = this->msgMotorPerc(msg->getContent());
-            this->pServo->setPosition(perc);
-            delete msg;
-            this->setState(REM_MANUAL);
-        }
-        break;
-    }
-    case LOC_MANUAL:
-    {
-        if (checkAndSetJustEntered())
+        // Message Handling 
+        this->checkUnconnectedMessage();
+        this->checkControlMessage();
+        this->checkRemoteMessage();
+        this->checkLocalMessage();
+
+        // Mode change requests
+        if(pButton->isPressed())
         {
-            Logger.log(F("WCS:LOCAL_START"));
-            pLcd->writeModeMessage("LOC MANUAL");
+            MsgService.sendMsg(LOCAL_MANUAL_SEND_MSG);
         }
-
-        if(pButton->isPressed()){
-            setState(AUTOMATIC);
-            Logger.log(F("WCS:LOCAL_END"));
-        }
-
-        if(MsgService.isMsgAvailable(unconected)){
-            Msg* msg = MsgService.receiveMsg(unconected);
-            delete msg;
-            this->setState(UNCONECTED);
-            Logger.log(F("WCS:LOCAL_END"));
-        }
-
-        pPot->sync();
-        int potValue = pPot->getValue();
-        int angle = map(potValue, POTENTIOMETER_MIN, POTENTIOMETER_MAX, 0, 90);
-        pServo->setPosition(angle);
-        pLcd->writePercMessage(String(angle));
-        char msg_angle[32];
-        snprintf(msg_angle, sizeof(msg_angle), "WCS:LOCAL_PERC:%d", angle);
-        Logger.log(msg_angle);
 
         break;
     }
-    case REM_MANUAL:
+    case LOCAL_MANUAL:
     {
         if (checkAndSetJustEntered())
         {
+            Logger.log(F("WCSTask:LOCAL_MANUAL"));
+            pLcd->writeModeMessage("LOCAL MANUAL");
+        }
+
+        // Message Handling 
+        this->checkUnconnectedMessage();
+        this->checkAutomaticMessage();
+
+        // Mode change requests
+        if(pButton->isPressed())
+        {
+            MsgService.sendMsg(AUTOMATIC_SEND_MSG);  
+        } 
+
+        this->processPotentiometerInput();
+
+        break;
+    }
+    case REMOTE_MANUAL:
+    {
+        if (checkAndSetJustEntered())
+        {
+            Logger.log(F("WCSTask:REMOTE_MANUAL"));
             pLcd->writeModeMessage("REMOTE MANUAL");
         }
-        if(MsgService.isMsgAvailable(unconected)){
-            Msg* msg = MsgService.receiveMsg(unconected);
-            delete msg;
-            this->setState(UNCONECTED);
-        }
-        if(MsgService.isMsgAvailable(automatic)){
-            Msg* msg = MsgService.receiveMsg(automatic);
-            delete msg;
-            this->setState(AUTOMATIC);
-        }
-        if(MsgService.isMsgAvailable(control)){
-        Msg* msg = MsgService.receiveMsg(control);
-        int perc = this->msgMotorPerc(msg->getContent());
-        this->pServo->setPosition(perc);
-        delete msg;
-        this->setState(REM_MANUAL);
-        }
- 
 
+        // Message Handling 
+        this->checkUnconnectedMessage();
+        this->checkAutomaticMessage();
+        this->checkControlMessage();
+ 
         break;
     }
     case UNCONECTED:
     {
         if (checkAndSetJustEntered())
         {
+            Logger.log(F("WCSTask:UNCONECTED"));
             pLcd->writeModeMessage("UNCONECTED");
         }
-        if(MsgService.isMsgAvailable(automatic)){
-            Msg* msg = MsgService.receiveMsg(automatic);
-            delete msg;
-            this->setState(AUTOMATIC);
-        }
+
+        // Message Handling 
+        this->checkAutomaticMessage();
 
         break;
     }   
     default:
         break;
     }
+}
+
+void WCSTask::checkUnconnectedMessage(){
+    static UnconectedPattern unconected;
+    if(MsgService.isMsgAvailable(unconected))
+    {
+        Msg* msg = MsgService.receiveMsg(unconected);
+        delete msg;
+        this->setState(UNCONECTED);
+    }
+}
+
+void WCSTask::checkAutomaticMessage(){
+    static AutomaticPattern automatic;
+    if(MsgService.isMsgAvailable(automatic))
+    {
+        Msg* msg = MsgService.receiveMsg(automatic);
+        delete msg;
+        this->setState(AUTOMATIC);
+    }
+}
+
+void WCSTask::checkControlMessage(){
+    static ControlPattern control;
+    if(MsgService.isMsgAvailable(control))
+    {
+        Logger.log(F("Servo angle is chaning"));
+        Msg* msg = MsgService.receiveMsg(control);
+        int perc = this->msgMotorPerc(msg->getContent());
+        int angle =  map(perc, PERCENTAGE_MIN, PERCENTAGE_MAX, 0, 90);
+        this->pServo->setPosition(angle);
+        delete msg;
+    }
+}
+
+void WCSTask::checkRemoteMessage(){
+    static RemotePattern remote;
+    if(MsgService.isMsgAvailable(remote))
+    {
+        Msg* msg = MsgService.receiveMsg(remote);
+        delete msg;
+        this->setState(REMOTE_MANUAL);
+    }
+}
+
+void WCSTask::checkLocalMessage(){
+    static LocalPattern local;
+    if(MsgService.isMsgAvailable(local))
+    {
+        Msg* msg = MsgService.receiveMsg(local);
+        delete msg;
+        this->setState(LOCAL_MANUAL);
+    }
+}
+
+void WCSTask::processPotentiometerInput(){
+    pPot->sync();
+    int potValue = pPot->getValue();
+    int angle = map(potValue, POTENTIOMETER_MIN, POTENTIOMETER_MAX, 0, 90);
+    pServo->setPosition(angle);
+    pLcd->writePercMessage(String(angle));
+    MsgService.sendMsg(CONTROL_SEND_MSG+String(angle));
 }
 
 void WCSTask::setState(WCSState s)

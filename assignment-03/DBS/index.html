@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Dashboard subsystem</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+        <link rel="stylesheet" href="./css/styles.css" />
+    </head>
+    <body>
+        <header>
+            <h1>Real-Time Water Level Monitor</h1>
+        </header>
+        <main>
+            <div class="statusblock">
+                <div class="status">
+                    Current Level
+                    <div id="waterLevel" >
+                        -- cm
+                    </div>
+                </div>
+                <div class="status">
+                    Opening Percentage
+                    <div id="openingPercentage">
+                        -- %
+                    </div>
+                </div>
+                <div class="status">
+                    Connection 
+                    <div id="displayConnection">
+                        NOT AVAILABLE
+                    </div>
+                </div>
+            </div>
+
+            <div id="chartContainer">
+                <canvas id="waterChart"></canvas>
+            </div>
+
+            <button id="control-btn" onclick="handleControlBtn()">
+                Request Remote Control
+            </button>
+
+            <div class="slider" hidden>
+                <input id="slider" type="range" min="0" max="100">
+                <button class="sliderbutton" onclick="sendOpeningPercentage()">Send</button>
+            </div>
+        </main>
+
+        <footer>Smart Tank Monitoring System project - University of Bologna - Cesena Campus</footer>
+
+        <script src="./js/websocket.js"></script>
+        <script src="./js/graph.js"></script>
+    </body>
+</html>

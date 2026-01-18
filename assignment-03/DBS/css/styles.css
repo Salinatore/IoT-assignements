@@ -1,0 +1,81 @@
+* {
+    margin: 0px;
+    padding: 0px;
+}
+
+html, body {
+    height: 100%;
+}
+
+body {
+    font-family: sans-serif;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    font-weight: bold;
+}
+
+header {
+    text-align: center;
+    padding: 7px;
+}
+
+main {
+    padding: 10px 70px;
+    flex: 1;
+    text-align: center;
+}
+
+canvas {
+    min-height: 50vh;
+}
+
+main > div {
+    margin: 10px 0px;
+}
+
+button {
+    border-radius: 10px;
+    color: white;
+    background-color: #53565A;
+    margin: 10px 0px;
+    padding: 10px;
+    cursor: pointer;
+    border: none;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #3a3c3f;
+}
+
+footer {
+    color: white;
+    background-color: #bb2e29;
+    text-align: center;
+    padding: 10px;
+    margin-top: 10px;
+}
+
+.statusblock {
+    margin-bottom: 30px;
+}
+
+.status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: center;
+}
+
+.status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: center;
+}
+
+.sliderbutton {
+    margin-left: 10px;
+}

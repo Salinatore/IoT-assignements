@@ -16,12 +16,20 @@ HWPlatform *pHWPlatform;
 void setup()
 {
   MsgService.init();
-  sched.init(50);
-  Logger.log(":::::: Drone System ::::::");
+  sched.init(40);
+  Logger.log(":::::: WCS ::::::");
 
   pHWPlatform = new HWPlatform();
 
 #ifndef __TESTING_HW__
+  Task *pWCSTask = new WCSTask(
+    pHWPlatform->getMotor(),
+    pHWPlatform->getLCD(),
+    pHWPlatform->getButton(),
+    pHWPlatform->getPot()
+  );
+  pWCSTask->init(40);
+  sched.addTask(pWCSTask);
   
 #endif
 
