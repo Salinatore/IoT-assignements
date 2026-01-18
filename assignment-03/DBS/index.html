@@ -12,17 +12,25 @@
             <h1>Real-Time Water Level Monitor</h1>
         </header>
         <main>
-            Current Level
-            <div id="waterLevel" >
-                -- cm
-            </div>
-            Opening Percentage
-            <div id="openingPercentage">
-                -- %
-            </div>
-            Connection
-            <div id="displayConnection">
-                NOT AVAILABLE
+            <div class="statusblock">
+                <div class="status">
+                    Current Level
+                    <div id="waterLevel" >
+                        -- cm
+                    </div>
+                </div>
+                <div class="status">
+                    Opening Percentage
+                    <div id="openingPercentage">
+                        -- %
+                    </div>
+                </div>
+                <div class="status">
+                    Connection 
+                    <div id="displayConnection">
+                        NOT AVAILABLE
+                    </div>
+                </div>
             </div>
 
             <div id="chartContainer">
@@ -35,9 +43,11 @@
 
             <div class="slider" hidden>
                 <input id="slider" type="range" min="0" max="100">
-                <button onclick="sendOpeningPercentage()">Send</button>
+                <button class="sliderbutton" onclick="sendOpeningPercentage()">Send</button>
             </div>
         </main>
+
+        <footer>Smart Tank Monitoring System project - University of Bologna - Cesena Campus</footer>
 
         <script src="./js/websocket.js"></script>
         <script src="./js/graph.js"></script>
