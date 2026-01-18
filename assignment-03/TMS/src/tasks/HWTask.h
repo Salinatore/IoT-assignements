@@ -11,7 +11,7 @@
 
 class HWTask : Task{
 public:
-    HWTask(Sonar* pSonar);
+    HWTask(Sonar* pSonar, Led* redLed, Led* greenLed);
     void tick();
     void task(void * pvParameters);
 
@@ -29,12 +29,13 @@ private:
     void sendMsg(float value);
 
     HWPlatform* pHW;
-    ConnectionHandlerClass* connection;
     MessageHandlerClass* msgHandler;
 
     bool justEntered;
 
     Sonar* pSonar;
+    Led* redLed;
+    Led* greenLed;
 
 };
 

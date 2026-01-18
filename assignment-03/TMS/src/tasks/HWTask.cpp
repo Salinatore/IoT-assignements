@@ -2,12 +2,13 @@
 #include "Arduino.h"
 
 
-HWTask::HWTask(Sonar* pSonar)
+HWTask::HWTask(Sonar* pSonar, Led* redLed, Led* greenLed)
 {
     this->pSonar = pSonar;
+    this->redLed = redLed;
+    this->greenLed = greenLed;
     this->setState(IDLE);
-    this->connection = new ConnectionHandlerClass();
-    this->msgHandler = new MessageHandlerClass(this->connection);
+    this->msgHandler = new MessageHandlerClass(new ConnectionHandlerClass());
 
 }
 
@@ -36,7 +37,8 @@ void HWTask::tick()
     case IDLE:
     {
         if(this->checkAndSetJustEntered()){
-            //ledverde
+            this->greenLed->switchOn();
+            this->redLed->switchOff();
         }
         if(!msgHandler->isConnectionOn()){
             this->setState(UNCONECTED);
@@ -49,7 +51,8 @@ void HWTask::tick()
     case UNCONECTED:
     {
         if(this->checkAndSetJustEntered()){
-            //led rosso
+            this->redLed->switchOn();
+            this->greenLed->switchOff();
         }
         
         this->msgHandler->tryReconection();

@@ -10,11 +10,16 @@
 HWPlatform *pHWPlatform;
 TaskHandle_t Task1;
 
+void Task1code(void* parameter){
+  pHWPlatform = new HWPlatform();
+  HWTask* hwTask = new HWTask(pHWPlatform->getSonar(), pHWPlatform->getRedLed(), pHWPlatform->getGreenLed());
+  hwTask->task(parameter);
+}
+
+
 void setup()
 {
-  pHWPlatform = new HWPlatform();
-  HWTask* hwTask = new HWTask(pHWPlatform->getSonar());
-  xTaskCreatePinnedToCore(&HWTask::taskWrapper,"hwTask",10000,NULL,1,&Task1,0);
+  xTaskCreatePinnedToCore(Task1code,"hwTask",10000,NULL,1,&Task1,0);
 #ifndef __TESTING_HW__
   
 #endif
