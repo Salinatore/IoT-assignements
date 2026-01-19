@@ -1,5 +1,5 @@
 from time import time
-from fastapi import APIRouter
+from fastapi import APIRouter, Query
 
 from model.model import Mode, State, state
 
@@ -50,28 +50,31 @@ async def change_state_to_automatic() -> State:
 
 
 @router.get("/increase_water_level", response_model=State)
-async def increase_water_level() -> State:
+async def increase_water_level(amount: int = Query(default=1)) -> State:
     """
-    [TEST ONLY] Increment the water level by 1.
+    [TEST ONLY] Increase the water level by a specified amount.
 
-    Increases the current water level value by one unit for testing purposes.
+    Increments the current water level and updates the timestamp.
 
+    Args:
+        amount: The amount to increase the water level by (default: 1).
     Returns:
-        State: The updated state object with the new water level.
+        State: The updated state object after water level increase.
     """
-    state.set_level(state._water_level + 1, time())
+    state.set_level(state._water_level + amount, time())
     return state
 
-
 @router.get("/decrease_water_level", response_model=State)
-async def decrease_water_level() -> State:
+async def decrease_water_level(amount: int = Query(default=1)) -> State:
     """
-    [TEST ONLY] Decrement the water level by 1.
+    [TEST ONLY] Decrease the water level by a specified amount.
 
-    Decreases the current water level value by one unit for testing purposes.
+    Decrements the current water level and updates the timestamp.
 
+    Args:
+        amount: The amount to decrease the water level by (default: 1).
     Returns:
-        State: The updated state object with the new water level.
+        State: The updated state object after water level decrease.
     """
-    state.set_level(state._water_level - 1, time())
+    state.set_level(state._water_level - amount, time())
     return state
