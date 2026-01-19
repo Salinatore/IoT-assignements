@@ -3,6 +3,7 @@
 #include "model/HWPlatform.h"
 #include "tasks/TestHWTask.h"
 #include "tasks/HWTask.h"
+#include "kernel/Task.h"
 
 // #define __TESTING_HW__
 
@@ -19,6 +20,8 @@ void Task1code(void* parameter){
 
 void setup()
 {
+  Serial.begin(9600);
+  Serial.println("set up serial");
   xTaskCreatePinnedToCore(Task1code,"hwTask",10000,NULL,1,&Task1,0);
 #ifndef __TESTING_HW__
   

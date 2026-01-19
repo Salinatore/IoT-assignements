@@ -42,6 +42,12 @@ void ConnectionHandlerClass::setUp()
   randomSeed(micros());
   client.setServer(this->mqtt_server, 1883);
   client.setCallback(callback);
+  if(this->isConnected()){
+    Serial.println("connected to server");
+  }
+  else{
+    Serial.println("not connected to server");
+  }
 }
 
 bool ConnectionHandlerClass::isConnected()

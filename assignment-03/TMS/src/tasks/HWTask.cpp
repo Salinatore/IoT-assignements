@@ -4,12 +4,13 @@
 
 HWTask::HWTask(Sonar* pSonar, Led* redLed, Led* greenLed)
 {
+    this->init(4000);
     this->pSonar = pSonar;
     this->redLed = redLed;
     this->greenLed = greenLed;
     this->setState(IDLE);
     this->msgHandler = new MessageHandlerClass(new ConnectionHandlerClass());
-
+    Serial.println("end set up");
 }
 
 void HWTask::task(void * pvParameters)
@@ -25,7 +26,7 @@ void HWTask::task(void * pvParameters)
                 this->tick();
             }
         }
-        
+        delay(1);
     }
     
 }
@@ -43,9 +44,10 @@ void HWTask::tick()
         if(!msgHandler->isConnectionOn()){
             this->setState(UNCONECTED);
         }
-
+        
         float distance = this->pSonar->getDistance();
         this->sendMsg(distance);
+        Serial.println(distance);
         break;
     }
     case UNCONECTED:
@@ -54,7 +56,7 @@ void HWTask::tick()
             this->redLed->switchOn();
             this->greenLed->switchOff();
         }
-        
+        Serial.println("unconected state");
         this->msgHandler->tryReconection();
 
         if(this->msgHandler->isConnectionOn()){
