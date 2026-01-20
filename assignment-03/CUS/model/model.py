@@ -67,6 +67,9 @@ class State(BaseModel):
         self._notify_listeners()
 
     def set_level(self, level: float, current_time: float):
+        if self._mode == Mode.UNCONNECTED:
+            self.set_mode(Mode.AUTOMATIC)
+
         if level < 0:
             logger.error(f"Unexpected water level. Water level: [{level}]")
             return
@@ -78,9 +81,6 @@ class State(BaseModel):
         if self._mode == Mode.AUTOMATIC:
             self._update_opening_presentage(current_time)
 
-        if self._mode == Mode.UNCONNECTED:
-            self.set_mode(Mode.AUTOMATIC)
-
         self._notify_listeners()
 
     def set_opening_percentage(self, opening_percentage: int):
@@ -90,7 +90,9 @@ class State(BaseModel):
             )
             return
 
-        logger.debug(f"Opening percentage set from [{self._opening_percentage}] to [{opening_percentage}]")
+        logger.debug(
+            f"Opening percentage set from [{self._opening_percentage}] to [{opening_percentage}]"
+        )
         self._opening_percentage = opening_percentage
 
         self._notify_listeners()
