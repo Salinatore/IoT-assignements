@@ -10,6 +10,7 @@ MessageHandlerClass::MessageHandlerClass(ConnectionHandlerClass* connection)
     this->setUp();
 }
 
+//all the conection set up in need
 void MessageHandlerClass::setUp()
 {
     this->connection->setUpWifi();
@@ -18,16 +19,19 @@ void MessageHandlerClass::setUp()
     this->connection->setUp();
 }
 
+//return if the connection is on
 bool MessageHandlerClass::isConnectionOn()
 {
     return this->connection->isConnected();
 }
 
+//try to reconnect the connection
 void MessageHandlerClass::tryReconection()
 {
     this->connection->tryReconect();
 }
 
+//send the message to the connection resizing to buffer size
 void MessageHandlerClass::sendMsg(char *msg)
 {
     char mesage[MSG_BUFFER_SIZE];

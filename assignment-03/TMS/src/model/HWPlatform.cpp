@@ -26,9 +26,3 @@ Led*  HWPlatform::getRedLed(){
 Led*  HWPlatform::getGreenLed(){
   return this->gLed;
 }
-
-void HWPlatform::test(){
-
-
-  
-}

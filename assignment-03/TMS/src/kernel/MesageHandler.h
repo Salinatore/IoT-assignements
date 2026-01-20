@@ -5,10 +5,10 @@
 #include "ConnectionHandler.h"
 
 class MessageHandlerClass {
+private:  
     ConnectionHandlerClass* connection;
     void setUp();
     
-
 public:
     MessageHandlerClass(ConnectionHandlerClass* connection);
     bool isConnectionOn();

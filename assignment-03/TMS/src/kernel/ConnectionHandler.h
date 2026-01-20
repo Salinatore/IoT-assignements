@@ -4,6 +4,7 @@
 #include "Arduino.h"
 
 class ConnectionHandlerClass {
+private:
     const char* mqtt_server;
     const char* topic;
 

@@ -2,18 +2,15 @@
 #include <PubSubClient.h>
 #include "ConnectionHandler.h"
 #include "config.h"
+
 #define MSG_BUFFER_SIZE  50
 
 WiFiClient espClient;
 PubSubClient client(espClient);
 
-void callback(char* topic, byte* payload, unsigned int length) {
-  Serial.println(String("Message arrived on [") + topic + "] len: " + length + " txt: " + String((char*)payload, length) );
-}
-
+//set up the wifi an loop until it si connected
 void ConnectionHandlerClass::setUpWifi()
 {
-    delay(10);
     Serial.println(String("Connecting to ") + WIFI_NAME);
     WiFi.mode(WIFI_STA);
     WiFi.begin(WIFI_NAME, WIFI_PW);
@@ -23,25 +20,24 @@ void ConnectionHandlerClass::setUpWifi()
     }
     Serial.println("");
     Serial.println("WiFi connected");
-    Serial.println("IP address: ");
-    Serial.println(WiFi.localIP());
 }
 
+//take the server name form the config 
 void ConnectionHandlerClass::selectMqttServer()
 {
     this->mqtt_server = MQTT_SERVER_NAME;
 }
 
+//take the topic form the form
 void ConnectionHandlerClass::selectMqttServerTopic()
 {
     this->topic = MQTT_TOPIC;
 }
 
+//set up the connection to the mqtt server
 void ConnectionHandlerClass::setUp()
 {
-  randomSeed(micros());
   client.setServer(this->mqtt_server, 1883);
-  client.setCallback(callback);
   if(this->isConnected()){
     Serial.println("connected to server");
   }
@@ -50,11 +46,13 @@ void ConnectionHandlerClass::setUp()
   }
 }
 
+//return it the connection is enstablished
 bool ConnectionHandlerClass::isConnected()
 {
     return client.connected();
 }
 
+//trying to reconnect if the connection is down
 void ConnectionHandlerClass::tryReconect()
 {
     if (!client.connected()) {
@@ -77,6 +75,7 @@ void ConnectionHandlerClass::tryReconect()
   }
 }
 
+//publish the message in the setted topic
 void ConnectionHandlerClass::publish(char* msg)
 {
     client.publish(this->topic, msg);  

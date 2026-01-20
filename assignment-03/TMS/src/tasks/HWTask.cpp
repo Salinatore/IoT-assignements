@@ -4,19 +4,21 @@
 
 HWTask::HWTask(Sonar* pSonar, Led* redLed, Led* greenLed)
 {
-    this->init(4000);
+    this->init(1000);
     this->pSonar = pSonar;
     this->redLed = redLed;
     this->greenLed = greenLed;
     this->setState(IDLE);
     this->msgHandler = new MessageHandlerClass(new ConnectionHandlerClass());
-    Serial.println("end set up");
+    Serial.println("end set up HWtask");
 }
 
-void HWTask::task(void * pvParameters)
+void HWTask::task()
 {
     long cicletime = millis();
+    //infinte loop
     for(;;){
+        //verify if hwtask is active and periodic, in that case call the new tick after the period define in the init
         if(this->isActive()){
             if(this->isPeriodic() && (millis() - cicletime) > this->getPeriod()){
                 cicletime = millis();
@@ -26,6 +28,7 @@ void HWTask::task(void * pvParameters)
                 this->tick();
             }
         }
+        //delaing the cicle so the core can execute backgound task that accomulate
         delay(1);
     }
     
@@ -41,24 +44,27 @@ void HWTask::tick()
             this->greenLed->switchOn();
             this->redLed->switchOff();
         }
+        //verify if the connection is on, else change state
         if(!msgHandler->isConnectionOn()){
-            this->setState(UNCONECTED);
+            this->setState(UNCONNECTED);
         }
-        
+        //read sonar value 
         float distance = this->pSonar->getDistance();
         this->sendMsg(distance);
-        Serial.println(distance);
+        
         break;
     }
-    case UNCONECTED:
+    case UNCONNECTED:
     {
         if(this->checkAndSetJustEntered()){
             this->redLed->switchOn();
             this->greenLed->switchOff();
         }
+
         Serial.println("unconected state");
         this->msgHandler->tryReconection();
 
+        //if is able to reconnect return to idle state 
         if(this->msgHandler->isConnectionOn()){
             this->setState(IDLE);
         }
@@ -84,9 +90,11 @@ bool HWTask::checkAndSetJustEntered()
     return bak;
 }
 
+//after reading the value send the message using the mesage handler
 void HWTask::sendMsg(float value)
 {
     char msg[50];
     snprintf(msg, sizeof(msg), MQTT_PREFIX_MSG "%.2f", value);
     this->msgHandler->sendMsg(msg);
+    Serial.println(msg);
 }

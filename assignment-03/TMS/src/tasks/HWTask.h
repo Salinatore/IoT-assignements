@@ -8,22 +8,15 @@
 #include "config.h"
 #include <Arduino.h>
 
-
 class HWTask : Task{
 public:
     HWTask(Sonar* pSonar, Led* redLed, Led* greenLed);
-    void tick();
-    void task(void * pvParameters);
-
-    static void taskWrapper(void* pvParameters) {
-        HWTask* self = static_cast<HWTask*>(pvParameters);
-        self->task(pvParameters);
-    }
-
+    void task();
 
 private:
-    enum WCSState { IDLE, UNCONECTED } state;
+    enum WCSState { IDLE, UNCONNECTED } state;
 
+    void tick();
     void setState(WCSState state);
     bool checkAndSetJustEntered();
     void sendMsg(float value);
