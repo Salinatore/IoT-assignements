@@ -26,6 +26,7 @@ private:
     HWPlatform* pHW;
 
     bool justEntered;
+    int lastAngle;
 
     ServoMotor* pServo;
     Lcd* pLcd;

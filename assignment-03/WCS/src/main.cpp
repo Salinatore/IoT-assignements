@@ -16,7 +16,7 @@ HWPlatform *pHWPlatform;
 void setup()
 {
   MsgService.init();
-  sched.init(40);
+  sched.init(75);
   Logger.log(":::::: WCS ::::::");
 
   pHWPlatform = new HWPlatform();
@@ -28,7 +28,7 @@ void setup()
     pHWPlatform->getButton(),
     pHWPlatform->getPot()
   );
-  pWCSTask->init(40);
+  pWCSTask->init(70);
   sched.addTask(pWCSTask);
   
 #endif

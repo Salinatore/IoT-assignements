@@ -21,8 +21,12 @@ setup_logging()
 logger: logging.Logger = logging.getLogger(__name__)
 config: Config = Config()
 
-mqtt_connection: MqttConnection = MqttConnection(broker=config.broker, topic=config.topic)
-serial_connection: SerialConnection = SerialConnection(port=config.serial_port, baud=config.baud)
+mqtt_connection: MqttConnection = MqttConnection(
+    broker=config.broker, topic=config.topic
+)
+serial_connection: SerialConnection = SerialConnection(
+    port=config.serial_port, baud=config.baud
+)
 websocket_connection: WebSocketConnection = WebSocketConnection()
 
 mqtt_handler: MqttHandler = MqttHandler(mqtt_connection, state)
@@ -32,12 +36,12 @@ websocket_handler: WebSocketHandler = WebSocketHandler(websocket_connection, sta
 water_level_monitor: WaterLevelMonitor = WaterLevelMonitor(state)
 
 
-def notify_listeners():
-    websocket_handler.send_state_update_to_websocket()
-    serial_handler.send_state_update_to_serial()
-
-
-state.set_listeners(notify_listeners)
+state.set_listeners(
+    on_status_change=serial_handler.send_state_update_to_serial,
+    on_mode_change=websocket_handler.send_mode_update_to_websocket,
+    on_water_level_change=websocket_handler.send_wl_update_to_websocket,
+    on_opening_percetage_change=websocket_handler.send_op_update_to_websocket,
+)
 
 
 @asynccontextmanager
@@ -88,5 +92,5 @@ if __name__ == "__main__":
         "main:app",
         host=config.host,
         port=config.port,
-        reload=config.in_development, # set auto reload only on development
+        reload=config.in_development,  # set auto reload only on development
     )
