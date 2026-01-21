@@ -1,5 +1,5 @@
-# config.py
 from dataclasses import dataclass
+
 
 @dataclass(frozen=True)
 class Config:
@@ -7,7 +7,7 @@ class Config:
     in_development: bool = True
 
     # Serial
-    serial_port: str = "/dev/ttyACM0"
+    serial_port: str = "/dev/tty.usbmodem101"
     baud: int = 115200
 
     # MQTT

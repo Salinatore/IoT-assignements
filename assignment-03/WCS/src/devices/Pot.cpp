@@ -11,7 +11,7 @@ void Potentiometer::sync(){
 }
 
 float Potentiometer::getValue(){
-  return value / 1023.0;
+  return value;
 }
 
 void Potentiometer::updateSyncTime(long time){

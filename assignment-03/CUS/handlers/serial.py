@@ -56,6 +56,9 @@ class SerialHandler:
             self._last_mode = current_mode
 
         if self._last_opening_percentage != current_opening_percentage:
+            if self._state.mode == Mode.LOCAL_MANUAL:
+                return
+
             if not (
                 self._MIN_PERCENTAGE
                 <= current_opening_percentage
@@ -118,6 +121,7 @@ class SerialHandler:
     def _handle_percentage_message(self, msg: str) -> None:
         """Extract and process percentage from message."""
         percentage_str = msg.removeprefix(self._WCS_TO_CUS_OPENING_PERCENTAGE_PREFIX)
+        percentage = None
         try:
             percentage = int(percentage_str)
             self._state.set_opening_percentage(percentage)

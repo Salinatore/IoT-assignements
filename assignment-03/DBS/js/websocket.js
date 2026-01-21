@@ -9,6 +9,7 @@ const connectionStatusTag = document.getElementById("displayConnection");
 
 let currentMode = "NOT AVAILABLE";
 let ws = null;
+let lastWaterLevel = null;
 
 function connect() {
   ws = new WebSocket("ws://localhost:8000/ws");
@@ -19,13 +20,39 @@ function connect() {
   };
 
   ws.onmessage = (event) => {
-    const data = JSON.parse(event.data);
+    const msg = JSON.parse(event.data);
+    console.log(msg);
 
-    updateMode(data.mode);
-    updateOP(data.opening_percentage);
-    updateWaterLevel(data.water_level);
+    const type = msg.type;
+    const data = msg.data;
 
-    addDataPoint(data.water_level, data.timestamp);
+    switch (type) {
+      case "init":
+        updateMode(data.mode);
+        updateOP(data.opening_percentage);
+        updateWaterLevel(data.water_level);
+        addDataPoint(data.water_level, data.timestamp);
+        break;
+
+      case "water_level":
+        updateWaterLevel(data.water_level);
+        addDataPoint(data.water_level, data.timestamp);
+        break;
+
+      case "mode":
+        updateMode(data.mode);
+        break;
+
+      case "opening_percentage":
+        updateOP(data.opening_percentage);
+        break;
+
+      default:  
+        console.log("Not expected json format.")
+        break;
+    }
+
+    
   };
 
   ws.onclose = () => {
@@ -59,7 +86,7 @@ function updateOP(openingPercentage) {
 }
 
 function updateWaterLevel(waterLevel) {
-  waterLevelTag.textContent = waterLevel + " cm";
+  waterLevelTag.textContent = waterLevel + " m";
 }
 
 function handleControlBtn() {

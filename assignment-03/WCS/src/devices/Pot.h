@@ -17,7 +17,7 @@ protected:
 private:
   long lastTimeSync;
   int pin;
-  float value;
+  int value;
 };
 
 #endif

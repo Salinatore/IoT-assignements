@@ -10,7 +10,7 @@ function initChart() {
       labels: [],
       datasets: [
         {
-          label: "Water Level (cm)",
+          label: "Water Level (m)",
           data: [],
           borderColor: "#3498db",
           backgroundColor: "rgba(52, 152, 219, 0.1)",
@@ -30,10 +30,12 @@ function initChart() {
       },
       scales: {
         y: {
+          min: 0,
+          max: 14,
           beginAtZero: true,
           title: {
             display: true,
-            text: "Water Level (cm)",
+            text: "Water Level (m)",
           },
         },
         x: {

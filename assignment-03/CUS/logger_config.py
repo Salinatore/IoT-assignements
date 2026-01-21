@@ -1,8 +1,10 @@
-import logging
-import colorlog
 import json
+import logging
 from datetime import datetime
 from pathlib import Path
+
+import colorlog
+
 
 class _JSONFormatter(logging.Formatter):
     def format(self, record):
@@ -13,11 +15,12 @@ class _JSONFormatter(logging.Formatter):
             "message": record.getMessage(),
             "module": record.module,
             "function": record.funcName,
-            "line": record.lineno
+            "line": record.lineno,
         }
         if record.exc_info:
             log_data["exception"] = self.formatException(record.exc_info)
         return json.dumps(log_data)
+
 
 def setup_logging(log_dir="logs", log_filename="app.log"):
     Path(log_dir).mkdir(exist_ok=True)
@@ -39,7 +42,7 @@ def setup_logging(log_dir="logs", log_filename="app.log"):
     console_handler.setFormatter(console_formatter)
     console_handler.setLevel(logging.INFO)
 
-    file_handler = logging.FileHandler(log_path, mode='w', encoding='utf-8')
+    file_handler = logging.FileHandler(log_path, mode="w", encoding="utf-8")
     file_handler.setFormatter(_JSONFormatter())
     file_handler.setLevel(logging.DEBUG)
 

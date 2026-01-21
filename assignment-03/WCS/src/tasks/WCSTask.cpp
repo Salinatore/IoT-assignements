@@ -90,6 +90,7 @@ void WCSTask::tick()
     {
         if (checkAndSetJustEntered())
         {
+            this->lastAngle = -1;
             Logger.log(F("WCSTask:LOCAL_MANUAL"));
             pLcd->writeModeMessage("LOCAL MANUAL");
         }
@@ -168,8 +169,9 @@ void WCSTask::checkControlMessage(){
         Logger.log(F("Servo angle is chaning"));
         Msg* msg = MsgService.receiveMsg(control);
         int perc = this->msgMotorPerc(msg->getContent());
-        int angle =  map(perc, PERCENTAGE_MIN, PERCENTAGE_MAX, 0, 90);
+        int angle = map(perc, PERCENTAGE_MIN, PERCENTAGE_MAX, 0, 180);
         this->pServo->setPosition(angle);
+        this->pLcd->writePercMessage(String(perc));
         delete msg;
     }
 }
@@ -197,10 +199,15 @@ void WCSTask::checkLocalMessage(){
 void WCSTask::processPotentiometerInput(){
     pPot->sync();
     int potValue = pPot->getValue();
-    int angle = map(potValue, POTENTIOMETER_MIN, POTENTIOMETER_MAX, 0, 90);
+    int angle = map(potValue, POTENTIOMETER_MIN, POTENTIOMETER_MAX, 0, 180);
+    String percentageString = String(map(angle, 0, 180, 0, 100));
     pServo->setPosition(angle);
-    pLcd->writePercMessage(String(angle));
-    MsgService.sendMsg(CONTROL_SEND_MSG+String(angle));
+    String angleString = String(angle);
+    if (this->lastAngle != angle) {
+        this->lastAngle = angle;
+        pLcd->writePercMessage(percentageString);
+    }
+    MsgService.sendMsg(CONTROL_SEND_MSG+percentageString);
 }
 
 void WCSTask::setState(WCSState s)

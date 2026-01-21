@@ -1,5 +1,7 @@
 import asyncio
+import json
 import logging
+from datetime import datetime
 from typing import Literal
 
 from pydantic import BaseModel, Field, TypeAdapter, ValidationError
@@ -51,14 +53,38 @@ class WebSocketHandler:
         """
         asyncio.create_task(self._process_message_from_websocket(msg))
 
-    def send_state_update_to_websocket(self) -> None:
+    def send_mode_update_to_websocket(self) -> None:
         """
-        Broadcast the current state to all connected WebSocket clients.
+        Broadcast the current mode to all connected WebSocket clients.
+
+        Creates a background task without blocking.
+        """
+        self._send_update_to_websocket(("mode", str(self._state.mode)))
+
+    def send_wl_update_to_websocket(self) -> None:
+        """
+        Broadcast the current water level to all connected WebSocket clients.
 
         Creates a background task without blocking.
         """
         asyncio.create_task(
-            self._connection_manager.broadcast(self._state.model_dump_json())
+            self._connection_manager.broadcast(
+                self._create_json_to_websocket(
+                    "water_level",
+                    ("water_level", str(self._state.water_level)),
+                    ("timestamp", datetime.now().isoformat()),
+                )
+            )
+        )
+
+    def send_op_update_to_websocket(self) -> None:
+        """
+        Broadcast the current opening percentage to all connected WebSocket clients.
+
+        Creates a background task without blocking.
+        """
+        self._send_update_to_websocket(
+            ("opening_percentage", str(self._state.opening_percentage))
         )
 
     def generate_state_update(self) -> str:
@@ -68,7 +94,13 @@ class WebSocketHandler:
         Returns:
             JSON string containing the serialized current state
         """
-        return self._state.model_dump_json()
+        return self._create_json_to_websocket(
+            "init",
+            ("mode", self._state.mode),
+            ("opening_percentage", str(self._state.opening_percentage)),
+            ("water_level", str(self._state.water_level)),
+            ("timestamp", datetime.now().isoformat()),
+        )
 
     async def _process_message_from_websocket(self, msg: str) -> None:
         """Parse and route incoming WebSocket messages to appropriate handlers."""
@@ -93,3 +125,36 @@ class WebSocketHandler:
     def _handle_update_op(self, data: _UpdateOpData) -> None:
         """Handle opening percentage update requests."""
         self._state.set_opening_percentage(data.percentage)
+
+    def _send_update_to_websocket(self, *msgs: tuple[str, str]) -> None:
+        """
+        Broadcast updates to all connected WebSocket clients.
+        Creates a background task without blocking.
+
+        Args:
+            *msgs: Variable number of (type, value) tuples to broadcast
+        """
+        for msg_type, value in msgs:
+            asyncio.create_task(
+                self._connection_manager.broadcast(
+                    self._create_json_to_websocket(msg_type, (msg_type, value))
+                )
+            )
+
+    def _create_json_to_websocket(self, type: str, *msgs: tuple[str, str]) -> str:
+        """
+        Create a JSON message for WebSocket communication.
+
+        Args:
+            type: Message type
+            *msgs: Variable number of (key, value) tuples
+
+        Returns:
+            JSON string with type and data fields
+        """
+        return json.dumps(
+            {
+                "type": type,
+                "data": dict(msgs) if msgs else {},
+            }
+        )

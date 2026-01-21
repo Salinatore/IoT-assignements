@@ -47,6 +47,7 @@ class SerialConnection:
         if self._writer:
             while True:
                 msg = await self._command_queue.get()
+                logger.info("HERE:" + msg)
                 self._writer.write((msg + "\n").encode())
                 await self._writer.drain()
                 await asyncio.sleep(0.4)
