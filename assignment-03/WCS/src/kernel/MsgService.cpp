@@ -2,7 +2,6 @@
 #include "MsgService.h"
 
 String content;
-
 MsgServiceClass MsgService;
 
 bool MsgServiceClass::isMsgAvailable(){

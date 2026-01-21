@@ -7,7 +7,6 @@
 class LoggerService {
     
 public: 
-  
   void log(const String& msg);
 };
 
