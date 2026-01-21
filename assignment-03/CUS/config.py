@@ -4,7 +4,7 @@ from dataclasses import dataclass
 @dataclass(frozen=True)
 class Config:
     # Development
-    in_development: bool = True
+    in_development: bool = False
 
     # Serial
     serial_port: str = "/dev/tty.usbmodem101"
