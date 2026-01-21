@@ -11,7 +11,6 @@ class HWPlatform
 
 public:
   HWPlatform();
-  void test();
 
   Sonar *getSonar();
   Led *getRedLed();
