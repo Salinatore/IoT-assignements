@@ -10,8 +10,12 @@ Le specifiche di progetto richiedono l'utilizzo di 4 subsystems da implementare,
     Questo è il modulo più importante: contiene una rappresentazione completa dello stato del sistema.
     Il modello incapsula l’oggetto Stato, che mantiene lo stato attuale del sistema ed è responsabile della gestione delle transizioni. Inoltre, il modulo ha il compito di aggiornare gli altri sottosistemi e di ricevere le richieste di cambio di modalità. Tutte le richieste di cambiamento passano attraverso il modello, che ne verifica la correttezza. 
 
+![Example of incoming message into the cus](imgs/Tasks.png)
+*Caption: Example of incoming message into the cus*
+
 - DBS: subsystem che funge da interfaccia grafica per il sistema. Qui vengono visualizzate informazioni inerenti a tutto il sistema, come livello di acqua e percentuale di apertura. Inoltre l'interfaccia funge anche da pannello per la modalità di controllo remota, permettendo l'apertura e la chiusura della valvola.
 
 ![DBS screenshot](imgs/DBS.png)
+*Caption: DBS screenshot*
 
 - WCS: subsystem responsabile dell'apertura della valvola, azione che viene effettuata una volta ricevuta la comunicazione dal CUS. Oltre a questo il subsystem può attivare la modalita manuale locale per poter controllare manualmente l'apertura della valvola attraverso l'uso di un potenziometro.
