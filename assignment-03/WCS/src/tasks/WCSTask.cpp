@@ -55,7 +55,7 @@ public:
 };
 
 WCSTask::WCSTask(ServoMotor* pServo, Lcd *pLcd, Button *pButton, Potentiometer* pPot) : 
-        pServo(pServo), pLcd(pLcd), pButton(pButton), pPot(pPot)
+    pServo(pServo), pLcd(pLcd), pButton(pButton), pPot(pPot)
 {
     this->setState(AUTOMATIC);    
 }
