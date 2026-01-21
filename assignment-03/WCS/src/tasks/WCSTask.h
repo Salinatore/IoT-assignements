@@ -1,5 +1,5 @@
-#ifndef __ALARM_TASK__
-#define __ALARM_TASK__
+#ifndef __WCS_TASK__
+#define __WCS_TASK__
 
 #include "kernel/Task.h"
 #include "model/HWPlatform.h"
