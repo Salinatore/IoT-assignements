@@ -67,7 +67,7 @@ class State(BaseModel):
         ):
             self.set_mode(Mode.UNCONNECTED)
 
-    def set_mode(self, mode: Mode):
+    def set_mode(self, mode: Mode) -> None:
         if (mode == Mode.LOCAL_MANUAL and self._mode == Mode.REMOTE_MANUAL) or (
             mode == Mode.REMOTE_MANUAL and self._mode == Mode.LOCAL_MANUAL
         ):
@@ -82,7 +82,7 @@ class State(BaseModel):
         self._on_status_change()
         self._on_mode_change()
 
-    def set_level(self, level: float, current_time: float):
+    def set_level(self, level: float, current_time: float) -> None:
         self._time_since_last_wl_update = current_time
         if self._mode == Mode.UNCONNECTED:
             self.set_mode(Mode.AUTOMATIC)
@@ -101,7 +101,7 @@ class State(BaseModel):
         self._on_status_change()
         self._on_water_level_change()
 
-    def set_opening_percentage(self, opening_percentage: int):
+    def set_opening_percentage(self, opening_percentage: int) -> None:
         if not (self._mode == Mode.LOCAL_MANUAL or self._mode == Mode.REMOTE_MANUAL):
             logger.error(
                 f"Cannot change the opening percentage due to the current mode. Current mode: [{self._mode}]"
