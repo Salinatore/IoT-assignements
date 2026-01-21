@@ -1,10 +1,11 @@
 #include "HWPlatform.h"
-#include <Arduino.h>
 #include "devices/ButtonImpl.h"
 #include "kernel/MsgService.h"
 #include "config.h"
 #include "devices/ServoMotorImpl.h"
 #include "kernel/Logger.h"
+#include <Arduino.h>
+
 
 #define TEST_ANGLE 56
 

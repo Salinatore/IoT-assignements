@@ -1,6 +1,6 @@
 #include "tasks/TestHWTask.h"
-#include <Arduino.h>
 #include "config.h"
+#include <Arduino.h>
 
 
 TestHWTask::TestHWTask(HWPlatform* pHW): pHW(pHW){
