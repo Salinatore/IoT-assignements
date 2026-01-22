@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 
 class WebSocketConnection:
-    """Manages WebSocket connections and broadcasting"""
+    """Manages WebSocket connections and broadcasting."""
 
     def __init__(self):
         self._active_connections: Set[WebSocket] = set()
@@ -27,7 +27,7 @@ class WebSocketConnection:
         self._generate_first_msg = generate_first_msg
 
     async def broadcast(self, message: str) -> None:
-        """Send message to all active websockets"""
+        """Send message to all active websockets."""
         disconnected = set()
         for websocket in self._active_connections:
             try:
@@ -38,7 +38,7 @@ class WebSocketConnection:
         self._active_connections.difference_update(disconnected)
 
     async def manage_new_connection(self, websocket: WebSocket) -> None:
-        """Accepts websocket and start to listen for messages continuously"""
+        """Accepts websocket and start to listen for messages continuously."""
         await self._connect(websocket)
 
         await websocket.send_text(self._generate_first_msg())

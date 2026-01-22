@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 
 class SerialHandler:
-    """Handles all communication to and from serial"""
+    """Handles all communication to and from serial."""
 
     # Message protocol constants
     _CUS_TO_WCS_STATUS_AUTOMATIC = "cus->wcs-st-automatic"
