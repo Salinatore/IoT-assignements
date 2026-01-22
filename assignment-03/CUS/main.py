@@ -55,8 +55,7 @@ async def lifespan(app: FastAPI):
     startup_tasks = [
         serial_connection.start(
             message_handler=serial_handler.handle_message_from_serial
-        ),class WebSocketHandler:
-            """Handles all communication to and from websockets."""
+        ),
         mqtt_connection.start(message_handler=mqtt_handler.handle_message_from_mqtt),
         websocket_connection.start(
             message_handeler=websocket_handler.handle_message_from_websocket,
