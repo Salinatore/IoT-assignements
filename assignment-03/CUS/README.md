@@ -1,6 +1,6 @@
 # Control Unit Subsystem
 
-This application is built to control the central part of the system.
+This application is built to control the central part of the Real-Time Water Level Monitor project.
 
 ## Quick Setup
 
