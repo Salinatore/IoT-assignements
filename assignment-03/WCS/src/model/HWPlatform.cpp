@@ -13,7 +13,7 @@
 void wakeUp(){}
 
 HWPlatform::HWPlatform(){
-  this->resetButton = new ButtonImpl(RST_BT_PIN);
+  this->resetButton = new ButtonImpl(BTN);
   this->servo = new ServoMotorImpl(MOTOR_PIN);
   this->lcd = new Lcd();
   this->pot = new Potentiometer(POT_PIN);
